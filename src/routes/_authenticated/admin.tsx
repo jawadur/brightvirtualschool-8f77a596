@@ -1,0 +1,84 @@
+import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { AppHeader } from "@/components/app/AppHeader";
+import { useAuth } from "@/hooks/use-auth";
+import { LayoutGrid, BookOpen, ClipboardList, ShieldAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/_authenticated/admin")({
+  head: () => ({ meta: [{ title: "Admin — Sunrise Virtual School" }] }),
+  component: AdminShell,
+});
+
+function AdminShell() {
+  const { isAdmin, loading, user, refreshRole } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/auth" });
+  }, [loading, user, navigate]);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen">
+        <AppHeader />
+        <main className="max-w-md mx-auto px-4 py-16 text-center">
+          <ShieldAlert className="h-12 w-12 text-primary mx-auto" />
+          <h1 className="mt-4 text-2xl font-extrabold">Admin access required</h1>
+          <p className="mt-2 text-muted-foreground">
+            Your account doesn't have an admin role yet. If you're setting up this school's content,
+            promote yourself below.
+          </p>
+          <Button
+            className="mt-6"
+            onClick={async () => {
+              if (!user) return;
+              const { error } = await supabase.from("user_roles").insert({ user_id: user.id, role: "admin" });
+              if (error) { toast.error(error.message); return; }
+              await refreshRole();
+              toast.success("You're now an admin.");
+            }}
+          >
+            Make me an admin (setup)
+          </Button>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Tip: in production, remove this button and grant admin only to trusted educators.
+          </p>
+        </main>
+      </div>
+    );
+  }
+
+  const tabs = [
+    { to: "/admin", icon: LayoutGrid, label: "Curriculum", exact: true },
+    { to: "/admin/assignments", icon: ClipboardList, label: "Assignments" },
+    { to: "/admin/badges", icon: BookOpen, label: "Badges" },
+  ];
+
+  return (
+    <div className="min-h-screen pb-20 sm:pb-0">
+      <AppHeader />
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <nav className="flex gap-2 mb-4 border-b">
+          {tabs.map(({ to, icon: Icon, label, exact }) => (
+            <Link
+              key={to}
+              to={to}
+              activeOptions={{ exact }}
+              activeProps={{ className: "border-primary text-primary" }}
+              inactiveProps={{ className: "border-transparent text-muted-foreground" }}
+              className="flex items-center gap-2 px-4 py-2 font-bold text-sm border-b-2 -mb-px"
+            >
+              <Icon className="h-4 w-4" /> {label}
+            </Link>
+          ))}
+        </nav>
+        <Outlet />
+      </div>
+    </div>
+  );
+}
