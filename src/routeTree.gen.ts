@@ -21,6 +21,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedStudentRewardsRouteImport } from './routes/_authenticated/student.rewards'
 import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
 import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
+import { Route as AuthenticatedAdminBadgesRouteImport } from './routes/_authenticated/admin.badges'
 import { Route as AuthenticatedAdminAssignmentsRouteImport } from './routes/_authenticated/admin.assignments'
 import { Route as AuthenticatedStudentSubjectSubjectIdRouteImport } from './routes/_authenticated/student.subject.$subjectId'
 import { Route as AuthenticatedStudentLessonLessonIdRouteImport } from './routes/_authenticated/student.lesson.$lessonId'
@@ -91,6 +92,12 @@ const AuthenticatedStudentAttendanceRoute =
     path: '/attendance',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedAdminBadgesRoute =
+  AuthenticatedAdminBadgesRouteImport.update({
+    id: '/badges',
+    path: '/badges',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminAssignmentsRoute =
   AuthenticatedAdminAssignmentsRouteImport.update({
     id: '/assignments',
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/profiles': typeof AuthenticatedProfilesRoute
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
+  '/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/profiles': typeof AuthenticatedProfilesRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
+  '/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/_authenticated/profiles': typeof AuthenticatedProfilesRoute
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
   '/_authenticated/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
+  '/_authenticated/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
   '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/profiles'
     | '/student'
     | '/admin/assignments'
+    | '/admin/badges'
     | '/student/attendance'
     | '/student/progress'
     | '/student/rewards'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/profiles'
     | '/admin/assignments'
+    | '/admin/badges'
     | '/student/attendance'
     | '/student/progress'
     | '/student/rewards'
@@ -232,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profiles'
     | '/_authenticated/student'
     | '/_authenticated/admin/assignments'
+    | '/_authenticated/admin/badges'
     | '/_authenticated/student/attendance'
     | '/_authenticated/student/progress'
     | '/_authenticated/student/rewards'
@@ -337,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentAttendanceRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/admin/badges': {
+      id: '/_authenticated/admin/badges'
+      path: '/badges'
+      fullPath: '/admin/badges'
+      preLoaderRoute: typeof AuthenticatedAdminBadgesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/assignments': {
       id: '/_authenticated/admin/assignments'
       path: '/assignments'
@@ -384,6 +404,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAssignmentsRoute: typeof AuthenticatedAdminAssignmentsRoute
+  AuthenticatedAdminBadgesRoute: typeof AuthenticatedAdminBadgesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminAssignmentAssignmentIdRoute: typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   AuthenticatedAdminLessonLessonIdRoute: typeof AuthenticatedAdminLessonLessonIdRoute
@@ -391,6 +412,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAssignmentsRoute: AuthenticatedAdminAssignmentsRoute,
+  AuthenticatedAdminBadgesRoute: AuthenticatedAdminBadgesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminAssignmentAssignmentIdRoute:
     AuthenticatedAdminAssignmentAssignmentIdRoute,
@@ -450,3 +472,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
