@@ -9,38 +9,210 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
+import { Route as AuthenticatedProfilesRouteImport } from './routes/_authenticated/profiles'
+import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authenticated/student.index'
+import { Route as AuthenticatedStudentRewardsRouteImport } from './routes/_authenticated/student.rewards'
+import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
+import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
+import { Route as AuthenticatedStudentSubjectSubjectIdRouteImport } from './routes/_authenticated/student.subject.$subjectId'
+import { Route as AuthenticatedStudentLessonLessonIdRouteImport } from './routes/_authenticated/student.lesson.$lessonId'
+import { Route as AuthenticatedStudentAssignmentAssignmentIdRouteImport } from './routes/_authenticated/student.assignment.$assignmentId'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedStudentRoute = AuthenticatedStudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfilesRoute = AuthenticatedProfilesRouteImport.update({
+  id: '/profiles',
+  path: '/profiles',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStudentIndexRoute =
+  AuthenticatedStudentIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentRewardsRoute =
+  AuthenticatedStudentRewardsRouteImport.update({
+    id: '/rewards',
+    path: '/rewards',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentProgressRoute =
+  AuthenticatedStudentProgressRouteImport.update({
+    id: '/progress',
+    path: '/progress',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentAttendanceRoute =
+  AuthenticatedStudentAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentSubjectSubjectIdRoute =
+  AuthenticatedStudentSubjectSubjectIdRouteImport.update({
+    id: '/subject/$subjectId',
+    path: '/subject/$subjectId',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentLessonLessonIdRoute =
+  AuthenticatedStudentLessonLessonIdRouteImport.update({
+    id: '/lesson/$lessonId',
+    path: '/lesson/$lessonId',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentAssignmentAssignmentIdRoute =
+  AuthenticatedStudentAssignmentAssignmentIdRouteImport.update({
+    id: '/assignment/$assignmentId',
+    path: '/assignment/$assignmentId',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/profiles': typeof AuthenticatedProfilesRoute
+  '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/student/': typeof AuthenticatedStudentIndexRoute
+  '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
+  '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/profiles': typeof AuthenticatedProfilesRoute
+  '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/student': typeof AuthenticatedStudentIndexRoute
+  '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
+  '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/profiles': typeof AuthenticatedProfilesRoute
+  '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
+  '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/_authenticated/student/': typeof AuthenticatedStudentIndexRoute
+  '/_authenticated/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  '/_authenticated/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
+  '/_authenticated/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/profiles'
+    | '/student'
+    | '/student/attendance'
+    | '/student/progress'
+    | '/student/rewards'
+    | '/student/'
+    | '/student/assignment/$assignmentId'
+    | '/student/lesson/$lessonId'
+    | '/student/subject/$subjectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/profiles'
+    | '/student/attendance'
+    | '/student/progress'
+    | '/student/rewards'
+    | '/student'
+    | '/student/assignment/$assignmentId'
+    | '/student/lesson/$lessonId'
+    | '/student/subject/$subjectId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/_authenticated/profiles'
+    | '/_authenticated/student'
+    | '/_authenticated/student/attendance'
+    | '/_authenticated/student/progress'
+    | '/_authenticated/student/rewards'
+    | '/_authenticated/student/'
+    | '/_authenticated/student/assignment/$assignmentId'
+    | '/_authenticated/student/lesson/$lessonId'
+    | '/_authenticated/student/subject/$subjectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +220,117 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/student': {
+      id: '/_authenticated/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof AuthenticatedStudentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profiles': {
+      id: '/_authenticated/profiles'
+      path: '/profiles'
+      fullPath: '/profiles'
+      preLoaderRoute: typeof AuthenticatedProfilesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/student/': {
+      id: '/_authenticated/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof AuthenticatedStudentIndexRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/rewards': {
+      id: '/_authenticated/student/rewards'
+      path: '/rewards'
+      fullPath: '/student/rewards'
+      preLoaderRoute: typeof AuthenticatedStudentRewardsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/progress': {
+      id: '/_authenticated/student/progress'
+      path: '/progress'
+      fullPath: '/student/progress'
+      preLoaderRoute: typeof AuthenticatedStudentProgressRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/attendance': {
+      id: '/_authenticated/student/attendance'
+      path: '/attendance'
+      fullPath: '/student/attendance'
+      preLoaderRoute: typeof AuthenticatedStudentAttendanceRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/subject/$subjectId': {
+      id: '/_authenticated/student/subject/$subjectId'
+      path: '/subject/$subjectId'
+      fullPath: '/student/subject/$subjectId'
+      preLoaderRoute: typeof AuthenticatedStudentSubjectSubjectIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/lesson/$lessonId': {
+      id: '/_authenticated/student/lesson/$lessonId'
+      path: '/lesson/$lessonId'
+      fullPath: '/student/lesson/$lessonId'
+      preLoaderRoute: typeof AuthenticatedStudentLessonLessonIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/assignment/$assignmentId': {
+      id: '/_authenticated/student/assignment/$assignmentId'
+      path: '/assignment/$assignmentId'
+      fullPath: '/student/assignment/$assignmentId'
+      preLoaderRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
   }
 }
 
+interface AuthenticatedStudentRouteChildren {
+  AuthenticatedStudentAttendanceRoute: typeof AuthenticatedStudentAttendanceRoute
+  AuthenticatedStudentProgressRoute: typeof AuthenticatedStudentProgressRoute
+  AuthenticatedStudentRewardsRoute: typeof AuthenticatedStudentRewardsRoute
+  AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
+  AuthenticatedStudentAssignmentAssignmentIdRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  AuthenticatedStudentLessonLessonIdRoute: typeof AuthenticatedStudentLessonLessonIdRoute
+  AuthenticatedStudentSubjectSubjectIdRoute: typeof AuthenticatedStudentSubjectSubjectIdRoute
+}
+
+const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
+  AuthenticatedStudentAttendanceRoute: AuthenticatedStudentAttendanceRoute,
+  AuthenticatedStudentProgressRoute: AuthenticatedStudentProgressRoute,
+  AuthenticatedStudentRewardsRoute: AuthenticatedStudentRewardsRoute,
+  AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
+  AuthenticatedStudentAssignmentAssignmentIdRoute:
+    AuthenticatedStudentAssignmentAssignmentIdRoute,
+  AuthenticatedStudentLessonLessonIdRoute:
+    AuthenticatedStudentLessonLessonIdRoute,
+  AuthenticatedStudentSubjectSubjectIdRoute:
+    AuthenticatedStudentSubjectSubjectIdRoute,
+}
+
+const AuthenticatedStudentRouteWithChildren =
+  AuthenticatedStudentRoute._addFileChildren(AuthenticatedStudentRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedProfilesRoute: typeof AuthenticatedProfilesRoute
+  AuthenticatedStudentRoute: typeof AuthenticatedStudentRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedProfilesRoute: AuthenticatedProfilesRoute,
+  AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

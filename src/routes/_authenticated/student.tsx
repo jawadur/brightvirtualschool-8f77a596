@@ -1,0 +1,60 @@
+import { createFileRoute, Outlet, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { AppHeader } from "@/components/app/AppHeader";
+import { useStudents } from "@/lib/student-context";
+import { useI18n } from "@/lib/i18n";
+import { Home, BookOpen, Trophy, BarChart3, CalendarCheck } from "lucide-react";
+
+export const Route = createFileRoute("/_authenticated/student")({
+  component: StudentShell,
+});
+
+function StudentShell() {
+  const { activeStudent, isLoading } = useStudents();
+  const { t } = useI18n();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && !activeStudent) navigate({ to: "/profiles" });
+  }, [isLoading, activeStudent, navigate]);
+
+  if (!activeStudent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        {t("loading")}
+      </div>
+    );
+  }
+
+  const tabs = [
+    { to: "/student", icon: Home, label: t("todays_school"), exact: true },
+    { to: "/student/progress", icon: BarChart3, label: t("progress") },
+    { to: "/student/attendance", icon: CalendarCheck, label: t("attendance") },
+    { to: "/student/rewards", icon: Trophy, label: t("trophy_room") },
+  ];
+
+  return (
+    <div className="min-h-screen pb-20 sm:pb-0">
+      <AppHeader showStudent />
+      <main className="max-w-5xl mx-auto px-4 py-4">
+        <Outlet />
+      </main>
+      {/* Bottom nav for mobile / sticky nav for desktop */}
+      <nav className="fixed bottom-0 inset-x-0 sm:static sm:max-w-5xl sm:mx-auto sm:mt-4 bg-card border-t sm:border border-border sm:rounded-2xl sm:px-4 px-2 py-2 flex justify-around sm:justify-center sm:gap-6">
+        {tabs.map(({ to, icon: Icon, label, exact }) => (
+          <Link
+            key={to}
+            to={to}
+            activeOptions={{ exact }}
+            activeProps={{ className: "text-primary" }}
+            inactiveProps={{ className: "text-muted-foreground" }}
+            className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-3 py-1.5 text-xs sm:text-sm font-bold"
+          >
+            <Icon className="h-5 w-5" />
+            <span>{label}</span>
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}

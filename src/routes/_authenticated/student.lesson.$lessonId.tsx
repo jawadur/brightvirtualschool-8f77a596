@@ -1,0 +1,77 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useStudents } from "@/lib/student-context";
+import { useI18n } from "@/lib/i18n";
+import { LessonPlayer } from "@/components/lesson/LessonPlayer";
+import { awardCoins, awardStar, completeLesson, type LessonContent } from "@/lib/data";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Trophy } from "lucide-react";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/_authenticated/student/lesson/$lessonId")({
+  component: LessonPage,
+});
+
+function LessonPage() {
+  const { lessonId } = Route.useParams();
+  const { activeStudent, refresh } = useStudents();
+  const { t, tr } = useI18n();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [finished, setFinished] = useState<null | { score: number; coinsEarned: number }>(null);
+
+  const { data: lesson, isLoading } = useQuery({
+    queryKey: ["lesson", lessonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("lessons")
+        .select("id, title, content, units(subject_id, subjects(id, name))")
+        .eq("id", lessonId).single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading || !lesson) return <div className="text-muted-foreground">{t("loading")}</div>;
+  const content = lesson.content as LessonContent;
+  const steps = Array.isArray(content?.steps) ? content.steps : [];
+
+  if (finished) {
+    return (
+      <Card className="p-8 text-center">
+        <Trophy className="h-16 w-16 mx-auto text-primary" />
+        <h1 className="mt-4 text-3xl font-extrabold">{t("great_job")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("score")}: {finished.score}%</p>
+        <p className="mt-1 font-bold text-coin">+ {finished.coinsEarned} coins</p>
+        <div className="mt-6 flex justify-center gap-3">
+          <Button onClick={() => navigate({ to: "/student" })}>{t("todays_school")}</Button>
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-extrabold">{tr(lesson.title)}</h1>
+      <LessonPlayer
+        steps={steps}
+        onFinished={async ({ score, coinsEarned }) => {
+          if (!activeStudent) return;
+          try {
+            await completeLesson(activeStudent.id, lessonId, score);
+            if (coinsEarned > 0) await awardCoins(activeStudent.id, coinsEarned, { en: "Lesson completed" }, lessonId, "lesson");
+            if (score === 100) await awardStar(activeStudent.id, { en: "Perfect lesson!" }, lessonId, "lesson");
+            refresh();
+            qc.invalidateQueries({ queryKey: ["progress"] });
+            setFinished({ score, coinsEarned });
+          } catch (e) {
+            toast.error((e as Error).message);
+          }
+        }}
+      />
+    </div>
+  );
+}
