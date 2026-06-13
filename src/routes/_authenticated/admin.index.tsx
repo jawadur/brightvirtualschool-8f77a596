@@ -12,9 +12,8 @@ import { I18nField } from "@/components/admin/I18nField";
 import { ChevronRight, Plus, Pencil, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
-const str = (v: unknown): string => (v == null ? "" : String(v));
-const i18n = (v: unknown): Record<string, string> => (v && typeof v === "object" ? (v as Record<string, string>) : {});
-const strOrNull = (v: unknown): string | null => { const s = str(v).trim(); return s ? s : null; };
+// vals are loose; entity inserts cast as needed
+type Vals = Record<string, any>;
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: CurriculumPage,
@@ -419,11 +418,11 @@ function EditEntity({
   fields?: { key: string; label: string; type?: string; placeholder?: string }[];
   i18nFields?: { key: string; label: string }[];
   initial?: Record<string, unknown>;
-  onSubmit: (vals: Record<string, unknown>) => Promise<void>;
+  onSubmit: (vals: Vals) => Promise<void>;
   children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const [vals, setVals] = useState<Record<string, unknown>>(initial);
+  const [vals, setVals] = useState<Vals>(initial);
   const [busy, setBusy] = useState(false);
 
   return (
