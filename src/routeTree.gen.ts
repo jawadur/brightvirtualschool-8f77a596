@@ -14,6 +14,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
 import { Route as AuthenticatedProfilesRouteImport } from './routes/_authenticated/profiles'
+import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authenticated/student.index'
+import { Route as AuthenticatedStudentSubjectSubjectIdRouteImport } from './routes/_authenticated/student.subject.$subjectId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -39,18 +41,33 @@ const AuthenticatedProfilesRoute = AuthenticatedProfilesRouteImport.update({
   path: '/profiles',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStudentIndexRoute =
+  AuthenticatedStudentIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentSubjectSubjectIdRoute =
+  AuthenticatedStudentSubjectSubjectIdRouteImport.update({
+    id: '/subject/$subjectId',
+    path: '/subject/$subjectId',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/profiles': typeof AuthenticatedProfilesRoute
-  '/student': typeof AuthenticatedStudentRoute
+  '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/student/': typeof AuthenticatedStudentIndexRoute
+  '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/profiles': typeof AuthenticatedProfilesRoute
-  '/student': typeof AuthenticatedStudentRoute
+  '/student': typeof AuthenticatedStudentIndexRoute
+  '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -58,13 +75,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/profiles': typeof AuthenticatedProfilesRoute
-  '/_authenticated/student': typeof AuthenticatedStudentRoute
+  '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
+  '/_authenticated/student/': typeof AuthenticatedStudentIndexRoute
+  '/_authenticated/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/profiles' | '/student'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/profiles'
+    | '/student'
+    | '/student/'
+    | '/student/subject/$subjectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/profiles' | '/student'
+  to: '/' | '/auth' | '/profiles' | '/student' | '/student/subject/$subjectId'
   id:
     | '__root__'
     | '/'
@@ -72,6 +97,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/profiles'
     | '/_authenticated/student'
+    | '/_authenticated/student/'
+    | '/_authenticated/student/subject/$subjectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,17 +144,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/student/': {
+      id: '/_authenticated/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof AuthenticatedStudentIndexRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/subject/$subjectId': {
+      id: '/_authenticated/student/subject/$subjectId'
+      path: '/subject/$subjectId'
+      fullPath: '/student/subject/$subjectId'
+      preLoaderRoute: typeof AuthenticatedStudentSubjectSubjectIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
   }
 }
 
+interface AuthenticatedStudentRouteChildren {
+  AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
+  AuthenticatedStudentSubjectSubjectIdRoute: typeof AuthenticatedStudentSubjectSubjectIdRoute
+}
+
+const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
+  AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
+  AuthenticatedStudentSubjectSubjectIdRoute:
+    AuthenticatedStudentSubjectSubjectIdRoute,
+}
+
+const AuthenticatedStudentRouteWithChildren =
+  AuthenticatedStudentRoute._addFileChildren(AuthenticatedStudentRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfilesRoute: typeof AuthenticatedProfilesRoute
-  AuthenticatedStudentRoute: typeof AuthenticatedStudentRoute
+  AuthenticatedStudentRoute: typeof AuthenticatedStudentRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfilesRoute: AuthenticatedProfilesRoute,
-  AuthenticatedStudentRoute: AuthenticatedStudentRoute,
+  AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
