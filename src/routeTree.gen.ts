@@ -26,6 +26,7 @@ import { Route as AuthenticatedStudentSubjectSubjectIdRouteImport } from './rout
 import { Route as AuthenticatedStudentLessonLessonIdRouteImport } from './routes/_authenticated/student.lesson.$lessonId'
 import { Route as AuthenticatedStudentAssignmentAssignmentIdRouteImport } from './routes/_authenticated/student.assignment.$assignmentId'
 import { Route as AuthenticatedAdminLessonLessonIdRouteImport } from './routes/_authenticated/admin.lesson.$lessonId'
+import { Route as AuthenticatedAdminAssignmentAssignmentIdRouteImport } from './routes/_authenticated/admin.assignment.$assignmentId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -120,6 +121,12 @@ const AuthenticatedAdminLessonLessonIdRoute =
     path: '/lesson/$lessonId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAssignmentAssignmentIdRoute =
+  AuthenticatedAdminAssignmentAssignmentIdRouteImport.update({
+    id: '/assignment/$assignmentId',
+    path: '/assignment/$assignmentId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/student/': typeof AuthenticatedStudentIndexRoute
+  '/admin/assignment/$assignmentId': typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   '/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
@@ -150,6 +158,7 @@ export interface FileRoutesByTo {
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/student': typeof AuthenticatedStudentIndexRoute
+  '/admin/assignment/$assignmentId': typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   '/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
@@ -170,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/student/': typeof AuthenticatedStudentIndexRoute
+  '/_authenticated/admin/assignment/$assignmentId': typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   '/_authenticated/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
   '/_authenticated/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/_authenticated/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/student/rewards'
     | '/admin/'
     | '/student/'
+    | '/admin/assignment/$assignmentId'
     | '/admin/lesson/$lessonId'
     | '/student/assignment/$assignmentId'
     | '/student/lesson/$lessonId'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/student/rewards'
     | '/admin'
     | '/student'
+    | '/admin/assignment/$assignmentId'
     | '/admin/lesson/$lessonId'
     | '/student/assignment/$assignmentId'
     | '/student/lesson/$lessonId'
@@ -225,6 +237,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/rewards'
     | '/_authenticated/admin/'
     | '/_authenticated/student/'
+    | '/_authenticated/admin/assignment/$assignmentId'
     | '/_authenticated/admin/lesson/$lessonId'
     | '/_authenticated/student/assignment/$assignmentId'
     | '/_authenticated/student/lesson/$lessonId'
@@ -359,18 +372,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLessonLessonIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/assignment/$assignmentId': {
+      id: '/_authenticated/admin/assignment/$assignmentId'
+      path: '/assignment/$assignmentId'
+      fullPath: '/admin/assignment/$assignmentId'
+      preLoaderRoute: typeof AuthenticatedAdminAssignmentAssignmentIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAssignmentsRoute: typeof AuthenticatedAdminAssignmentsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminAssignmentAssignmentIdRoute: typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   AuthenticatedAdminLessonLessonIdRoute: typeof AuthenticatedAdminLessonLessonIdRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAssignmentsRoute: AuthenticatedAdminAssignmentsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminAssignmentAssignmentIdRoute:
+    AuthenticatedAdminAssignmentAssignmentIdRoute,
   AuthenticatedAdminLessonLessonIdRoute: AuthenticatedAdminLessonLessonIdRoute,
 }
 
@@ -427,3 +450,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
