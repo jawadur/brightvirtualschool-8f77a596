@@ -59,7 +59,8 @@ export function LessonPlayer({
       setFeedback(ok ? "correct" : "wrong");
       if (ok) {
         setCorrectCount((c) => c + 1);
-        if (step.coins) setCoins((c) => c + step.coins);
+        const reward = step.coins ?? 0;
+        if (reward) setCoins((c) => c + reward);
         setCanAdvance(true);
       }
     } else if (step.type === "match_pairs") {
@@ -67,7 +68,8 @@ export function LessonPlayer({
       setFeedback(ok ? "correct" : "wrong");
       if (ok) {
         setCorrectCount((c) => c + 1);
-        if (step.coins) setCoins((c) => c + step.coins);
+        const reward = step.coins ?? 0;
+        if (reward) setCoins((c) => c + reward);
         setCanAdvance(true);
       }
     }
