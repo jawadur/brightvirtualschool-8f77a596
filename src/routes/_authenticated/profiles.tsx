@@ -11,8 +11,10 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, User as UserIcon } from "lucide-react";
+import { Plus, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/profiles")({
   head: () => ({ meta: [{ title: "Choose a learner" }] }),
@@ -23,6 +25,7 @@ function ProfilesPage() {
   const { t, tr } = useI18n();
   const { students, setActiveStudentId, refresh, isLoading } = useStudents();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   const pick = (id: string) => {
     setActiveStudentId(id);
@@ -35,6 +38,13 @@ function ProfilesPage() {
       <main className="max-w-4xl mx-auto px-4 py-10">
         <h1 className="text-4xl font-extrabold text-center">{t("students")}</h1>
         <p className="text-center text-muted-foreground mt-2">Pick a learner to begin today's school.</p>
+        {isAdmin && (
+          <div className="mt-4 text-center">
+            <Link to="/admin" className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-4 py-2 font-bold hover:bg-primary/20">
+              <ShieldCheck className="h-4 w-4" /> Open Admin
+            </Link>
+          </div>
+        )}
 
         <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {isLoading && <div className="col-span-full text-center text-muted-foreground">{t("loading")}</div>}
