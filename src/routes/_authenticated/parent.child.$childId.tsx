@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, CalendarCheck, BookOpen, ClipboardList, ClipboardCheck, Clock, TrendingUp } from "lucide-react";
+import { ChevronLeft, CalendarCheck, BookOpen, ClipboardList, ClipboardCheck, Clock, TrendingUp, GraduationCap, AlertTriangle, Target, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { computeSchoolReadiness } from "@/lib/readiness";
 
 export const Route = createFileRoute("/_authenticated/parent/child/$childId")({
   component: ChildDetail,
@@ -80,6 +82,12 @@ function ChildDetail() {
     },
   });
 
+  const readiness = useQuery({
+    queryKey: ["parent-readiness", childId, child.data?.class_id],
+    enabled: !!child.data?.class_id,
+    queryFn: () => computeSchoolReadiness(childId, [child.data!.class_id!]),
+  });
+
   if (child.isLoading || !child.data) return <p className="text-muted-foreground">Loading…</p>;
 
   const completedLessonIds = new Set(progress.data?.filter((p) => p.status === "completed").map((p) => p.lesson_id));
@@ -122,6 +130,73 @@ function ChildDetail() {
         <SummaryCard icon={<TrendingUp className="h-5 w-5" />} label="Monthly lessons" value={completedThisMonth} />
         <SummaryCard icon={<Clock className="h-5 w-5" />} label="Learning time" value={learningTime} />
       </section>
+
+      {readiness.data && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-extrabold flex items-center gap-2"><GraduationCap className="h-5 w-5 text-primary" /> School Readiness</h2>
+            <Link to="/parent/report/$childId" params={{ childId }}>
+              <Button size="sm" variant="outline" className="gap-1"><FileText className="h-4 w-4" /> Monthly Report</Button>
+            </Link>
+          </div>
+          <Card className="p-5 bg-gradient-to-br from-primary/10 to-accent/20">
+            <div className="flex items-end gap-6">
+              <div className="flex-1">
+                <div className="text-xs font-bold uppercase text-muted-foreground">Overall</div>
+                <div className="text-5xl font-extrabold text-primary">{readiness.data.overall}%</div>
+              </div>
+              <div className="text-right text-xs text-muted-foreground">
+                Attendance {readiness.data.attendancePct}%
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {readiness.data.subjects.map((s) => (
+                <div key={s.subject_id} className="rounded-lg bg-background/60 p-2">
+                  <div className="text-xs font-bold truncate">{tr(s.subject_name)}</div>
+                  <div className="text-lg font-extrabold">{s.score}%</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Card className="p-4">
+              <div className="font-extrabold flex items-center gap-2 text-success"><TrendingUp className="h-4 w-4" /> Strong Areas</div>
+              <ul className="mt-2 text-sm space-y-1">
+                {readiness.data.subjects.filter((s) => s.score >= 75).map((s) => (
+                  <li key={s.subject_id}>• {tr(s.subject_name)} — {s.score}%</li>
+                ))}
+                {readiness.data.subjects.filter((s) => s.score >= 75).length === 0 && (
+                  <li className="text-muted-foreground">Building up — keep practicing daily.</li>
+                )}
+              </ul>
+            </Card>
+            <Card className="p-4">
+              <div className="font-extrabold flex items-center gap-2 text-destructive"><AlertTriangle className="h-4 w-4" /> Needs Improvement</div>
+              <ul className="mt-2 text-sm space-y-1">
+                {readiness.data.weakConcepts.slice(0, 5).map((w) => (
+                  <li key={w.lesson_id}>• {tr(w.subject_name)} — {tr(w.lesson_title)}</li>
+                ))}
+                {readiness.data.weakConcepts.length === 0 && (
+                  <li className="text-muted-foreground">No weak areas — great job!</li>
+                )}
+              </ul>
+            </Card>
+          </div>
+
+          <Card className="p-4">
+            <div className="font-extrabold flex items-center gap-2"><Target className="h-4 w-4 text-primary" /> Recommended Practice</div>
+            <ul className="mt-2 text-sm space-y-1">
+              {readiness.data.recoveryPlan.map((p) => (
+                <li key={p.lesson_id}>• {tr(p.lesson_title)} — {p.minutesPerDay} mins/day × {p.days} days</li>
+              ))}
+              {readiness.data.recoveryPlan.length === 0 && (
+                <li className="text-muted-foreground">No additional practice needed right now.</li>
+              )}
+            </ul>
+          </Card>
+        </section>
+      )}
 
       <section>
         <h2 className="text-lg font-extrabold mb-2">Subject progress</h2>
