@@ -54,7 +54,6 @@ const dict: Record<string, Record<Lang, string>> = {
   no_rewards_yet: { en: "Complete lessons to earn rewards!", hi: "पुरस्कार के लिए पाठ पूरे करें!", te: "పురస్కారాల కోసం పాఠాలు పూర్తి చేయండి!" },
   this_month: { en: "This month", hi: "इस महीने", te: "ఈ నెల" },
   loading: { en: "Loading…", hi: "लोड हो रहा है…", te: "లోడ్ అవుతోంది…" },
-  tests: { en: "Tests", hi: "परीक्षाएँ", te: "పరీక్షలు" } as any,
   start_test: { en: "Start test", hi: "परीक्षा शुरू करें", te: "పరీక్ష ప్రారంభించండి" } as any,
   time_left: { en: "Time left", hi: "बचा समय", te: "మిగిలిన సమయం" } as any,
   passed: { en: "Passed 🎉", hi: "उत्तीर्ण 🎉", te: "ఉత్తీర్ణత 🎉" } as any,
