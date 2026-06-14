@@ -12,9 +12,18 @@ function pickVoice(lang: TtsLang): SpeechSynthesisVoice | undefined {
   if (typeof window === "undefined" || !window.speechSynthesis) return undefined;
   const voices = window.speechSynthesis.getVoices();
   const target = LANG_MAP[lang];
+  const isFemale = (v: SpeechSynthesisVoice) =>
+    /female|woman|girl|samantha|victoria|tessa|fiona|karen|moira|veena|priya|aditi|raveena|geeta|swara|kalpana|lekha|asha/i.test(
+      v.name || "",
+    );
+  const inLang = voices.filter((v) => v.lang === target);
+  const inLangLoose = voices.filter((v) => v.lang?.startsWith(lang));
   return (
-    voices.find((v) => v.lang === target) ||
-    voices.find((v) => v.lang?.startsWith(lang)) ||
+    inLang.find(isFemale) ||
+    inLangLoose.find(isFemale) ||
+    inLang[0] ||
+    inLangLoose[0] ||
+    voices.find(isFemale) ||
     voices.find((v) => v.lang?.startsWith("en"))
   );
 }
