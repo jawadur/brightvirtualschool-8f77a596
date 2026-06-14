@@ -127,8 +127,8 @@ function CurriculumPage() {
   );
 }
 
-function Row({ open, onToggle, label, edit, onDelete }: {
-  open: boolean; onToggle: () => void; label: string; edit?: React.ReactNode; onDelete?: () => void;
+function Row({ open, onToggle, label, edit, onDelete, extra }: {
+  open: boolean; onToggle: () => void; label: string; edit?: React.ReactNode; onDelete?: () => void; extra?: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -136,6 +136,7 @@ function Row({ open, onToggle, label, edit, onDelete }: {
         <ChevronRight className={`h-4 w-4 transition ${open ? "rotate-90" : ""}`} />
         {label}
       </button>
+      {extra}
       {edit}
       {onDelete && (
         <Button size="icon" variant="ghost" onClick={onDelete} aria-label="Delete">
