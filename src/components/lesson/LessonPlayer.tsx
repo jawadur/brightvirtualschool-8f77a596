@@ -280,6 +280,33 @@ function Badge({ children, className }: { children: React.ReactNode; className?:
   return <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-bold ${className ?? ""}`}>{children}</span>;
 }
 
+function extractReadableText(step: LessonStep, tr: (v: any) => string): string {
+  switch (step.type) {
+    case "introduction":
+    case "teacher_explanation":
+      return tr((step as any).text);
+    case "multiple_choice":
+    case "fill_blank":
+    case "picture_question": {
+      const parts: string[] = [tr((step as any).question)];
+      const opts = (step as any).options as any[] | undefined;
+      if (opts?.length) parts.push("Options: " + opts.map((o) => tr(o)).join(", "));
+      return parts.join(". ");
+    }
+    case "match_pairs":
+      return "Match the pairs. " + (step as any).pairs.map((p: any) => `${tr(p.left)} with ${tr(p.right)}`).join(", ");
+    case "drag_drop":
+      return tr((step as any).question);
+    case "audio_placeholder":
+    case "speaking_placeholder":
+      return tr((step as any).instructions ?? (step as any).prompt);
+    case "tracing_activity":
+      return `Trace the letter ${(step as any).letter}. ${tr((step as any).instructions)}`;
+    default:
+      return "";
+  }
+}
+
 function MatchPairs({
   step, matches, setMatches, feedback, canAdvance, onCheck, onNext,
 }: {
