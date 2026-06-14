@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useStudents } from "@/lib/student-context";
 import { useI18n } from "@/lib/i18n";
@@ -8,10 +8,10 @@ import { awardCoins } from "@/lib/data";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Trophy } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { QuestionRenderer, isAnswered, scoreQuestion, type LearningQuestion, type QuestionAnswer } from "@/components/learning/QuestionRenderer";
+import { ChevronLeft, RotateCcw, Trophy } from "lucide-react";
 import { toast } from "sonner";
-
-type Q = { type: string; question: Record<string, string>; options: Record<string, string>[]; answer: number };
 
 export const Route = createFileRoute("/_authenticated/student/assignment/$assignmentId")({
   component: AssignmentPage,
@@ -22,84 +22,140 @@ function AssignmentPage() {
   const { activeStudent, refresh } = useStudents();
   const { t, tr } = useI18n();
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [result, setResult] = useState<null | { score: number; max: number }>(null);
+  const [answers, setAnswers] = useState<Record<number, QuestionAnswer>>({});
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [result, setResult] = useState<null | { score: number; correct: number; total: number; passed: boolean }>(null);
 
   const { data: assignment, isLoading } = useQuery({
     queryKey: ["assignment", assignmentId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("assignments")
-        .select("id, title, instructions, questions, pass_threshold")
-        .eq("id", assignmentId).single();
+        .select("id, title, instructions, questions, pass_threshold, lesson_id, subject_id")
+        .eq("id", assignmentId)
+        .single();
       if (error) throw error;
       return data;
     },
   });
 
-  if (isLoading || !assignment) return <div className="text-muted-foreground">{t("loading")}</div>;
+  const questions = useMemo(() => ((assignment?.questions as LearningQuestion[] | null) ?? []), [assignment]);
+  const answeredCount = questions.filter((question, index) => isAnswered(question, answers[index])).length;
+  const progress = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0;
 
-  const questions = (assignment.questions as Q[]) ?? [];
+  if (isLoading || !assignment) return <div className="text-muted-foreground">{t("loading")}</div>;
 
   const submit = async () => {
     if (!activeStudent) return;
-    let score = 0;
-    questions.forEach((q, i) => { if (answers[i] === q.answer) score += 1; });
-    const pct = Math.round((score / Math.max(1, questions.length)) * 100);
+
+    let correct = 0;
+    questions.forEach((question, index) => {
+      if (scoreQuestion(question, answers[index])) correct += 1;
+    });
+
+    const score = Math.round((correct / Math.max(1, questions.length)) * 100);
+    const passed = score >= (assignment.pass_threshold ?? 60);
+
     try {
       await supabase.from("assignment_submissions").insert({
         student_profile_id: activeStudent.id,
         assignment_id: assignmentId,
-        answers: Object.entries(answers).map(([i, a]) => ({ index: Number(i), answer: a })),
-        score: pct,
+        answers: Object.entries(answers).map(([index, answer]) => ({ index: Number(index), answer })),
+        score,
         max_score: 100,
         status: "completed",
         completed_at: new Date().toISOString(),
+        metadata: { correct, total: questions.length },
       });
-      const coinsEarned = Math.round(pct / 10);
-      if (coinsEarned > 0) await awardCoins(activeStudent.id, coinsEarned, { en: "Assignment completed" }, assignmentId, "assignment");
+
+      const coinsEarned = passed ? Math.max(5, Math.round(score / 10)) : Math.max(1, Math.round(score / 20));
+      await awardCoins(activeStudent.id, coinsEarned, { en: "Assignment completed", hi: "होमवर्क पूरा", te: "హోంవర్క్ పూర్తయింది" }, assignmentId, "assignment");
       refresh();
-      setResult({ score: pct, max: 100 });
-    } catch (e) { toast.error((e as Error).message); }
+      setShowFeedback(true);
+      setResult({ score, correct, total: questions.length, passed });
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
   };
 
   if (result) {
-    const passed = result.score >= (assignment.pass_threshold ?? 60);
     return (
-      <Card className="p-8 text-center">
-        <Trophy className="h-16 w-16 mx-auto text-primary" />
-        <h1 className="mt-4 text-3xl font-extrabold">{passed ? t("great_job") : "Good try!"}</h1>
-        <p className="mt-2 text-muted-foreground">{t("score")}: {result.score}%</p>
-        <Button className="mt-6" onClick={() => navigate({ to: "/student" })}>{t("todays_school")}</Button>
-      </Card>
+      <div className="space-y-4">
+        <Link to="/student" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
+          <ChevronLeft className="h-4 w-4" /> {t("back")}
+        </Link>
+        <Card className="p-8 text-center">
+          <Trophy className={`mx-auto h-16 w-16 ${result.passed ? "text-primary" : "text-muted-foreground"}`} />
+          <h1 className="mt-4 text-3xl font-extrabold">{result.passed ? t("great_job") : t("try_again")}</h1>
+          <p className="mt-2 text-muted-foreground">
+            {t("score")}: {result.score}% · {result.correct}/{result.total}
+          </p>
+          <Badge className="mt-3" variant={result.passed ? "default" : "secondary"}>
+            {result.passed ? "Passed" : "Practice again"}
+          </Badge>
+          <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setAnswers({});
+                setResult(null);
+                setShowFeedback(false);
+              }}
+            >
+              <RotateCcw className="mr-1 h-4 w-4" /> Retry
+            </Button>
+            <Button onClick={() => navigate({ to: "/student" })}>{t("todays_school")}</Button>
+          </div>
+        </Card>
+
+        <div className="space-y-3">
+          {questions.map((question, index) => (
+            <QuestionRenderer
+              key={index}
+              question={question}
+              index={index}
+              answer={answers[index]}
+              onAnswer={(answer) => setAnswers({ ...answers, [index]: answer })}
+              showFeedback={showFeedback}
+            />
+          ))}
+        </div>
+      </div>
     );
   }
 
-  const answered = Object.keys(answers).length;
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold">{tr(assignment.title)}</h1>
-      <p className="text-sm text-muted-foreground">{tr(assignment.instructions)}</p>
-      <Progress value={(answered / questions.length) * 100} />
-      {questions.map((q, i) => (
-        <Card key={i} className="p-5">
-          <div className="font-bold mb-3">{i + 1}. {tr(q.question)}</div>
-          <div className="grid sm:grid-cols-2 gap-2">
-            {q.options.map((opt, j) => (
-              <button
-                key={j}
-                onClick={() => setAnswers({ ...answers, [i]: j })}
-                className={`rounded-2xl border-2 p-3 text-left font-bold transition ${
-                  answers[i] === j ? "border-primary bg-primary/10" : "border-border"
-                }`}
-              >
-                {tr(opt)}
-              </button>
-            ))}
-          </div>
-        </Card>
-      ))}
-      <Button className="w-full" disabled={answered < questions.length} onClick={submit}>{t("submit")}</Button>
+      <Link to="/student" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
+        <ChevronLeft className="h-4 w-4" /> {t("back")}
+      </Link>
+      <div>
+        <h1 className="text-2xl font-extrabold">{tr(assignment.title)}</h1>
+        <p className="text-sm text-muted-foreground">{tr(assignment.instructions)}</p>
+      </div>
+      <div className="sticky top-16 z-10 rounded-2xl bg-background/80 p-3 backdrop-blur">
+        <div className="mb-2 flex justify-between text-sm font-bold">
+          <span>{answeredCount}/{questions.length}</span>
+          <span>{progress}%</span>
+        </div>
+        <Progress value={progress} />
+      </div>
+
+      <div className="space-y-3">
+        {questions.map((question, index) => (
+          <QuestionRenderer
+            key={index}
+            question={question}
+            index={index}
+            answer={answers[index]}
+            onAnswer={(answer) => setAnswers({ ...answers, [index]: answer })}
+          />
+        ))}
+      </div>
+
+      <Button className="w-full" disabled={answeredCount < questions.length} onClick={submit}>
+        {t("submit")}
+      </Button>
     </div>
   );
 }
