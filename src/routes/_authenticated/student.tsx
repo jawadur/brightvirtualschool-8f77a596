@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import { AppHeader } from "@/components/app/AppHeader";
 import { useStudents } from "@/lib/student-context";
 import { useI18n } from "@/lib/i18n";
-import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck } from "lucide-react";
+import { StudentPrefsProvider } from "@/lib/student-prefs";
+import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck, Sparkles, Settings as SettingsIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student")({
   component: StudentShell,
@@ -28,20 +29,23 @@ function StudentShell() {
 
   const tabs = [
     { to: "/student", icon: Home, label: t("todays_school"), exact: true },
+    { to: "/student/brush-up", icon: Sparkles, label: "Brush-Up" },
     { to: "/student/tests", icon: ClipboardCheck, label: t("tests") },
     { to: "/student/progress", icon: BarChart3, label: t("progress") },
     { to: "/student/attendance", icon: CalendarCheck, label: t("attendance") },
     { to: "/student/rewards", icon: Trophy, label: t("trophy_room") },
+    { to: "/student/settings", icon: SettingsIcon, label: "Settings" },
   ];
 
   return (
-    <div className="min-h-screen pb-20 sm:pb-0">
+    <StudentPrefsProvider>
+      <div className="min-h-screen pb-20 sm:pb-0">
       <AppHeader showStudent />
       <main className="max-w-5xl mx-auto px-4 py-4">
         <Outlet />
       </main>
       {/* Bottom nav for mobile / sticky nav for desktop */}
-      <nav className="fixed bottom-0 inset-x-0 sm:static sm:max-w-5xl sm:mx-auto sm:mt-4 bg-card border-t sm:border border-border sm:rounded-2xl sm:px-4 px-2 py-2 flex justify-around sm:justify-center sm:gap-6">
+      <nav className="fixed bottom-0 inset-x-0 sm:static sm:max-w-5xl sm:mx-auto sm:mt-4 bg-card border-t sm:border border-border sm:rounded-2xl sm:px-4 px-2 py-2 flex justify-around sm:justify-center sm:gap-4 overflow-x-auto">
         {tabs.map(({ to, icon: Icon, label, exact }) => (
           <Link
             key={to}
@@ -49,13 +53,14 @@ function StudentShell() {
             activeOptions={{ exact }}
             activeProps={{ className: "text-primary" }}
             inactiveProps={{ className: "text-muted-foreground" }}
-            className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-3 py-1.5 text-xs sm:text-sm font-bold"
+            className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 text-[11px] sm:text-sm font-bold shrink-0"
           >
             <Icon className="h-5 w-5" />
             <span>{label}</span>
           </Link>
         ))}
       </nav>
-    </div>
+      </div>
+    </StudentPrefsProvider>
   );
 }
