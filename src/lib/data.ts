@@ -245,3 +245,47 @@ export async function fetchScheduleStatuses(studentId: string, items: any[]) {
   });
   return { lessonMap, aMap, tMap };
 }
+
+export async function fetchPendingAssignments(studentId: string, classIds: string[]) {
+  if (classIds.length === 0) return [] as any[];
+  const { data: subjects } = await supabase
+    .from("subjects").select("id").in("class_id", classIds);
+  const subjectIds = (subjects ?? []).map((s: any) => s.id);
+  if (subjectIds.length === 0) return [];
+  const { data: assigns } = await supabase
+    .from("assignments")
+    .select("id, title, subject:subjects(id, name, color, icon), metadata")
+    .in("subject_id", subjectIds)
+    .limit(50);
+  const list = (assigns ?? []).filter((a: any) => a.metadata?.published !== false);
+  if (list.length === 0) return [];
+  const { data: subs } = await supabase
+    .from("assignment_submissions")
+    .select("assignment_id, completed_at")
+    .eq("student_profile_id", studentId)
+    .in("assignment_id", list.map((a: any) => a.id));
+  const done = new Set((subs ?? []).filter((s: any) => s.completed_at).map((s: any) => s.assignment_id));
+  return list.filter((a: any) => !done.has(a.id)).slice(0, 6);
+}
+
+export async function fetchPendingTests(studentId: string, classIds: string[]) {
+  if (classIds.length === 0) return [] as any[];
+  const { data: subjects } = await supabase
+    .from("subjects").select("id").in("class_id", classIds);
+  const subjectIds = (subjects ?? []).map((s: any) => s.id);
+  if (subjectIds.length === 0) return [];
+  const { data: tests } = await supabase
+    .from("tests")
+    .select("id, title, scope, subject:subjects(id, name, color, icon), metadata")
+    .in("subject_id", subjectIds)
+    .limit(50);
+  const list = (tests ?? []).filter((t: any) => t.metadata?.published !== false);
+  if (list.length === 0) return [];
+  const { data: atts } = await supabase
+    .from("test_attempts")
+    .select("test_id, completed_at")
+    .eq("student_profile_id", studentId)
+    .in("test_id", list.map((t: any) => t.id));
+  const done = new Set((atts ?? []).filter((a: any) => a.completed_at).map((a: any) => a.test_id));
+  return list.filter((t: any) => !done.has(t.id)).slice(0, 6);
+}
