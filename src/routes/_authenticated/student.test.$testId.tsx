@@ -34,7 +34,7 @@ function TestPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tests")
-        .select("id, title, questions, duration_minutes, pass_threshold, subject_id, scope, subjects(name)")
+        .select("id, title, questions, duration_minutes, pass_threshold, subject_id, scope, metadata, subjects(name)")
         .eq("id", testId)
         .single();
       if (error) throw error;
@@ -42,7 +42,13 @@ function TestPage() {
     },
   });
 
-  const questions = useMemo(() => ((test?.questions as LearningQuestion[] | null) ?? []), [test]);
+  const questions = useMemo(() => {
+    const raw = (test?.questions as LearningQuestion[] | null) ?? [];
+    if ((test?.metadata as any)?.randomize) {
+      return [...raw].sort(() => Math.random() - 0.5);
+    }
+    return raw;
+  }, [test]);
   const answeredCount = questions.filter((question, index) => isAnswered(question, answers[index])).length;
   const progress = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0;
 
