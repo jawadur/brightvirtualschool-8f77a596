@@ -7,57 +7,84 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { I18nField } from "@/components/admin/I18nField";
-import { Plus, Trash2, Save, Library } from "lucide-react";
+import { Trash2, Save, Library } from "lucide-react";
 import { toast } from "sonner";
+import { QuestionEditor, QUESTION_TYPES, emptyQuestion } from "@/components/admin/QuestionEditor";
+import type { LearningQuestion } from "@/components/learning/QuestionRenderer";
 
 export const Route = createFileRoute("/_authenticated/admin/questions")({
   component: QuestionBank,
 });
 
-type Payload = { question: Record<string, string>; options: Record<string, string>[]; answer: number };
-
 function QuestionBank() {
   const qc = useQueryClient();
   const { tr } = useI18n();
   const [subjectId, setSubjectId] = useState("");
+  const [lessonId, setLessonId] = useState("");
+  const [filterSubject, setFilterSubject] = useState("");
   const [difficulty, setDifficulty] = useState("easy");
   const [outcome, setOutcome] = useState("");
-  const [payload, setPayload] = useState<Payload>({
-    question: { en: "" }, options: [{ en: "" }, { en: "" }], answer: 0,
-  });
+  const [audioUrl, setAudioUrl] = useState("");
+  const [question, setQuestion] = useState<LearningQuestion>(emptyQuestion("multiple_choice"));
 
   const subjects = useQuery({
     queryKey: ["all-subjects"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("subjects")
-        .select("id, code, name, classes(code, boards(code))")
+        .select("id, code, name, classes(code, boards(code, is_active))")
         .order("sort_order");
-      if (error) throw error; return data ?? [];
+      if (error) throw error;
+      return (data ?? []).filter((s: any) => s.classes?.boards?.is_active !== false);
     },
   });
 
-  const list = useQuery({
-    queryKey: ["question-bank", subjectId],
+  const lessons = useQuery({
+    queryKey: ["qb-lessons", subjectId],
     queryFn: async () => {
-      let q = supabase.from("question_bank").select("id, payload, difficulty, learning_outcome, subject_id, subjects(code, name)");
-      if (subjectId) q = q.eq("subject_id", subjectId);
-      const { data, error } = await q.order("created_at", { ascending: false }).limit(100);
-      if (error) throw error; return data ?? [];
+      const { data, error } = await supabase
+        .from("lessons")
+        .select("id, code, title, units!inner(subject_id)")
+        .eq("units.subject_id", subjectId)
+        .order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!subjectId,
+  });
+
+  const list = useQuery({
+    queryKey: ["question-bank", filterSubject],
+    queryFn: async () => {
+      let q = supabase
+        .from("question_bank")
+        .select("id, payload, question_type, difficulty, learning_outcome, subject_id, lesson_id, subjects(name)");
+      if (filterSubject) q = q.eq("subject_id", filterSubject);
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(200);
+      if (error) throw error;
+      return data ?? [];
     },
   });
 
   const add = async () => {
     if (!subjectId) { toast.error("Pick a subject"); return; }
+    const { type, ...payload } = question as any;
+    const meta: Record<string, unknown> = {};
+    if (audioUrl) meta.audio_url = audioUrl;
     const { error } = await supabase.from("question_bank").insert({
-      subject_id: subjectId, difficulty, question_type: "multiple_choice",
-      learning_outcome: outcome || null, payload: payload as any,
+      subject_id: subjectId,
+      lesson_id: lessonId || null,
+      difficulty,
+      question_type: type,
+      learning_outcome: outcome || null,
+      payload,
+      metadata: meta,
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Question added");
-    setPayload({ question: { en: "" }, options: [{ en: "" }, { en: "" }], answer: 0 });
+    setQuestion(emptyQuestion(type));
     setOutcome("");
+    setAudioUrl("");
     qc.invalidateQueries({ queryKey: ["question-bank"] });
   };
 
@@ -67,16 +94,26 @@ function QuestionBank() {
         <Library className="h-6 w-6 text-primary" />
         <h1 className="text-2xl font-extrabold">Question Bank</h1>
       </div>
+
       <Card className="p-4 space-y-3">
         <div className="grid sm:grid-cols-3 gap-3">
           <div>
             <Label>Subject</Label>
-            <select value={subjectId} onChange={(e) => setSubjectId(e.target.value)} className="w-full rounded-md border border-input bg-card px-3 py-2">
+            <select value={subjectId} onChange={(e) => { setSubjectId(e.target.value); setLessonId(""); }} className="w-full rounded-md border border-input bg-card px-3 py-2">
               <option value="">Select…</option>
               {(subjects.data ?? []).map((s: any) => (
                 <option key={s.id} value={s.id}>
                   {s.classes?.boards?.code} · {s.classes?.code} · {s.code} ({tr(s.name)})
                 </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label>Lesson (optional)</Label>
+            <select value={lessonId} onChange={(e) => setLessonId(e.target.value)} className="w-full rounded-md border border-input bg-card px-3 py-2" disabled={!subjectId}>
+              <option value="">— Subject-wide —</option>
+              {(lessons.data ?? []).map((l: any) => (
+                <option key={l.id} value={l.id}>{l.code} · {(l.title as any)?.en}</option>
               ))}
             </select>
           </div>
@@ -89,57 +126,60 @@ function QuestionBank() {
             </select>
           </div>
           <div>
+            <Label>Type</Label>
+            <select
+              value={question.type}
+              onChange={(e) => setQuestion(emptyQuestion(e.target.value as LearningQuestion["type"]))}
+              className="w-full rounded-md border border-input bg-card px-3 py-2"
+            >
+              {QUESTION_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+          </div>
+          <div>
             <Label>Learning outcome (optional)</Label>
             <Input value={outcome} onChange={(e) => setOutcome(e.target.value)} placeholder="LO-1.2" />
           </div>
-        </div>
-        <I18nField label="Question" value={payload.question} onChange={(v) => setPayload({ ...payload, question: v })} required />
-        <Label>Options (select correct)</Label>
-        {payload.options.map((opt, i) => (
-          <div key={i} className="flex items-start gap-2 rounded-xl border p-3">
-            <input type="radio" checked={payload.answer === i} onChange={() => setPayload({ ...payload, answer: i })} className="mt-3" />
-            <div className="flex-1">
-              <I18nField label={`Option ${i + 1}`} value={opt} onChange={(v) => {
-                const options = [...payload.options]; options[i] = v;
-                setPayload({ ...payload, options });
-              }} required />
-            </div>
-            <Button size="icon" variant="ghost" onClick={() => {
-              const options = payload.options.filter((_, k) => k !== i);
-              setPayload({ ...payload, options, answer: Math.min(payload.answer, options.length - 1) });
-            }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          <div>
+            <Label>Audio URL (optional)</Label>
+            <Input value={audioUrl} onChange={(e) => setAudioUrl(e.target.value)} placeholder="https://..." />
           </div>
-        ))}
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => setPayload({ ...payload, options: [...payload.options, { en: "" }] })}>
-            <Plus className="h-3 w-3 mr-1" />Option
-          </Button>
-          <div className="flex-1" />
+        </div>
+        <QuestionEditor question={question} onChange={setQuestion} />
+        <div className="flex justify-end">
           <Button onClick={add}><Save className="h-4 w-4 mr-1" />Add to bank</Button>
         </div>
       </Card>
 
-      <h2 className="font-extrabold text-lg">Bank ({list.data?.length ?? 0})</h2>
+      <div className="flex items-end gap-3">
+        <div className="flex-1">
+          <Label>Filter by subject</Label>
+          <select value={filterSubject} onChange={(e) => setFilterSubject(e.target.value)} className="w-full rounded-md border border-input bg-card px-3 py-2">
+            <option value="">All subjects</option>
+            {(subjects.data ?? []).map((s: any) => (
+              <option key={s.id} value={s.id}>{s.classes?.boards?.code} · {s.classes?.code} · {tr(s.name)}</option>
+            ))}
+          </select>
+        </div>
+        <div className="text-sm text-muted-foreground">{list.data?.length ?? 0} questions</div>
+      </div>
+
       <div className="grid gap-2">
-        {(list.data ?? []).map((row: any) => {
-          const p = row.payload as Payload;
-          return (
-            <Card key={row.id} className="p-3 flex items-start gap-3">
-              <div className="flex-1">
-                <div className="font-bold">{tr(p?.question)}</div>
-                <div className="text-xs text-muted-foreground">
-                  {tr(row.subjects?.name)} · {row.difficulty}{row.learning_outcome ? ` · ${row.learning_outcome}` : ""}
-                </div>
+        {(list.data ?? []).map((row: any) => (
+          <Card key={row.id} className="p-3 flex items-start gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="font-bold truncate">{row.payload?.question?.en ?? "(no en)"}</div>
+              <div className="text-xs text-muted-foreground">
+                {tr(row.subjects?.name)} · {row.question_type} · {row.difficulty}{row.learning_outcome ? ` · ${row.learning_outcome}` : ""}
               </div>
-              <Button size="icon" variant="ghost" onClick={async () => {
-                if (!confirm("Delete question?")) return;
-                const { error } = await supabase.from("question_bank").delete().eq("id", row.id);
-                if (error) { toast.error(error.message); return; }
-                qc.invalidateQueries({ queryKey: ["question-bank"] });
-              }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-            </Card>
-          );
-        })}
+            </div>
+            <Button size="icon" variant="ghost" onClick={async () => {
+              if (!confirm("Delete question?")) return;
+              const { error } = await supabase.from("question_bank").delete().eq("id", row.id);
+              if (error) { toast.error(error.message); return; }
+              qc.invalidateQueries({ queryKey: ["question-bank"] });
+            }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </Card>
+        ))}
       </div>
     </div>
   );
