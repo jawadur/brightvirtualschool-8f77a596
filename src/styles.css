@@ -148,7 +148,14 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: 'Nunito', 'Quicksand', system-ui, sans-serif;
+    font-family: 'Nunito', 'Noto Sans Telugu', 'Noto Sans Devanagari', 'Quicksand', system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+  }
+  /* Indic scripts need a bit more line height to avoid clipping */
+  :lang(te), :lang(hi), .indic {
+    line-height: 1.6;
+    word-break: normal;
+    overflow-wrap: anywhere;
   }
   h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; }
 }
@@ -158,6 +165,8 @@
   .shadow-pop { box-shadow: var(--shadow-pop); }
   .text-coin { color: var(--coin); }
   .bg-success { background-color: var(--success); }
+  .no-clip { overflow-wrap: anywhere; word-break: normal; hyphens: auto; }
+  .font-indic { font-family: 'Noto Sans Telugu', 'Noto Sans Devanagari', 'Nunito', sans-serif; }
 }
 
 /* Accessibility preferences applied at <html> level */
