@@ -401,6 +401,7 @@ export type Database = {
           description: Json
           estimated_minutes: number
           id: string
+          is_published: boolean
           lesson_type: Database["public"]["Enums"]["lesson_type"]
           metadata: Json
           sort_order: number
@@ -414,6 +415,7 @@ export type Database = {
           description?: Json
           estimated_minutes?: number
           id?: string
+          is_published?: boolean
           lesson_type?: Database["public"]["Enums"]["lesson_type"]
           metadata?: Json
           sort_order?: number
@@ -427,6 +429,7 @@ export type Database = {
           description?: Json
           estimated_minutes?: number
           id?: string
+          is_published?: boolean
           lesson_type?: Database["public"]["Enums"]["lesson_type"]
           metadata?: Json
           sort_order?: number
