@@ -69,7 +69,7 @@ function QuestionBank() {
   const add = async () => {
     if (!subjectId) { toast.error("Pick a subject"); return; }
     const { type, ...payload } = question as any;
-    const meta: Record<string, unknown> = {};
+    const meta: Record<string, string> = {};
     if (audioUrl) meta.audio_url = audioUrl;
     const { error } = await supabase.from("question_bank").insert({
       subject_id: subjectId,
@@ -78,7 +78,7 @@ function QuestionBank() {
       question_type: type,
       learning_outcome: outcome || null,
       payload,
-      metadata: meta,
+      metadata: meta as any,
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Question added");
