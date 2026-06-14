@@ -17,7 +17,12 @@ interface ReadAloudProps {
 /** Speaker button wired to browser SpeechSynthesis + per-student preferences. */
 export function ReadAloud({ text, lang = "en", variant = "icon", autoStart = false, label, className }: ReadAloudProps) {
   const { prefs } = useStudentPrefs();
-  const { supported, speak, pause, resume, stop, speaking, paused } = useTts(lang, prefs.speech_rate);
+  const { supported, speak, pause, resume, stop, speaking, paused } = useTts(lang, {
+    rate: prefs.speech_rate,
+    pitch: prefs.speech_pitch,
+    volume: prefs.speech_volume,
+    voiceURI: prefs.preferred_voice_uri,
+  });
   const full = Array.isArray(text) ? text.filter(Boolean).join(". ") : text;
 
   useEffect(() => {

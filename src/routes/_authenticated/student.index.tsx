@@ -27,6 +27,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { fetchTodayRevision } from "@/lib/revision";
+import { fetchHomework, summarizeHomework } from "@/lib/homework";
+import { ClipboardList } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -119,6 +121,8 @@ function TodaysSchool() {
       {nextUp && <ContinueLearningCard next={nextUp} tr={tr} />}
 
       {activeStudent && <TodaysRevisionWidget studentId={activeStudent.id} />}
+
+      {activeStudent && <TodaysHomeworkWidget studentId={activeStudent.id} />}
 
       {pct === 100 && totalSubjects > 0 && <DailySummary enriched={enriched} tr={tr} />}
 
@@ -362,6 +366,29 @@ function TodaysRevisionWidget({ studentId }: { studentId: string }) {
               <div className="text-muted-foreground">{r.label}</div>
             </div>
           ))}
+        </div>
+      </Card>
+    </Link>
+  );
+}
+
+function TodaysHomeworkWidget({ studentId }: { studentId: string }) {
+  const { data = [] } = useQuery({
+    queryKey: ["homework", studentId],
+    queryFn: () => fetchHomework(studentId),
+  });
+  const s = summarizeHomework(data);
+  if (data.length === 0) return null;
+  return (
+    <Link to="/student/homework">
+      <Card className="p-5 hover:shadow-pop transition cursor-pointer bg-gradient-to-r from-accent to-primary/10">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-primary/15 flex items-center justify-center"><ClipboardList className="h-6 w-6 text-primary" /></div>
+          <div className="min-w-0">
+            <div className="text-xs font-bold uppercase text-primary">Today's Homework</div>
+            <div className="font-extrabold truncate">{s.pending.length} pending · {s.completed.length} done{s.overdue.length ? ` · ${s.overdue.length} overdue` : ""}</div>
+          </div>
+          <ArrowRight className="h-5 w-5 text-primary" />
         </div>
       </Card>
     </Link>

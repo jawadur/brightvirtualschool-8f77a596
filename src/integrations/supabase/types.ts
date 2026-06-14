@@ -412,6 +412,86 @@ export type Database = {
           },
         ]
       }
+      homework: {
+        Row: {
+          assigned_date: string
+          assignment_id: string | null
+          completed_at: string | null
+          created_at: string
+          due_date: string
+          id: string
+          kind: string
+          lesson_id: string | null
+          notes: string | null
+          score: number | null
+          student_profile_id: string
+          subject_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_date?: string
+          assignment_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string
+          id?: string
+          kind: string
+          lesson_id?: string | null
+          notes?: string | null
+          score?: number | null
+          student_profile_id: string
+          subject_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_date?: string
+          assignment_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string
+          id?: string
+          kind?: string
+          lesson_id?: string | null
+          notes?: string | null
+          score?: number | null
+          student_profile_id?: string
+          subject_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homework_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "homework_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "homework_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "homework_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lesson_objectives: {
         Row: {
           id: string
@@ -775,6 +855,44 @@ export type Database = {
           },
         ]
       }
+      reading_sessions: {
+        Row: {
+          completed_at: string
+          duration_sec: number
+          id: string
+          language: string
+          passage_id: string
+          student_profile_id: string
+          words_read: number
+        }
+        Insert: {
+          completed_at?: string
+          duration_sec?: number
+          id?: string
+          language?: string
+          passage_id: string
+          student_profile_id: string
+          words_read?: number
+        }
+        Update: {
+          completed_at?: string
+          duration_sec?: number
+          id?: string
+          language?: string
+          passage_id?: string
+          student_profile_id?: string
+          words_read?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_sessions_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       revision_items: {
         Row: {
           category: string
@@ -1043,13 +1161,57 @@ export type Database = {
           },
         ]
       }
+      student_journey_events: {
+        Row: {
+          description: string | null
+          event_type: string
+          icon: string | null
+          id: string
+          occurred_at: string
+          payload: Json
+          student_profile_id: string
+          title: string
+        }
+        Insert: {
+          description?: string | null
+          event_type: string
+          icon?: string | null
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          student_profile_id: string
+          title: string
+        }
+        Update: {
+          description?: string | null
+          event_type?: string
+          icon?: string | null
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          student_profile_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_journey_events_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_preferences: {
         Row: {
           auto_read_lesson: boolean
           high_contrast: boolean
           larger_text: boolean
           metadata: Json
+          preferred_voice_uri: string | null
+          speech_pitch: number
           speech_rate: number
+          speech_volume: number
           student_profile_id: string
           updated_at: string
           voice_reader: boolean
@@ -1059,7 +1221,10 @@ export type Database = {
           high_contrast?: boolean
           larger_text?: boolean
           metadata?: Json
+          preferred_voice_uri?: string | null
+          speech_pitch?: number
           speech_rate?: number
+          speech_volume?: number
           student_profile_id: string
           updated_at?: string
           voice_reader?: boolean
@@ -1069,7 +1234,10 @@ export type Database = {
           high_contrast?: boolean
           larger_text?: boolean
           metadata?: Json
+          preferred_voice_uri?: string | null
+          speech_pitch?: number
           speech_rate?: number
+          speech_volume?: number
           student_profile_id?: string
           updated_at?: string
           voice_reader?: boolean
@@ -1095,6 +1263,7 @@ export type Database = {
           current_streak: number
           date_of_birth: string | null
           display_name: string
+          homework_streak: number
           id: string
           last_attendance_date: string | null
           longest_streak: number
@@ -1102,6 +1271,8 @@ export type Database = {
           owner_user_id: string | null
           pin: string | null
           preferred_language: string
+          reading_streak: number
+          revision_streak: number
           stars: number
           updated_at: string
         }
@@ -1115,6 +1286,7 @@ export type Database = {
           current_streak?: number
           date_of_birth?: string | null
           display_name: string
+          homework_streak?: number
           id?: string
           last_attendance_date?: string | null
           longest_streak?: number
@@ -1122,6 +1294,8 @@ export type Database = {
           owner_user_id?: string | null
           pin?: string | null
           preferred_language?: string
+          reading_streak?: number
+          revision_streak?: number
           stars?: number
           updated_at?: string
         }
@@ -1135,6 +1309,7 @@ export type Database = {
           current_streak?: number
           date_of_birth?: string | null
           display_name?: string
+          homework_streak?: number
           id?: string
           last_attendance_date?: string | null
           longest_streak?: number
@@ -1142,6 +1317,8 @@ export type Database = {
           owner_user_id?: string | null
           pin?: string | null
           preferred_language?: string
+          reading_streak?: number
+          revision_streak?: number
           stars?: number
           updated_at?: string
         }
@@ -1432,6 +1609,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      writing_practice_completions: {
+        Row: {
+          accuracy: number | null
+          completed_at: string
+          glyph: string
+          id: string
+          script: string
+          strokes: number
+          student_profile_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          completed_at?: string
+          glyph: string
+          id?: string
+          script: string
+          strokes?: number
+          student_profile_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          completed_at?: string
+          glyph?: string
+          id?: string
+          script?: string
+          strokes?: number
+          student_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "writing_practice_completions_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

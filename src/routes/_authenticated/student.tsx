@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/app/AppHeader";
 import { useStudents } from "@/lib/student-context";
 import { useI18n } from "@/lib/i18n";
 import { StudentPrefsProvider } from "@/lib/student-prefs";
-import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck, Sparkles, Settings as SettingsIcon, LineChart, GraduationCap, RefreshCcw } from "lucide-react";
+import { Home, Trophy, BarChart3, ClipboardCheck, Sparkles, Settings as SettingsIcon, GraduationCap, RefreshCcw, ClipboardList, PencilLine, BookOpen, BookHeart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student")({
   component: StudentShell,
@@ -29,13 +29,15 @@ function StudentShell() {
 
   const tabs = [
     { to: "/student", icon: Home, label: t("todays_school"), exact: true },
+    { to: "/student/classroom", icon: GraduationCap, label: "Classroom" },
+    { to: "/student/homework", icon: ClipboardList, label: "Homework" },
     { to: "/student/brush-up", icon: Sparkles, label: "Brush-Up" },
-    { to: "/student/readiness", icon: GraduationCap, label: "Readiness" },
+    { to: "/student/read-along", icon: BookOpen, label: "Read Along" },
+    { to: "/student/writing", icon: PencilLine, label: "Writing" },
+    { to: "/student/readiness", icon: BookHeart, label: "Readiness" },
     { to: "/student/revision-center", icon: RefreshCcw, label: "Revision" },
     { to: "/student/tests", icon: ClipboardCheck, label: t("tests") },
-    { to: "/student/progress", icon: BarChart3, label: t("progress") },
-    { to: "/student/analytics", icon: LineChart, label: "Analytics" },
-    { to: "/student/attendance", icon: CalendarCheck, label: t("attendance") },
+    { to: "/student/portfolio", icon: BarChart3, label: "Journey" },
     { to: "/student/rewards", icon: Trophy, label: t("trophy_room") },
     { to: "/student/settings", icon: SettingsIcon, label: "Settings" },
   ];

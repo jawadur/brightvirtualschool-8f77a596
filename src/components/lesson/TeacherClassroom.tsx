@@ -54,7 +54,7 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
   const { prefs } = useStudentPrefs();
   const { tr } = useI18n();
   const qc = useQueryClient();
-  const tts = useTts(lang, 0.85);
+  const tts = useTts(lang, { rate: 0.85 });
 
   const stagesQ = useQuery({
     queryKey: ["lesson-stages", lessonId],
