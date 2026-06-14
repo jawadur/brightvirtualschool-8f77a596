@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/app/AppHeader";
 import { useStudents } from "@/lib/student-context";
 import { useI18n } from "@/lib/i18n";
 import { StudentPrefsProvider } from "@/lib/student-prefs";
-import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck, Sparkles, Settings as SettingsIcon } from "lucide-react";
+import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck, Sparkles, Settings as SettingsIcon, LineChart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student")({
   component: StudentShell,
@@ -32,6 +32,7 @@ function StudentShell() {
     { to: "/student/brush-up", icon: Sparkles, label: "Brush-Up" },
     { to: "/student/tests", icon: ClipboardCheck, label: t("tests") },
     { to: "/student/progress", icon: BarChart3, label: t("progress") },
+    { to: "/student/analytics", icon: LineChart, label: "Analytics" },
     { to: "/student/attendance", icon: CalendarCheck, label: t("attendance") },
     { to: "/student/rewards", icon: Trophy, label: t("trophy_room") },
     { to: "/student/settings", icon: SettingsIcon, label: "Settings" },
