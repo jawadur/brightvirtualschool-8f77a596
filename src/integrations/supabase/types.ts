@@ -471,6 +471,68 @@ export type Database = {
           },
         ]
       }
+      lesson_stages: {
+        Row: {
+          created_at: string
+          explanation: Json
+          id: string
+          image_url: string | null
+          lesson_id: string
+          narration_en: string | null
+          narration_hi: string | null
+          narration_te: string | null
+          pass_threshold: number
+          questions: Json
+          slides: Json
+          sort_order: number
+          stage_type: Database["public"]["Enums"]["lesson_stage_type"]
+          title: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          explanation?: Json
+          id?: string
+          image_url?: string | null
+          lesson_id: string
+          narration_en?: string | null
+          narration_hi?: string | null
+          narration_te?: string | null
+          pass_threshold?: number
+          questions?: Json
+          slides?: Json
+          sort_order?: number
+          stage_type: Database["public"]["Enums"]["lesson_stage_type"]
+          title?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          explanation?: Json
+          id?: string
+          image_url?: string | null
+          lesson_id?: string
+          narration_en?: string | null
+          narration_hi?: string | null
+          narration_te?: string | null
+          pass_threshold?: number
+          questions?: Json
+          slides?: Json
+          sort_order?: number
+          stage_type?: Database["public"]["Enums"]["lesson_stage_type"]
+          title?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_stages_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
           code: string
@@ -1100,6 +1162,60 @@ export type Database = {
           },
         ]
       }
+      student_stage_progress: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          lesson_id: string
+          score: number | null
+          stage_type: Database["public"]["Enums"]["lesson_stage_type"]
+          student_profile_id: string
+          time_spent_seconds: number
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          score?: number | null
+          stage_type: Database["public"]["Enums"]["lesson_stage_type"]
+          student_profile_id: string
+          time_spent_seconds?: number
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          score?: number | null
+          stage_type?: Database["public"]["Enums"]["lesson_stage_type"]
+          student_profile_id?: string
+          time_spent_seconds?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_stage_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_stage_progress_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subjects: {
         Row: {
           class_id: string
@@ -1346,6 +1462,16 @@ export type Database = {
         | "reading"
       app_role: "admin" | "teacher" | "parent" | "student"
       calendar_event_type: "holiday" | "event" | "exam" | "break"
+      lesson_stage_type:
+        | "welcome"
+        | "concept"
+        | "example1"
+        | "example2"
+        | "guided"
+        | "independent"
+        | "assignment"
+        | "test"
+        | "revision"
       lesson_type:
         | "video"
         | "teacher_explanation"
@@ -1504,6 +1630,17 @@ export const Constants = {
       ],
       app_role: ["admin", "teacher", "parent", "student"],
       calendar_event_type: ["holiday", "event", "exam", "break"],
+      lesson_stage_type: [
+        "welcome",
+        "concept",
+        "example1",
+        "example2",
+        "guided",
+        "independent",
+        "assignment",
+        "test",
+        "revision",
+      ],
       lesson_type: [
         "video",
         "teacher_explanation",

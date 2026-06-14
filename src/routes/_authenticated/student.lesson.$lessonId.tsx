@@ -8,7 +8,7 @@ import { LessonPlayer } from "@/components/lesson/LessonPlayer";
 import { awardCoins, awardStar, completeLesson, type LessonContent } from "@/lib/data";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Trophy } from "lucide-react";
+import { Sparkles, Trophy, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/student/lesson/$lessonId")({
@@ -55,7 +55,13 @@ function LessonPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold">{tr(lesson.title)}</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="text-2xl font-extrabold no-clip flex-1 min-w-0">{tr(lesson.title)}</h1>
+        <Button asChild variant="outline" className="gap-2">
+          <a href={`/student/classroom/${lessonId}`}><GraduationCap className="h-4 w-4" /> Virtual Classroom</a>
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">For a teacher-led, step-by-step lesson, open the Virtual Classroom.</p>
       <LessonPlayer
         steps={steps}
         onFinished={async ({ score, coinsEarned }) => {
