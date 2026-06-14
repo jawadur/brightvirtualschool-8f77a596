@@ -41,6 +41,7 @@ import { Route as AuthenticatedStudentTestTestIdRouteImport } from './routes/_au
 import { Route as AuthenticatedStudentSubjectSubjectIdRouteImport } from './routes/_authenticated/student.subject.$subjectId'
 import { Route as AuthenticatedStudentProgramClassIdRouteImport } from './routes/_authenticated/student.program.$classId'
 import { Route as AuthenticatedStudentLessonLessonIdRouteImport } from './routes/_authenticated/student.lesson.$lessonId'
+import { Route as AuthenticatedStudentClassroomLessonIdRouteImport } from './routes/_authenticated/student.classroom.$lessonId'
 import { Route as AuthenticatedStudentAssignmentAssignmentIdRouteImport } from './routes/_authenticated/student.assignment.$assignmentId'
 import { Route as AuthenticatedParentChildChildIdRouteImport } from './routes/_authenticated/parent.child.$childId'
 import { Route as AuthenticatedAdminTestTestIdRouteImport } from './routes/_authenticated/admin.test.$testId'
@@ -228,6 +229,12 @@ const AuthenticatedStudentLessonLessonIdRoute =
     path: '/lesson/$lessonId',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedStudentClassroomLessonIdRoute =
+  AuthenticatedStudentClassroomLessonIdRouteImport.update({
+    id: '/classroom/$lessonId',
+    path: '/classroom/$lessonId',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 const AuthenticatedStudentAssignmentAssignmentIdRoute =
   AuthenticatedStudentAssignmentAssignmentIdRouteImport.update({
     id: '/assignment/$assignmentId',
@@ -292,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
   '/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  '/student/classroom/$lessonId': typeof AuthenticatedStudentClassroomLessonIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
   '/student/program/$classId': typeof AuthenticatedStudentProgramClassIdRoute
   '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
@@ -327,6 +335,7 @@ export interface FileRoutesByTo {
   '/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
   '/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  '/student/classroom/$lessonId': typeof AuthenticatedStudentClassroomLessonIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
   '/student/program/$classId': typeof AuthenticatedStudentProgramClassIdRoute
   '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
@@ -367,6 +376,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
   '/_authenticated/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
   '/_authenticated/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  '/_authenticated/student/classroom/$lessonId': typeof AuthenticatedStudentClassroomLessonIdRoute
   '/_authenticated/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
   '/_authenticated/student/program/$classId': typeof AuthenticatedStudentProgramClassIdRoute
   '/_authenticated/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/admin/test/$testId'
     | '/parent/child/$childId'
     | '/student/assignment/$assignmentId'
+    | '/student/classroom/$lessonId'
     | '/student/lesson/$lessonId'
     | '/student/program/$classId'
     | '/student/subject/$subjectId'
@@ -442,6 +453,7 @@ export interface FileRouteTypes {
     | '/admin/test/$testId'
     | '/parent/child/$childId'
     | '/student/assignment/$assignmentId'
+    | '/student/classroom/$lessonId'
     | '/student/lesson/$lessonId'
     | '/student/program/$classId'
     | '/student/subject/$subjectId'
@@ -481,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/test/$testId'
     | '/_authenticated/parent/child/$childId'
     | '/_authenticated/student/assignment/$assignmentId'
+    | '/_authenticated/student/classroom/$lessonId'
     | '/_authenticated/student/lesson/$lessonId'
     | '/_authenticated/student/program/$classId'
     | '/_authenticated/student/subject/$subjectId'
@@ -720,6 +733,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentLessonLessonIdRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/student/classroom/$lessonId': {
+      id: '/_authenticated/student/classroom/$lessonId'
+      path: '/classroom/$lessonId'
+      fullPath: '/student/classroom/$lessonId'
+      preLoaderRoute: typeof AuthenticatedStudentClassroomLessonIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
     '/_authenticated/student/assignment/$assignmentId': {
       id: '/_authenticated/student/assignment/$assignmentId'
       path: '/assignment/$assignmentId'
@@ -818,6 +838,7 @@ interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentTestsRoute: typeof AuthenticatedStudentTestsRoute
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
   AuthenticatedStudentAssignmentAssignmentIdRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRoute
+  AuthenticatedStudentClassroomLessonIdRoute: typeof AuthenticatedStudentClassroomLessonIdRoute
   AuthenticatedStudentLessonLessonIdRoute: typeof AuthenticatedStudentLessonLessonIdRoute
   AuthenticatedStudentProgramClassIdRoute: typeof AuthenticatedStudentProgramClassIdRoute
   AuthenticatedStudentSubjectSubjectIdRoute: typeof AuthenticatedStudentSubjectSubjectIdRoute
@@ -837,6 +858,8 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
   AuthenticatedStudentAssignmentAssignmentIdRoute:
     AuthenticatedStudentAssignmentAssignmentIdRoute,
+  AuthenticatedStudentClassroomLessonIdRoute:
+    AuthenticatedStudentClassroomLessonIdRoute,
   AuthenticatedStudentLessonLessonIdRoute:
     AuthenticatedStudentLessonLessonIdRoute,
   AuthenticatedStudentProgramClassIdRoute:
