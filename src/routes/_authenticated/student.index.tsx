@@ -22,7 +22,9 @@ import {
   CheckCircle2,
   Lock,
   CalendarX,
+  ArrowRight,
 } from "lucide-react";
+import { fetchTodayRevision } from "@/lib/revision";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -113,6 +115,8 @@ function TodaysSchool() {
       </section>
 
       {nextUp && <ContinueLearningCard next={nextUp} tr={tr} />}
+
+      {activeStudent && <TodaysRevisionWidget studentId={activeStudent.id} />}
 
       {pct === 100 && totalSubjects > 0 && <DailySummary enriched={enriched} tr={tr} />}
 
@@ -315,5 +319,45 @@ function DailySummary({ enriched, tr }: { enriched: any[]; tr: (v: any) => strin
         </div>
       </div>
     </Card>
+  );
+}
+
+function TodaysRevisionWidget({ studentId }: { studentId: string }) {
+  const { data: groups } = useQuery({
+    queryKey: ["today-revision", studentId],
+    queryFn: () => fetchTodayRevision(studentId, 5),
+  });
+  if (!groups) return null;
+  const rows = [
+    { code: "telugu", label: "Telugu", emoji: "🌼", count: groups.telugu?.length ?? 0 },
+    { code: "hindi", label: "Hindi", emoji: "🪷", count: groups.hindi?.length ?? 0 },
+    { code: "english", label: "English", emoji: "📚", count: groups.english?.length ?? 0 },
+    { code: "math", label: "Maths", emoji: "🔢", count: groups.math?.length ?? 0 },
+  ];
+  const total = rows.reduce((n, r) => n + r.count, 0);
+  if (total === 0) return null;
+  return (
+    <Link to="/student/brush-up">
+      <Card className="p-5 hover:shadow-pop transition cursor-pointer bg-gradient-to-r from-secondary/40 to-accent">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-primary/15 flex items-center justify-center"><Sparkles className="h-6 w-6 text-primary" /></div>
+          <div className="flex-1">
+            <div className="text-xs font-bold uppercase text-primary">Today's Revision · ~10 min</div>
+            <div className="font-extrabold">Daily Brush-Up — {total} quick items</div>
+            <div className="text-xs text-muted-foreground">20% revision + 80% new learning keeps memory strong</div>
+          </div>
+          <ArrowRight className="h-5 w-5 text-primary" />
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-2 text-center text-xs">
+          {rows.map((r) => (
+            <div key={r.code} className="rounded-xl bg-background/60 py-2">
+              <div className="text-base">{r.emoji}</div>
+              <div className="font-bold">{r.count}</div>
+              <div className="text-muted-foreground">{r.label}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </Link>
   );
 }

@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ReadAloud } from "@/components/app/ReadAloud";
 
 export type I18nText = Record<string, string> | string;
 
@@ -106,13 +107,18 @@ export function QuestionRenderer({
 
   if (question.type === "multiple_choice" || question.type === "picture_question") {
     const selected = answer?.type === "choice" ? answer.value : undefined;
+    const speechText = [
+      tr(question.question),
+      ...(question.options ?? []).map((o, i) => `Option ${i + 1}: ${tr(o)}`),
+    ].join(". ");
     return (
       <Card className={`p-5 ${feedbackClass}`}>
         {question.type === "picture_question" && question.image_url && (
           <img src={question.image_url} alt="" className="mb-4 max-h-52 w-full rounded-2xl object-contain" />
         )}
-        <div className="mb-3 font-bold">
-          {index + 1}. {tr(question.question)}
+        <div className="mb-3 flex items-start gap-2">
+          <div className="flex-1 font-bold">{index + 1}. {tr(question.question)}</div>
+          <ReadAloud text={speechText} lang="en" />
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
           {question.options.map((option, optionIndex) => (

@@ -21,9 +21,11 @@ import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenticated/parent.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedStudentTestsRouteImport } from './routes/_authenticated/student.tests'
+import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student.settings'
 import { Route as AuthenticatedStudentRewardsRouteImport } from './routes/_authenticated/student.rewards'
 import { Route as AuthenticatedStudentReadingRouteImport } from './routes/_authenticated/student.reading'
 import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
+import { Route as AuthenticatedStudentBrushUpRouteImport } from './routes/_authenticated/student.brush-up'
 import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
 import { Route as AuthenticatedStudentAiTeacherRouteImport } from './routes/_authenticated/student.ai-teacher'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
@@ -104,6 +106,12 @@ const AuthenticatedStudentTestsRoute =
     path: '/tests',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedStudentSettingsRoute =
+  AuthenticatedStudentSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 const AuthenticatedStudentRewardsRoute =
   AuthenticatedStudentRewardsRouteImport.update({
     id: '/rewards',
@@ -120,6 +128,12 @@ const AuthenticatedStudentProgressRoute =
   AuthenticatedStudentProgressRouteImport.update({
     id: '/progress',
     path: '/progress',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentBrushUpRoute =
+  AuthenticatedStudentBrushUpRouteImport.update({
+    id: '/brush-up',
+    path: '/brush-up',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentAttendanceRoute =
@@ -240,9 +254,11 @@ export interface FileRoutesByFullPath {
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/student/tests': typeof AuthenticatedStudentTestsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/parent/': typeof AuthenticatedParentIndexRoute
@@ -270,9 +286,11 @@ export interface FileRoutesByTo {
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/student/tests': typeof AuthenticatedStudentTestsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/parent': typeof AuthenticatedParentIndexRoute
@@ -305,9 +323,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/_authenticated/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
   '/_authenticated/student/reading': typeof AuthenticatedStudentReadingRoute
   '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/_authenticated/student/tests': typeof AuthenticatedStudentTestsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/parent/': typeof AuthenticatedParentIndexRoute
@@ -340,9 +360,11 @@ export interface FileRouteTypes {
     | '/admin/tests'
     | '/student/ai-teacher'
     | '/student/attendance'
+    | '/student/brush-up'
     | '/student/progress'
     | '/student/reading'
     | '/student/rewards'
+    | '/student/settings'
     | '/student/tests'
     | '/admin/'
     | '/parent/'
@@ -370,9 +392,11 @@ export interface FileRouteTypes {
     | '/admin/tests'
     | '/student/ai-teacher'
     | '/student/attendance'
+    | '/student/brush-up'
     | '/student/progress'
     | '/student/reading'
     | '/student/rewards'
+    | '/student/settings'
     | '/student/tests'
     | '/admin'
     | '/parent'
@@ -404,9 +428,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/tests'
     | '/_authenticated/student/ai-teacher'
     | '/_authenticated/student/attendance'
+    | '/_authenticated/student/brush-up'
     | '/_authenticated/student/progress'
     | '/_authenticated/student/reading'
     | '/_authenticated/student/rewards'
+    | '/_authenticated/student/settings'
     | '/_authenticated/student/tests'
     | '/_authenticated/admin/'
     | '/_authenticated/parent/'
@@ -515,6 +541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentTestsRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/student/settings': {
+      id: '/_authenticated/student/settings'
+      path: '/settings'
+      fullPath: '/student/settings'
+      preLoaderRoute: typeof AuthenticatedStudentSettingsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
     '/_authenticated/student/rewards': {
       id: '/_authenticated/student/rewards'
       path: '/rewards'
@@ -534,6 +567,13 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/student/progress'
       preLoaderRoute: typeof AuthenticatedStudentProgressRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/brush-up': {
+      id: '/_authenticated/student/brush-up'
+      path: '/brush-up'
+      fullPath: '/student/brush-up'
+      preLoaderRoute: typeof AuthenticatedStudentBrushUpRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/attendance': {
@@ -704,9 +744,11 @@ const AuthenticatedParentRouteWithChildren =
 interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentAiTeacherRoute: typeof AuthenticatedStudentAiTeacherRoute
   AuthenticatedStudentAttendanceRoute: typeof AuthenticatedStudentAttendanceRoute
+  AuthenticatedStudentBrushUpRoute: typeof AuthenticatedStudentBrushUpRoute
   AuthenticatedStudentProgressRoute: typeof AuthenticatedStudentProgressRoute
   AuthenticatedStudentReadingRoute: typeof AuthenticatedStudentReadingRoute
   AuthenticatedStudentRewardsRoute: typeof AuthenticatedStudentRewardsRoute
+  AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
   AuthenticatedStudentTestsRoute: typeof AuthenticatedStudentTestsRoute
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
   AuthenticatedStudentAssignmentAssignmentIdRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRoute
@@ -719,9 +761,11 @@ interface AuthenticatedStudentRouteChildren {
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentAiTeacherRoute: AuthenticatedStudentAiTeacherRoute,
   AuthenticatedStudentAttendanceRoute: AuthenticatedStudentAttendanceRoute,
+  AuthenticatedStudentBrushUpRoute: AuthenticatedStudentBrushUpRoute,
   AuthenticatedStudentProgressRoute: AuthenticatedStudentProgressRoute,
   AuthenticatedStudentReadingRoute: AuthenticatedStudentReadingRoute,
   AuthenticatedStudentRewardsRoute: AuthenticatedStudentRewardsRoute,
+  AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
   AuthenticatedStudentTestsRoute: AuthenticatedStudentTestsRoute,
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
   AuthenticatedStudentAssignmentAssignmentIdRoute:

@@ -713,6 +713,96 @@ export type Database = {
           },
         ]
       }
+      revision_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          language: string
+          metadata: Json
+          sort_order: number
+          subject_code: string
+          value: Json
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          language?: string
+          metadata?: Json
+          sort_order?: number
+          subject_code: string
+          value?: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          language?: string
+          metadata?: Json
+          sort_order?: number
+          subject_code?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      revision_progress: {
+        Row: {
+          attempts: number
+          correct_count: number
+          id: string
+          last_seen_at: string | null
+          mastery: Database["public"]["Enums"]["mastery_level"]
+          metadata: Json
+          next_due_at: string | null
+          repetitions: number
+          revision_item_id: string
+          student_profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          correct_count?: number
+          id?: string
+          last_seen_at?: string | null
+          mastery?: Database["public"]["Enums"]["mastery_level"]
+          metadata?: Json
+          next_due_at?: string | null
+          repetitions?: number
+          revision_item_id: string
+          student_profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          correct_count?: number
+          id?: string
+          last_seen_at?: string | null
+          mastery?: Database["public"]["Enums"]["mastery_level"]
+          metadata?: Json
+          next_due_at?: string | null
+          repetitions?: number
+          revision_item_id?: string
+          student_profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revision_progress_revision_item_id_fkey"
+            columns: ["revision_item_id"]
+            isOneToOne: false
+            referencedRelation: "revision_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revision_progress_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rewards: {
         Row: {
           amount: number
@@ -802,6 +892,59 @@ export type Database = {
           },
         ]
       }
+      speech_assessments: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          fluency_score: number | null
+          id: string
+          language: string
+          metadata: Json
+          prompt_text: string | null
+          pronunciation_score: number | null
+          ref_id: string | null
+          ref_type: string
+          student_profile_id: string
+          transcript: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          fluency_score?: number | null
+          id?: string
+          language?: string
+          metadata?: Json
+          prompt_text?: string | null
+          pronunciation_score?: number | null
+          ref_id?: string | null
+          ref_type: string
+          student_profile_id: string
+          transcript?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          fluency_score?: number | null
+          id?: string
+          language?: string
+          metadata?: Json
+          prompt_text?: string | null
+          pronunciation_score?: number | null
+          ref_id?: string | null
+          ref_type?: string
+          student_profile_id?: string
+          transcript?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speech_assessments_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_badges: {
         Row: {
           badge_id: string
@@ -833,6 +976,47 @@ export type Database = {
             foreignKeyName: "student_badges_student_profile_id_fkey"
             columns: ["student_profile_id"]
             isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_preferences: {
+        Row: {
+          auto_read_lesson: boolean
+          high_contrast: boolean
+          larger_text: boolean
+          metadata: Json
+          speech_rate: number
+          student_profile_id: string
+          updated_at: string
+          voice_reader: boolean
+        }
+        Insert: {
+          auto_read_lesson?: boolean
+          high_contrast?: boolean
+          larger_text?: boolean
+          metadata?: Json
+          speech_rate?: number
+          student_profile_id: string
+          updated_at?: string
+          voice_reader?: boolean
+        }
+        Update: {
+          auto_read_lesson?: boolean
+          high_contrast?: boolean
+          larger_text?: boolean
+          metadata?: Json
+          speech_rate?: number
+          student_profile_id?: string
+          updated_at?: string
+          voice_reader?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_preferences_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: true
             referencedRelation: "student_profiles"
             referencedColumns: ["id"]
           },
@@ -1174,6 +1358,7 @@ export type Database = {
         | "speaking_activity"
         | "tracing_activity"
         | "mixed"
+      mastery_level: "new" | "learning" | "familiar" | "mastered"
       progress_status: "not_started" | "in_progress" | "completed"
       reward_type: "coin" | "star" | "badge" | "certificate"
       test_scope: "daily" | "weekly" | "monthly" | "unit" | "custom"
@@ -1332,6 +1517,7 @@ export const Constants = {
         "tracing_activity",
         "mixed",
       ],
+      mastery_level: ["new", "learning", "familiar", "mastered"],
       progress_status: ["not_started", "in_progress", "completed"],
       reward_type: ["coin", "star", "badge", "certificate"],
       test_scope: ["daily", "weekly", "monthly", "unit", "custom"],

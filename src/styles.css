@@ -159,3 +159,19 @@
   .text-coin { color: var(--coin); }
   .bg-success { background-color: var(--success); }
 }
+
+/* Accessibility preferences applied at <html> level */
+html.text-larger { font-size: 18px; }
+html.text-larger body { line-height: 1.6; }
+html.high-contrast {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.12 0 0);
+  --muted-foreground: oklch(0.22 0 0);
+  --border: oklch(0.18 0 0);
+  --primary: oklch(0.30 0.18 260);
+  --primary-foreground: oklch(1 0 0);
+}
+html.high-contrast .dark {
+  --background: oklch(0.10 0 0);
+  --foreground: oklch(0.98 0 0);
+}

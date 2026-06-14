@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
+import { ReadAloud } from "@/components/app/ReadAloud";
+import { useStudentPrefs } from "@/lib/student-prefs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
@@ -10,11 +12,14 @@ import type { LessonStep } from "@/lib/data";
 export function LessonPlayer({
   steps,
   onFinished,
+  lang = "en",
 }: {
   steps: LessonStep[];
   onFinished: (result: { score: number; coinsEarned: number }) => void;
+  lang?: "en" | "hi" | "te";
 }) {
   const { t, tr } = useI18n();
+  const { prefs } = useStudentPrefs();
   const [idx, setIdx] = useState(0);
   const [coins, setCoins] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -30,6 +35,8 @@ export function LessonPlayer({
 
   const step = steps[idx];
   const pct = Math.round(((idx + 1) / steps.length) * 100);
+
+  const readableText = useMemo(() => extractReadableText(step, tr), [step, tr]);
 
   const reset = () => {
     setFeedback(null); setCanAdvance(false); setSelected(null); setText(""); setMatches({});
@@ -85,6 +92,17 @@ export function LessonPlayer({
       </div>
 
       <Card className="p-6 min-h-[280px]">
+        {readableText && (
+          <div className="flex justify-end mb-2">
+            <ReadAloud
+              text={readableText}
+              lang={lang}
+              variant="controls"
+              label="🔊 Read Aloud"
+              autoStart={idx === 0 && prefs.auto_read_lesson}
+            />
+          </div>
+        )}
         {step.type === "introduction" && (
           <div className="text-center py-6">
             <div className="text-6xl mb-4">👋</div>
@@ -260,6 +278,33 @@ function ActionRow({
 
 function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
   return <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-bold ${className ?? ""}`}>{children}</span>;
+}
+
+function extractReadableText(step: LessonStep, tr: (v: any) => string): string {
+  switch (step.type) {
+    case "introduction":
+    case "teacher_explanation":
+      return tr((step as any).text);
+    case "multiple_choice":
+    case "fill_blank":
+    case "picture_question": {
+      const parts: string[] = [tr((step as any).question)];
+      const opts = (step as any).options as any[] | undefined;
+      if (opts?.length) parts.push("Options: " + opts.map((o) => tr(o)).join(", "));
+      return parts.join(". ");
+    }
+    case "match_pairs":
+      return "Match the pairs. " + (step as any).pairs.map((p: any) => `${tr(p.left)} with ${tr(p.right)}`).join(", ");
+    case "drag_drop":
+      return tr((step as any).question);
+    case "audio_placeholder":
+    case "speaking_placeholder":
+      return tr((step as any).instructions ?? (step as any).prompt);
+    case "tracing_activity":
+      return `Trace the letter ${(step as any).letter}. ${tr((step as any).instructions)}`;
+    default:
+      return "";
+  }
 }
 
 function MatchPairs({
