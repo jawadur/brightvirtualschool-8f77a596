@@ -245,4 +245,3 @@ export async function fetchScheduleStatuses(studentId: string, items: any[]) {
   });
   return { lessonMap, aMap, tMap };
 }
-}
