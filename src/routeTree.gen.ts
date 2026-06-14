@@ -27,6 +27,7 @@ import { Route as AuthenticatedStudentReadingRouteImport } from './routes/_authe
 import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
 import { Route as AuthenticatedStudentBrushUpRouteImport } from './routes/_authenticated/student.brush-up'
 import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
+import { Route as AuthenticatedStudentAnalyticsRouteImport } from './routes/_authenticated/student.analytics'
 import { Route as AuthenticatedStudentAiTeacherRouteImport } from './routes/_authenticated/student.ai-teacher'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
 import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
@@ -142,6 +143,12 @@ const AuthenticatedStudentAttendanceRoute =
   AuthenticatedStudentAttendanceRouteImport.update({
     id: '/attendance',
     path: '/attendance',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentAnalyticsRoute =
+  AuthenticatedStudentAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentAiTeacherRoute =
@@ -269,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
+  '/student/analytics': typeof AuthenticatedStudentAnalyticsRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
@@ -303,6 +311,7 @@ export interface FileRoutesByTo {
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
+  '/student/analytics': typeof AuthenticatedStudentAnalyticsRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
@@ -342,6 +351,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
+  '/_authenticated/student/analytics': typeof AuthenticatedStudentAnalyticsRoute
   '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/_authenticated/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/tests'
     | '/student/ai-teacher'
+    | '/student/analytics'
     | '/student/attendance'
     | '/student/brush-up'
     | '/student/progress'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/tests'
     | '/student/ai-teacher'
+    | '/student/analytics'
     | '/student/attendance'
     | '/student/brush-up'
     | '/student/progress'
@@ -453,6 +465,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/schedule'
     | '/_authenticated/admin/tests'
     | '/_authenticated/student/ai-teacher'
+    | '/_authenticated/student/analytics'
     | '/_authenticated/student/attendance'
     | '/_authenticated/student/brush-up'
     | '/_authenticated/student/progress'
@@ -607,6 +620,13 @@ declare module '@tanstack/react-router' {
       path: '/attendance'
       fullPath: '/student/attendance'
       preLoaderRoute: typeof AuthenticatedStudentAttendanceRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/analytics': {
+      id: '/_authenticated/student/analytics'
+      path: '/analytics'
+      fullPath: '/student/analytics'
+      preLoaderRoute: typeof AuthenticatedStudentAnalyticsRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/ai-teacher': {
@@ -788,6 +808,7 @@ const AuthenticatedParentRouteWithChildren =
 
 interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentAiTeacherRoute: typeof AuthenticatedStudentAiTeacherRoute
+  AuthenticatedStudentAnalyticsRoute: typeof AuthenticatedStudentAnalyticsRoute
   AuthenticatedStudentAttendanceRoute: typeof AuthenticatedStudentAttendanceRoute
   AuthenticatedStudentBrushUpRoute: typeof AuthenticatedStudentBrushUpRoute
   AuthenticatedStudentProgressRoute: typeof AuthenticatedStudentProgressRoute
@@ -805,6 +826,7 @@ interface AuthenticatedStudentRouteChildren {
 
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentAiTeacherRoute: AuthenticatedStudentAiTeacherRoute,
+  AuthenticatedStudentAnalyticsRoute: AuthenticatedStudentAnalyticsRoute,
   AuthenticatedStudentAttendanceRoute: AuthenticatedStudentAttendanceRoute,
   AuthenticatedStudentBrushUpRoute: AuthenticatedStudentBrushUpRoute,
   AuthenticatedStudentProgressRoute: AuthenticatedStudentProgressRoute,
