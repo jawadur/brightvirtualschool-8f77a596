@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Coins } from "lucide-react";
 import type { LessonStep } from "@/lib/data";
 
@@ -33,7 +32,11 @@ export function LessonPlayer({
   const pct = Math.round(((idx + 1) / steps.length) * 100);
 
   const reset = () => {
-    setFeedback(null); setCanAdvance(false); setSelected(null); setText(""); setMatches({});
+    setFeedback(null);
+    setCanAdvance(false);
+    setSelected(null);
+    setText("");
+    setMatches({});
   };
 
   const next = () => {
@@ -90,14 +93,30 @@ export function LessonPlayer({
           <div className="text-center py-6">
             <div className="text-6xl mb-4">👋</div>
             <p className="text-xl font-bold">{tr(step.text)}</p>
-            <Button className="mt-6" onClick={() => { setCanAdvance(true); next(); }}>{t("next")}</Button>
+            <Button
+              className="mt-6"
+              onClick={() => {
+                setCanAdvance(true);
+                next();
+              }}
+            >
+              {t("next")}
+            </Button>
           </div>
         )}
         {step.type === "teacher_explanation" && (
           <div className="text-center py-6">
             <div className="text-6xl mb-4">👩‍🏫</div>
             <p className="text-lg">{tr(step.text)}</p>
-            <Button className="mt-6" onClick={() => { setCanAdvance(true); next(); }}>{t("next")}</Button>
+            <Button
+              className="mt-6"
+              onClick={() => {
+                setCanAdvance(true);
+                next();
+              }}
+            >
+              {t("next")}
+            </Button>
           </div>
         )}
         {step.type === "multiple_choice" && (
@@ -117,18 +136,43 @@ export function LessonPlayer({
                 </button>
               ))}
             </div>
-            <ActionRow feedback={feedback} canAdvance={canAdvance} disabled={selected == null} onCheck={handleCheck} onNext={next} />
+            <ActionRow
+              feedback={feedback}
+              canAdvance={canAdvance}
+              disabled={selected == null}
+              onCheck={handleCheck}
+              onNext={next}
+            />
           </div>
         )}
         {step.type === "fill_blank" && (
           <div>
             <p className="text-lg font-bold mb-4">{tr(step.question)}</p>
-            <Input value={text} onChange={(e) => setText(e.target.value)} className="text-center text-2xl font-bold h-14" maxLength={20} />
-            <ActionRow feedback={feedback} canAdvance={canAdvance} disabled={!text} onCheck={handleCheck} onNext={next} />
+            <Input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="text-center text-2xl font-bold h-14"
+              maxLength={20}
+            />
+            <ActionRow
+              feedback={feedback}
+              canAdvance={canAdvance}
+              disabled={!text}
+              onCheck={handleCheck}
+              onNext={next}
+            />
           </div>
         )}
         {step.type === "match_pairs" && (
-          <MatchPairs step={step} matches={matches} setMatches={setMatches} feedback={feedback} canAdvance={canAdvance} onCheck={handleCheck} onNext={next} />
+          <MatchPairs
+            step={step}
+            matches={matches}
+            setMatches={setMatches}
+            feedback={feedback}
+            canAdvance={canAdvance}
+            onCheck={handleCheck}
+            onNext={next}
+          />
         )}
         {step.type === "tracing_activity" && (
           <div className="text-center py-6">
@@ -136,11 +180,23 @@ export function LessonPlayer({
             <div className="my-6 text-[160px] leading-none font-extrabold text-primary/30 select-none">
               {step.letter}
             </div>
-            <Button onClick={() => { setCorrectCount((c) => c + 1); next(); }}>{t("done")}</Button>
+            <Button
+              onClick={() => {
+                setCorrectCount((c) => c + 1);
+                next();
+              }}
+            >
+              {t("done")}
+            </Button>
           </div>
         )}
         {step.type === "drag_drop" && (
-          <DragDrop step={step} matches={matches} setMatches={setMatches} feedback={feedback} canAdvance={canAdvance}
+          <DragDrop
+            step={step}
+            matches={matches}
+            setMatches={setMatches}
+            feedback={feedback}
+            canAdvance={canAdvance}
             onCheck={() => {
               const ok = step.mapping.every((targetIdx, itemIdx) => matches[itemIdx] === targetIdx);
               setFeedback(ok ? "correct" : "wrong");
@@ -171,7 +227,10 @@ export function LessonPlayer({
                 </button>
               ))}
             </div>
-            <ActionRow feedback={feedback} canAdvance={canAdvance} disabled={selected == null}
+            <ActionRow
+              feedback={feedback}
+              canAdvance={canAdvance}
+              disabled={selected == null}
               onCheck={() => {
                 const ok = selected === step.answer;
                 setFeedback(ok ? "correct" : "wrong");
@@ -181,23 +240,46 @@ export function LessonPlayer({
                   setCanAdvance(true);
                 }
               }}
-              onNext={next} />
+              onNext={next}
+            />
           </div>
         )}
         {step.type === "audio_placeholder" && (
           <div className="text-center py-6">
             <div className="text-6xl mb-4">🔊</div>
             <p className="text-sm text-muted-foreground">{tr(step.instructions)}</p>
-            <p className="mt-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold">Audio activity — coming soon</p>
-            <div className="mt-6"><Button onClick={() => { setCanAdvance(true); next(); }}>{t("next")}</Button></div>
+            <p className="mt-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold">
+              Audio activity — coming soon
+            </p>
+            <div className="mt-6">
+              <Button
+                onClick={() => {
+                  setCanAdvance(true);
+                  next();
+                }}
+              >
+                {t("next")}
+              </Button>
+            </div>
           </div>
         )}
         {step.type === "speaking_placeholder" && (
           <div className="text-center py-6">
             <div className="text-6xl mb-4">🎤</div>
             <p className="text-lg font-bold">{tr(step.prompt)}</p>
-            <p className="mt-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold">Speaking activity — coming soon</p>
-            <div className="mt-6"><Button onClick={() => { setCanAdvance(true); next(); }}>{t("next")}</Button></div>
+            <p className="mt-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold">
+              Speaking activity — coming soon
+            </p>
+            <div className="mt-6">
+              <Button
+                onClick={() => {
+                  setCanAdvance(true);
+                  next();
+                }}
+              >
+                {t("next")}
+              </Button>
+            </div>
           </div>
         )}
       </Card>
@@ -206,7 +288,13 @@ export function LessonPlayer({
 }
 
 function DragDrop({
-  step, matches, setMatches, feedback, canAdvance, onCheck, onNext,
+  step,
+  matches,
+  setMatches,
+  feedback,
+  canAdvance,
+  onCheck,
+  onNext,
 }: {
   step: Extract<LessonStep, { type: "drag_drop" }>;
   matches: Record<number, number>;
@@ -231,27 +319,59 @@ function DragDrop({
               className="flex-1 rounded-2xl border-2 border-border bg-card px-4 py-3 font-bold"
             >
               <option value="">Drop here…</option>
-              {step.targets.map((t, idx) => <option key={idx} value={idx}>{tr(t)}</option>)}
+              {step.targets.map((t, idx) => (
+                <option key={idx} value={idx}>
+                  {tr(t)}
+                </option>
+              ))}
             </select>
           </div>
         ))}
       </div>
-      <ActionRow feedback={feedback} canAdvance={canAdvance} disabled={Object.keys(matches).length !== step.items.length} onCheck={onCheck} onNext={onNext} />
+      <ActionRow
+        feedback={feedback}
+        canAdvance={canAdvance}
+        disabled={Object.keys(matches).length !== step.items.length}
+        onCheck={onCheck}
+        onNext={onNext}
+      />
     </div>
   );
 }
 
 function ActionRow({
-  feedback, canAdvance, disabled, onCheck, onNext,
-}: { feedback: null | "correct" | "wrong"; canAdvance: boolean; disabled: boolean; onCheck: () => void; onNext: () => void }) {
+  feedback,
+  canAdvance,
+  disabled,
+  onCheck,
+  onNext,
+}: {
+  feedback: null | "correct" | "wrong";
+  canAdvance: boolean;
+  disabled: boolean;
+  onCheck: () => void;
+  onNext: () => void;
+}) {
   const { t } = useI18n();
   return (
     <div className="mt-6 flex items-center justify-between gap-3">
-      {feedback === "correct" && <Badge className="bg-success text-white"><CheckCircle2 className="h-4 w-4 mr-1" />{t("correct")}</Badge>}
-      {feedback === "wrong" && <Badge className="bg-destructive text-white"><XCircle className="h-4 w-4 mr-1" />{t("try_again")}</Badge>}
+      {feedback === "correct" && (
+        <Badge className="bg-success text-white">
+          <CheckCircle2 className="h-4 w-4 mr-1" />
+          {t("correct")}
+        </Badge>
+      )}
+      {feedback === "wrong" && (
+        <Badge className="bg-destructive text-white">
+          <XCircle className="h-4 w-4 mr-1" />
+          {t("try_again")}
+        </Badge>
+      )}
       <div className="flex-1" />
       {!canAdvance ? (
-        <Button onClick={onCheck} disabled={disabled}>{t("check")}</Button>
+        <Button onClick={onCheck} disabled={disabled}>
+          {t("check")}
+        </Button>
       ) : (
         <Button onClick={onNext}>{t("next")}</Button>
       )}
@@ -260,11 +380,21 @@ function ActionRow({
 }
 
 function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-bold ${className ?? ""}`}>{children}</span>;
+  return (
+    <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-bold ${className ?? ""}`}>
+      {children}
+    </span>
+  );
 }
 
 function MatchPairs({
-  step, matches, setMatches, feedback, canAdvance, onCheck, onNext,
+  step,
+  matches,
+  setMatches,
+  feedback,
+  canAdvance,
+  onCheck,
+  onNext,
 }: {
   step: Extract<LessonStep, { type: "match_pairs" }>;
   matches: Record<number, number>;
@@ -289,12 +419,22 @@ function MatchPairs({
               className="flex-1 rounded-2xl border-2 border-border bg-card px-4 py-3 font-bold"
             >
               <option value="">Choose…</option>
-              {rightOptions.map((r) => <option key={r.idx} value={r.idx}>{tr(r)}</option>)}
+              {rightOptions.map((r) => (
+                <option key={r.idx} value={r.idx}>
+                  {tr(r)}
+                </option>
+              ))}
             </select>
           </div>
         ))}
       </div>
-      <ActionRow feedback={feedback} canAdvance={canAdvance} disabled={Object.keys(matches).length !== step.pairs.length} onCheck={onCheck} onNext={onNext} />
+      <ActionRow
+        feedback={feedback}
+        canAdvance={canAdvance}
+        disabled={Object.keys(matches).length !== step.pairs.length}
+        onCheck={onCheck}
+        onNext={onNext}
+      />
     </div>
   );
 }
