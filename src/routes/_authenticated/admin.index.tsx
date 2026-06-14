@@ -24,6 +24,7 @@ type Klass = { id: string; board_id: string; code: string; name: Record<string, 
 type Subject = { id: string; class_id: string; code: string; name: Record<string, string>; icon: string | null; color: string | null; sort_order: number };
 type Unit = { id: string; subject_id: string; code: string; title: Record<string, string>; sort_order: number };
 type Lesson = { id: string; unit_id: string; code: string; title: Record<string, string>; lesson_type: string; estimated_minutes: number; sort_order: number };
+type LessonRow = Lesson & { is_published: boolean };
 
 function CurriculumPage() {
   const { tr } = useI18n();
@@ -73,7 +74,21 @@ function CurriculumPage() {
             <Row
               open={openBoardId === b.id}
               onToggle={() => setOpenBoardId(openBoardId === b.id ? null : b.id)}
-              label={`${b.code} · ${tr(b.name)}`}
+              label={`${b.code} · ${tr(b.name)}${b.is_active ? "" : " · (inactive)"}`}
+              extra={
+                <label className="flex items-center gap-1 text-xs font-bold">
+                  <input
+                    type="checkbox"
+                    checked={b.is_active}
+                    onChange={async (e) => {
+                      const { error } = await supabase.from("boards").update({ is_active: e.target.checked }).eq("id", b.id);
+                      if (error) { toast.error(error.message); return; }
+                      qc.invalidateQueries({ queryKey: ["admin-boards"] });
+                    }}
+                  />
+                  Active
+                </label>
+              }
               edit={
                 <EditEntity
                   title="Edit board"
