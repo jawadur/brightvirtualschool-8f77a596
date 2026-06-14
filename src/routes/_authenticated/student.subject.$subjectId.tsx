@@ -33,6 +33,21 @@ function SubjectPage() {
     queryFn: () => fetchLessonsForSubject(subjectId),
   });
 
+  const { data: prereqs = [] } = useQuery({
+    queryKey: ["lesson-prereqs", subjectId],
+    queryFn: async () => {
+      const lessonIds = (lessons as any[]).map((l) => l.id);
+      if (lessonIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("lesson_prerequisites")
+        .select("lesson_id, prerequisite_lesson_id")
+        .in("lesson_id", lessonIds);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: lessons.length > 0,
+  });
+
   const { data: progress = [] } = useQuery({
     queryKey: ["progress", activeStudent?.id],
     enabled: !!activeStudent,
@@ -101,6 +116,33 @@ function SubjectPage() {
   const assignmentPercent = assignments.length ? Math.round((completedAssignments.size / assignments.length) * 100) : 0;
   const testPercent = tests.length ? Math.round((completedTests.size / tests.length) * 100) : 0;
 
+  // Group lessons by unit, sorted by unit.sort_order then lesson.sort_order
+  const unitsMap = new Map<string, { unit: any; lessons: any[] }>();
+  for (const l of lessons as any[]) {
+    const u = l.units;
+    if (!unitsMap.has(u.id)) unitsMap.set(u.id, { unit: u, lessons: [] });
+    unitsMap.get(u.id)!.lessons.push(l);
+  }
+  const units = [...unitsMap.values()].sort((a, b) => a.unit.sort_order - b.unit.sort_order);
+  units.forEach((u) => u.lessons.sort((a, b) => a.sort_order - b.sort_order));
+
+  // Build prerequisite map and flat ordered list for sequential locking
+  const prereqMap = new Map<string, string[]>();
+  for (const p of prereqs as any[]) {
+    const arr = prereqMap.get(p.lesson_id) ?? [];
+    arr.push(p.prerequisite_lesson_id);
+    prereqMap.set(p.lesson_id, arr);
+  }
+  const flatOrder = units.flatMap((u) => u.lessons);
+  const isLocked = (lessonId: string, indexInFlat: number) => {
+    // Explicit prerequisites (if any) take priority
+    const reqs = prereqMap.get(lessonId);
+    if (reqs && reqs.length > 0) return reqs.some((r) => !completedLessons.has(r));
+    // Otherwise sequential: previous lesson must be done
+    if (indexInFlat === 0) return false;
+    return !completedLessons.has(flatOrder[indexInFlat - 1].id);
+  };
+
   return (
     <div className="space-y-6">
       <Link to="/student" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
@@ -120,16 +162,21 @@ function SubjectPage() {
 
       <section>
         <h2 className="mb-2 text-lg font-extrabold">{t("lessons")}</h2>
-        <div className="space-y-3">
-          {lessons.map((lesson: any, index: number) => {
-            const isDone = completedLessons.has(lesson.id);
-            const previousDone = index === 0 || completedLessons.has((lessons[index - 1] as any).id);
-            const locked = !previousDone;
-            const linkedAssignments = assignments.filter((a: any) => a.lesson_id === lesson.id);
-            const linkedTests = tests.filter((test: any) => test.unit_id === lesson.unit_id || !test.unit_id);
-
-            return (
-              <Card key={lesson.id} className="p-4">
+        <div className="space-y-6">
+          {units.map(({ unit, lessons: unitLessons }) => (
+            <div key={unit.id} className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-1.5 rounded-full bg-primary" />
+                <h3 className="text-base font-extrabold">{tr(unit.title)}</h3>
+              </div>
+              {unitLessons.map((lesson: any) => {
+                const flatIdx = flatOrder.findIndex((l) => l.id === lesson.id);
+                const isDone = completedLessons.has(lesson.id);
+                const locked = !isDone && isLocked(lesson.id, flatIdx);
+                const linkedAssignments = assignments.filter((a: any) => a.lesson_id === lesson.id);
+                const linkedTests = tests.filter((test: any) => test.unit_id === lesson.unit_id || !test.unit_id);
+                return (
+                  <Card key={lesson.id} className="p-4">
                 <div className="flex items-center gap-3">
                   <div className={`flex h-11 w-11 items-center justify-center rounded-full ${isDone ? "bg-success text-white" : locked ? "bg-muted text-muted-foreground" : "bg-accent"}`}>
                     {isDone ? <CheckCircle2 className="h-5 w-5" /> : locked ? <Lock className="h-5 w-5" /> : <PlayCircle className="h-5 w-5 text-primary" />}
@@ -177,9 +224,11 @@ function SubjectPage() {
                     })}
                   </div>
                 )}
-              </Card>
-            );
-          })}
+                  </Card>
+                );
+              })}
+            </div>
+          ))}
           {lessons.length === 0 && <Card className="p-6 text-center text-muted-foreground">No lessons added yet.</Card>}
         </div>
       </section>
