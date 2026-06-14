@@ -8,6 +8,9 @@ export interface StudentPrefs {
   larger_text: boolean;
   high_contrast: boolean;
   speech_rate: number;
+  speech_pitch: number;
+  speech_volume: number;
+  preferred_voice_uri: string | null;
 }
 
 const DEFAULTS: StudentPrefs = {
@@ -16,6 +19,9 @@ const DEFAULTS: StudentPrefs = {
   larger_text: false,
   high_contrast: false,
   speech_rate: 0.9,
+  speech_pitch: 1.0,
+  speech_volume: 1.0,
+  preferred_voice_uri: null,
 };
 
 interface Ctx {
@@ -36,11 +42,17 @@ export function StudentPrefsProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     supabase
       .from("student_preferences")
-      .select("voice_reader, auto_read_lesson, larger_text, high_contrast, speech_rate")
+      .select("voice_reader, auto_read_lesson, larger_text, high_contrast, speech_rate, speech_pitch, speech_volume, preferred_voice_uri")
       .eq("student_profile_id", activeStudent.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) setPrefs({ ...DEFAULTS, ...data, speech_rate: Number(data.speech_rate) || DEFAULTS.speech_rate });
+        if (data) setPrefs({
+          ...DEFAULTS,
+          ...data,
+          speech_rate: Number(data.speech_rate) || DEFAULTS.speech_rate,
+          speech_pitch: Number(data.speech_pitch) || DEFAULTS.speech_pitch,
+          speech_volume: Number(data.speech_volume) || DEFAULTS.speech_volume,
+        });
         setLoading(false);
       });
   }, [activeStudent?.id]);
