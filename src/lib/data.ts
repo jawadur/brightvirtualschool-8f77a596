@@ -6,7 +6,11 @@ export type LessonStep =
   | { type: "multiple_choice"; question: Record<string, string>; options: Record<string, string>[]; answer: number; coins?: number }
   | { type: "match_pairs"; pairs: { left: Record<string, string>; right: Record<string, string> }[]; coins?: number }
   | { type: "fill_blank"; question: Record<string, string>; answer: string; coins?: number }
-  | { type: "tracing_activity"; letter: string; instructions: Record<string, string> };
+  | { type: "tracing_activity"; letter: string; instructions: Record<string, string> }
+  | { type: "drag_drop"; question: Record<string, string>; items: Record<string, string>[]; targets: Record<string, string>[]; mapping: number[]; coins?: number }
+  | { type: "picture_question"; image_url: string; question: Record<string, string>; options: Record<string, string>[]; answer: number; coins?: number }
+  | { type: "audio_placeholder"; instructions: Record<string, string> }
+  | { type: "speaking_placeholder"; prompt: Record<string, string> };
 
 export type LessonContent = { steps: LessonStep[] };
 

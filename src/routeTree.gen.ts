@@ -15,17 +15,28 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
 import { Route as AuthenticatedProfilesRouteImport } from './routes/_authenticated/profiles'
+import { Route as AuthenticatedParentRouteImport } from './routes/_authenticated/parent'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authenticated/student.index'
+import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenticated/parent.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedStudentTestsRouteImport } from './routes/_authenticated/student.tests'
 import { Route as AuthenticatedStudentRewardsRouteImport } from './routes/_authenticated/student.rewards'
+import { Route as AuthenticatedStudentReadingRouteImport } from './routes/_authenticated/student.reading'
 import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
 import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
+import { Route as AuthenticatedStudentAiTeacherRouteImport } from './routes/_authenticated/student.ai-teacher'
+import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
+import { Route as AuthenticatedAdminQuestionsRouteImport } from './routes/_authenticated/admin.questions'
+import { Route as AuthenticatedAdminHomeworkRouteImport } from './routes/_authenticated/admin.homework'
 import { Route as AuthenticatedAdminBadgesRouteImport } from './routes/_authenticated/admin.badges'
 import { Route as AuthenticatedAdminAssignmentsRouteImport } from './routes/_authenticated/admin.assignments'
+import { Route as AuthenticatedStudentTestTestIdRouteImport } from './routes/_authenticated/student.test.$testId'
 import { Route as AuthenticatedStudentSubjectSubjectIdRouteImport } from './routes/_authenticated/student.subject.$subjectId'
 import { Route as AuthenticatedStudentLessonLessonIdRouteImport } from './routes/_authenticated/student.lesson.$lessonId'
 import { Route as AuthenticatedStudentAssignmentAssignmentIdRouteImport } from './routes/_authenticated/student.assignment.$assignmentId'
+import { Route as AuthenticatedParentChildChildIdRouteImport } from './routes/_authenticated/parent.child.$childId'
+import { Route as AuthenticatedAdminTestTestIdRouteImport } from './routes/_authenticated/admin.test.$testId'
 import { Route as AuthenticatedAdminLessonLessonIdRouteImport } from './routes/_authenticated/admin.lesson.$lessonId'
 import { Route as AuthenticatedAdminAssignmentAssignmentIdRouteImport } from './routes/_authenticated/admin.assignment.$assignmentId'
 
@@ -58,6 +69,11 @@ const AuthenticatedProfilesRoute = AuthenticatedProfilesRouteImport.update({
   path: '/profiles',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedParentRoute = AuthenticatedParentRouteImport.update({
+  id: '/parent',
+  path: '/parent',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -69,15 +85,33 @@ const AuthenticatedStudentIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedParentIndexRoute =
+  AuthenticatedParentIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedParentRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedStudentTestsRoute =
+  AuthenticatedStudentTestsRouteImport.update({
+    id: '/tests',
+    path: '/tests',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 const AuthenticatedStudentRewardsRoute =
   AuthenticatedStudentRewardsRouteImport.update({
     id: '/rewards',
     path: '/rewards',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentReadingRoute =
+  AuthenticatedStudentReadingRouteImport.update({
+    id: '/reading',
+    path: '/reading',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentProgressRoute =
@@ -92,6 +126,29 @@ const AuthenticatedStudentAttendanceRoute =
     path: '/attendance',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedStudentAiTeacherRoute =
+  AuthenticatedStudentAiTeacherRouteImport.update({
+    id: '/ai-teacher',
+    path: '/ai-teacher',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedAdminTestsRoute = AuthenticatedAdminTestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminQuestionsRoute =
+  AuthenticatedAdminQuestionsRouteImport.update({
+    id: '/questions',
+    path: '/questions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminHomeworkRoute =
+  AuthenticatedAdminHomeworkRouteImport.update({
+    id: '/homework',
+    path: '/homework',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminBadgesRoute =
   AuthenticatedAdminBadgesRouteImport.update({
     id: '/badges',
@@ -103,6 +160,12 @@ const AuthenticatedAdminAssignmentsRoute =
     id: '/assignments',
     path: '/assignments',
     getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedStudentTestTestIdRoute =
+  AuthenticatedStudentTestTestIdRouteImport.update({
+    id: '/test/$testId',
+    path: '/test/$testId',
+    getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentSubjectSubjectIdRoute =
   AuthenticatedStudentSubjectSubjectIdRouteImport.update({
@@ -122,6 +185,18 @@ const AuthenticatedStudentAssignmentAssignmentIdRoute =
     path: '/assignment/$assignmentId',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedParentChildChildIdRoute =
+  AuthenticatedParentChildChildIdRouteImport.update({
+    id: '/child/$childId',
+    path: '/child/$childId',
+    getParentRoute: () => AuthenticatedParentRoute,
+  } as any)
+const AuthenticatedAdminTestTestIdRoute =
+  AuthenticatedAdminTestTestIdRouteImport.update({
+    id: '/test/$testId',
+    path: '/test/$testId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminLessonLessonIdRoute =
   AuthenticatedAdminLessonLessonIdRouteImport.update({
     id: '/lesson/$lessonId',
@@ -140,20 +215,31 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/parent': typeof AuthenticatedParentRouteWithChildren
   '/profiles': typeof AuthenticatedProfilesRoute
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/badges': typeof AuthenticatedAdminBadgesRoute
+  '/admin/homework': typeof AuthenticatedAdminHomeworkRoute
+  '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/admin/tests': typeof AuthenticatedAdminTestsRoute
+  '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/student/tests': typeof AuthenticatedStudentTestsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/parent/': typeof AuthenticatedParentIndexRoute
   '/student/': typeof AuthenticatedStudentIndexRoute
   '/admin/assignment/$assignmentId': typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   '/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
+  '/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
+  '/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
   '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
+  '/student/test/$testId': typeof AuthenticatedStudentTestTestIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -162,16 +248,26 @@ export interface FileRoutesByTo {
   '/profiles': typeof AuthenticatedProfilesRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/badges': typeof AuthenticatedAdminBadgesRoute
+  '/admin/homework': typeof AuthenticatedAdminHomeworkRoute
+  '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/admin/tests': typeof AuthenticatedAdminTestsRoute
+  '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/student/tests': typeof AuthenticatedStudentTestsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/parent': typeof AuthenticatedParentIndexRoute
   '/student': typeof AuthenticatedStudentIndexRoute
   '/admin/assignment/$assignmentId': typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   '/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
+  '/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
+  '/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
   '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
+  '/student/test/$testId': typeof AuthenticatedStudentTestTestIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -180,20 +276,31 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/parent': typeof AuthenticatedParentRouteWithChildren
   '/_authenticated/profiles': typeof AuthenticatedProfilesRoute
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
   '/_authenticated/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/_authenticated/admin/badges': typeof AuthenticatedAdminBadgesRoute
+  '/_authenticated/admin/homework': typeof AuthenticatedAdminHomeworkRoute
+  '/_authenticated/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
+  '/_authenticated/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/_authenticated/student/reading': typeof AuthenticatedStudentReadingRoute
   '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
+  '/_authenticated/student/tests': typeof AuthenticatedStudentTestsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/parent/': typeof AuthenticatedParentIndexRoute
   '/_authenticated/student/': typeof AuthenticatedStudentIndexRoute
   '/_authenticated/admin/assignment/$assignmentId': typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   '/_authenticated/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
+  '/_authenticated/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
+  '/_authenticated/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
   '/_authenticated/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/_authenticated/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
   '/_authenticated/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
+  '/_authenticated/student/test/$testId': typeof AuthenticatedStudentTestTestIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -202,20 +309,31 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/admin'
+    | '/parent'
     | '/profiles'
     | '/student'
     | '/admin/assignments'
     | '/admin/badges'
+    | '/admin/homework'
+    | '/admin/questions'
+    | '/admin/tests'
+    | '/student/ai-teacher'
     | '/student/attendance'
     | '/student/progress'
+    | '/student/reading'
     | '/student/rewards'
+    | '/student/tests'
     | '/admin/'
+    | '/parent/'
     | '/student/'
     | '/admin/assignment/$assignmentId'
     | '/admin/lesson/$lessonId'
+    | '/admin/test/$testId'
+    | '/parent/child/$childId'
     | '/student/assignment/$assignmentId'
     | '/student/lesson/$lessonId'
     | '/student/subject/$subjectId'
+    | '/student/test/$testId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -224,16 +342,26 @@ export interface FileRouteTypes {
     | '/profiles'
     | '/admin/assignments'
     | '/admin/badges'
+    | '/admin/homework'
+    | '/admin/questions'
+    | '/admin/tests'
+    | '/student/ai-teacher'
     | '/student/attendance'
     | '/student/progress'
+    | '/student/reading'
     | '/student/rewards'
+    | '/student/tests'
     | '/admin'
+    | '/parent'
     | '/student'
     | '/admin/assignment/$assignmentId'
     | '/admin/lesson/$lessonId'
+    | '/admin/test/$testId'
+    | '/parent/child/$childId'
     | '/student/assignment/$assignmentId'
     | '/student/lesson/$lessonId'
     | '/student/subject/$subjectId'
+    | '/student/test/$testId'
   id:
     | '__root__'
     | '/'
@@ -241,20 +369,31 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/_authenticated/admin'
+    | '/_authenticated/parent'
     | '/_authenticated/profiles'
     | '/_authenticated/student'
     | '/_authenticated/admin/assignments'
     | '/_authenticated/admin/badges'
+    | '/_authenticated/admin/homework'
+    | '/_authenticated/admin/questions'
+    | '/_authenticated/admin/tests'
+    | '/_authenticated/student/ai-teacher'
     | '/_authenticated/student/attendance'
     | '/_authenticated/student/progress'
+    | '/_authenticated/student/reading'
     | '/_authenticated/student/rewards'
+    | '/_authenticated/student/tests'
     | '/_authenticated/admin/'
+    | '/_authenticated/parent/'
     | '/_authenticated/student/'
     | '/_authenticated/admin/assignment/$assignmentId'
     | '/_authenticated/admin/lesson/$lessonId'
+    | '/_authenticated/admin/test/$testId'
+    | '/_authenticated/parent/child/$childId'
     | '/_authenticated/student/assignment/$assignmentId'
     | '/_authenticated/student/lesson/$lessonId'
     | '/_authenticated/student/subject/$subjectId'
+    | '/_authenticated/student/test/$testId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -308,6 +447,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/parent': {
+      id: '/_authenticated/parent'
+      path: '/parent'
+      fullPath: '/parent'
+      preLoaderRoute: typeof AuthenticatedParentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -322,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentIndexRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/parent/': {
+      id: '/_authenticated/parent/'
+      path: '/'
+      fullPath: '/parent/'
+      preLoaderRoute: typeof AuthenticatedParentIndexRouteImport
+      parentRoute: typeof AuthenticatedParentRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -329,11 +482,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/student/tests': {
+      id: '/_authenticated/student/tests'
+      path: '/tests'
+      fullPath: '/student/tests'
+      preLoaderRoute: typeof AuthenticatedStudentTestsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
     '/_authenticated/student/rewards': {
       id: '/_authenticated/student/rewards'
       path: '/rewards'
       fullPath: '/student/rewards'
       preLoaderRoute: typeof AuthenticatedStudentRewardsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/reading': {
+      id: '/_authenticated/student/reading'
+      path: '/reading'
+      fullPath: '/student/reading'
+      preLoaderRoute: typeof AuthenticatedStudentReadingRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/progress': {
@@ -350,6 +517,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentAttendanceRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/student/ai-teacher': {
+      id: '/_authenticated/student/ai-teacher'
+      path: '/ai-teacher'
+      fullPath: '/student/ai-teacher'
+      preLoaderRoute: typeof AuthenticatedStudentAiTeacherRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/admin/tests': {
+      id: '/_authenticated/admin/tests'
+      path: '/tests'
+      fullPath: '/admin/tests'
+      preLoaderRoute: typeof AuthenticatedAdminTestsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/questions': {
+      id: '/_authenticated/admin/questions'
+      path: '/questions'
+      fullPath: '/admin/questions'
+      preLoaderRoute: typeof AuthenticatedAdminQuestionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/homework': {
+      id: '/_authenticated/admin/homework'
+      path: '/homework'
+      fullPath: '/admin/homework'
+      preLoaderRoute: typeof AuthenticatedAdminHomeworkRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/badges': {
       id: '/_authenticated/admin/badges'
       path: '/badges'
@@ -363,6 +558,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/assignments'
       preLoaderRoute: typeof AuthenticatedAdminAssignmentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/student/test/$testId': {
+      id: '/_authenticated/student/test/$testId'
+      path: '/test/$testId'
+      fullPath: '/student/test/$testId'
+      preLoaderRoute: typeof AuthenticatedStudentTestTestIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/subject/$subjectId': {
       id: '/_authenticated/student/subject/$subjectId'
@@ -385,6 +587,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/parent/child/$childId': {
+      id: '/_authenticated/parent/child/$childId'
+      path: '/child/$childId'
+      fullPath: '/parent/child/$childId'
+      preLoaderRoute: typeof AuthenticatedParentChildChildIdRouteImport
+      parentRoute: typeof AuthenticatedParentRoute
+    }
+    '/_authenticated/admin/test/$testId': {
+      id: '/_authenticated/admin/test/$testId'
+      path: '/test/$testId'
+      fullPath: '/admin/test/$testId'
+      preLoaderRoute: typeof AuthenticatedAdminTestTestIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/lesson/$lessonId': {
       id: '/_authenticated/admin/lesson/$lessonId'
       path: '/lesson/$lessonId'
@@ -405,37 +621,65 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAssignmentsRoute: typeof AuthenticatedAdminAssignmentsRoute
   AuthenticatedAdminBadgesRoute: typeof AuthenticatedAdminBadgesRoute
+  AuthenticatedAdminHomeworkRoute: typeof AuthenticatedAdminHomeworkRoute
+  AuthenticatedAdminQuestionsRoute: typeof AuthenticatedAdminQuestionsRoute
+  AuthenticatedAdminTestsRoute: typeof AuthenticatedAdminTestsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminAssignmentAssignmentIdRoute: typeof AuthenticatedAdminAssignmentAssignmentIdRoute
   AuthenticatedAdminLessonLessonIdRoute: typeof AuthenticatedAdminLessonLessonIdRoute
+  AuthenticatedAdminTestTestIdRoute: typeof AuthenticatedAdminTestTestIdRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAssignmentsRoute: AuthenticatedAdminAssignmentsRoute,
   AuthenticatedAdminBadgesRoute: AuthenticatedAdminBadgesRoute,
+  AuthenticatedAdminHomeworkRoute: AuthenticatedAdminHomeworkRoute,
+  AuthenticatedAdminQuestionsRoute: AuthenticatedAdminQuestionsRoute,
+  AuthenticatedAdminTestsRoute: AuthenticatedAdminTestsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminAssignmentAssignmentIdRoute:
     AuthenticatedAdminAssignmentAssignmentIdRoute,
   AuthenticatedAdminLessonLessonIdRoute: AuthenticatedAdminLessonLessonIdRoute,
+  AuthenticatedAdminTestTestIdRoute: AuthenticatedAdminTestTestIdRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedParentRouteChildren {
+  AuthenticatedParentIndexRoute: typeof AuthenticatedParentIndexRoute
+  AuthenticatedParentChildChildIdRoute: typeof AuthenticatedParentChildChildIdRoute
+}
+
+const AuthenticatedParentRouteChildren: AuthenticatedParentRouteChildren = {
+  AuthenticatedParentIndexRoute: AuthenticatedParentIndexRoute,
+  AuthenticatedParentChildChildIdRoute: AuthenticatedParentChildChildIdRoute,
+}
+
+const AuthenticatedParentRouteWithChildren =
+  AuthenticatedParentRoute._addFileChildren(AuthenticatedParentRouteChildren)
+
 interface AuthenticatedStudentRouteChildren {
+  AuthenticatedStudentAiTeacherRoute: typeof AuthenticatedStudentAiTeacherRoute
   AuthenticatedStudentAttendanceRoute: typeof AuthenticatedStudentAttendanceRoute
   AuthenticatedStudentProgressRoute: typeof AuthenticatedStudentProgressRoute
+  AuthenticatedStudentReadingRoute: typeof AuthenticatedStudentReadingRoute
   AuthenticatedStudentRewardsRoute: typeof AuthenticatedStudentRewardsRoute
+  AuthenticatedStudentTestsRoute: typeof AuthenticatedStudentTestsRoute
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
   AuthenticatedStudentAssignmentAssignmentIdRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   AuthenticatedStudentLessonLessonIdRoute: typeof AuthenticatedStudentLessonLessonIdRoute
   AuthenticatedStudentSubjectSubjectIdRoute: typeof AuthenticatedStudentSubjectSubjectIdRoute
+  AuthenticatedStudentTestTestIdRoute: typeof AuthenticatedStudentTestTestIdRoute
 }
 
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
+  AuthenticatedStudentAiTeacherRoute: AuthenticatedStudentAiTeacherRoute,
   AuthenticatedStudentAttendanceRoute: AuthenticatedStudentAttendanceRoute,
   AuthenticatedStudentProgressRoute: AuthenticatedStudentProgressRoute,
+  AuthenticatedStudentReadingRoute: AuthenticatedStudentReadingRoute,
   AuthenticatedStudentRewardsRoute: AuthenticatedStudentRewardsRoute,
+  AuthenticatedStudentTestsRoute: AuthenticatedStudentTestsRoute,
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
   AuthenticatedStudentAssignmentAssignmentIdRoute:
     AuthenticatedStudentAssignmentAssignmentIdRoute,
@@ -443,6 +687,7 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
     AuthenticatedStudentLessonLessonIdRoute,
   AuthenticatedStudentSubjectSubjectIdRoute:
     AuthenticatedStudentSubjectSubjectIdRoute,
+  AuthenticatedStudentTestTestIdRoute: AuthenticatedStudentTestTestIdRoute,
 }
 
 const AuthenticatedStudentRouteWithChildren =
@@ -450,12 +695,14 @@ const AuthenticatedStudentRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedParentRoute: typeof AuthenticatedParentRouteWithChildren
   AuthenticatedProfilesRoute: typeof AuthenticatedProfilesRoute
   AuthenticatedStudentRoute: typeof AuthenticatedStudentRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedParentRoute: AuthenticatedParentRouteWithChildren,
   AuthenticatedProfilesRoute: AuthenticatedProfilesRoute,
   AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
 }
@@ -472,13 +719,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

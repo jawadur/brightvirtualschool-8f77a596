@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, ShieldCheck } from "lucide-react";
+import { Plus, ShieldCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "@tanstack/react-router";
@@ -45,6 +45,11 @@ function ProfilesPage() {
             </Link>
           </div>
         )}
+        <div className="mt-2 text-center">
+          <Link to="/parent" className="inline-flex items-center gap-2 rounded-full bg-secondary/40 text-foreground px-4 py-2 font-bold hover:bg-secondary/60">
+            <Users className="h-4 w-4" /> Parent Portal
+          </Link>
+        </div>
 
         <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {isLoading && <div className="col-span-full text-center text-muted-foreground">{t("loading")}</div>}

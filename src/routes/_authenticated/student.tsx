@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { AppHeader } from "@/components/app/AppHeader";
 import { useStudents } from "@/lib/student-context";
 import { useI18n } from "@/lib/i18n";
-import { Home, BookOpen, Trophy, BarChart3, CalendarCheck } from "lucide-react";
+import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student")({
   component: StudentShell,
@@ -28,6 +28,7 @@ function StudentShell() {
 
   const tabs = [
     { to: "/student", icon: Home, label: t("todays_school"), exact: true },
+    { to: "/student/tests", icon: ClipboardCheck, label: t("tests") },
     { to: "/student/progress", icon: BarChart3, label: t("progress") },
     { to: "/student/attendance", icon: CalendarCheck, label: t("attendance") },
     { to: "/student/rewards", icon: Trophy, label: t("trophy_room") },

@@ -54,6 +54,14 @@ const dict: Record<string, Record<Lang, string>> = {
   no_rewards_yet: { en: "Complete lessons to earn rewards!", hi: "पुरस्कार के लिए पाठ पूरे करें!", te: "పురస్కారాల కోసం పాఠాలు పూర్తి చేయండి!" },
   this_month: { en: "This month", hi: "इस महीने", te: "ఈ నెల" },
   loading: { en: "Loading…", hi: "लोड हो रहा है…", te: "లోడ్ అవుతోంది…" },
+  start_test: { en: "Start test", hi: "परीक्षा शुरू करें", te: "పరీక్ష ప్రారంభించండి" } as any,
+  time_left: { en: "Time left", hi: "बचा समय", te: "మిగిలిన సమయం" } as any,
+  passed: { en: "Passed 🎉", hi: "उत्तीर्ण 🎉", te: "ఉత్తీర్ణత 🎉" } as any,
+  failed: { en: "Try again", hi: "फिर से कोशिश", te: "మళ్ళీ ప్రయత్నించండి" } as any,
+  parent_portal: { en: "Parent Portal", hi: "अभिभावक पोर्टल", te: "తల్లిదండ్రుల పోర్టల్" } as any,
+  ai_teacher: { en: "AI Teacher", hi: "एआई शिक्षक", te: "AI ఉపాధ్యాయుడు" } as any,
+  reading_assessment: { en: "Reading Check", hi: "पठन जांच", te: "పఠన పరీక్ష" } as any,
+  coming_soon: { en: "Coming soon", hi: "जल्द आ रहा है", te: "త్వరలో వస్తోంది" } as any,
 };
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (key: keyof typeof dict) => string; tr: (val: unknown) => string };
