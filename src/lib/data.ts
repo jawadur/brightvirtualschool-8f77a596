@@ -197,3 +197,52 @@ export async function completeLesson(studentId: string, lessonId: string, score:
     console.warn("graduation check failed", e);
   }
 }
+
+export async function fetchTodaySchedule(classIds: string[]) {
+  if (classIds.length === 0) return [];
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("daily_schedule")
+    .select(`
+      id, date, class_id, sort_order,
+      subject:subjects(id, code, name, color, icon, class_id),
+      lesson:lessons(id, title),
+      assignment:assignments(id, title),
+      test:tests(id, title)
+    `)
+    .eq("date", today)
+    .in("class_id", classIds)
+    .order("sort_order");
+  if (error) throw error;
+  return (data ?? []) as any[];
+}
+
+export async function fetchScheduleStatuses(studentId: string, items: any[]) {
+  const lessonIds = items.map((i) => i.lesson?.id).filter(Boolean);
+  const assignmentIds = items.map((i) => i.assignment?.id).filter(Boolean);
+  const testIds = items.map((i) => i.test?.id).filter(Boolean);
+  const [{ data: prog }, { data: subs }, { data: atts }] = await Promise.all([
+    lessonIds.length
+      ? supabase.from("progress").select("lesson_id, status, score").eq("student_profile_id", studentId).in("lesson_id", lessonIds)
+      : Promise.resolve({ data: [] as any[] }),
+    assignmentIds.length
+      ? supabase.from("assignment_submissions").select("assignment_id, status, score, max_score, completed_at").eq("student_profile_id", studentId).in("assignment_id", assignmentIds)
+      : Promise.resolve({ data: [] as any[] }),
+    testIds.length
+      ? supabase.from("test_attempts").select("test_id, status, score, max_score, completed_at").eq("student_profile_id", studentId).in("test_id", testIds)
+      : Promise.resolve({ data: [] as any[] }),
+  ]);
+  const lessonMap = new Map((prog ?? []).map((p: any) => [p.lesson_id, p]));
+  const aMap = new Map<string, any>();
+  (subs ?? []).forEach((s: any) => {
+    const prev = aMap.get(s.assignment_id);
+    if (!prev || (s.completed_at && !prev.completed_at) || (s.score ?? 0) > (prev.score ?? 0)) aMap.set(s.assignment_id, s);
+  });
+  const tMap = new Map<string, any>();
+  (atts ?? []).forEach((a: any) => {
+    const prev = tMap.get(a.test_id);
+    if (!prev || (a.completed_at && !prev.completed_at) || (a.score ?? 0) > (prev.score ?? 0)) tMap.set(a.test_id, a);
+  });
+  return { lessonMap, aMap, tMap };
+}
+}
