@@ -146,6 +146,10 @@ function TodaysSchool() {
         )}
       </section>
 
+      {activeStudent && classIds.length > 0 && (
+        <PendingLists studentId={activeStudent.id} classIds={classIds} tr={tr} />
+      )}
+
       <section>
         <h2 className="text-xl font-extrabold mb-3">Try something new</h2>
         <div className="grid sm:grid-cols-2 gap-4">
