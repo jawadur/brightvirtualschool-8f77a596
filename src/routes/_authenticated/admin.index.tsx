@@ -376,8 +376,8 @@ function LessonsPanel({ unitId }: { unitId: string }) {
   const q = useQuery({
     queryKey: key,
     queryFn: async () => {
-      const { data, error } = await supabase.from("lessons").select("id, unit_id, code, title, lesson_type, estimated_minutes, sort_order").eq("unit_id", unitId).order("sort_order");
-      if (error) throw error; return (data ?? []) as Lesson[];
+      const { data, error } = await supabase.from("lessons").select("id, unit_id, code, title, lesson_type, estimated_minutes, sort_order, is_published").eq("unit_id", unitId).order("sort_order");
+      if (error) throw error; return (data ?? []) as LessonRow[];
     },
   });
 
@@ -410,6 +410,9 @@ function LessonsPanel({ unitId }: { unitId: string }) {
         <div key={l.id} className="flex items-center gap-2 py-1.5">
           <BookOpen className="h-4 w-4 text-muted-foreground" />
           <span className="flex-1 font-bold">{l.code} · {tr(l.title)}</span>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${l.is_published ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"}`}>
+            {l.is_published ? "Published" : "Draft"}
+          </span>
           <span className="text-xs text-muted-foreground">{l.lesson_type} · {l.estimated_minutes}m</span>
           <Link to="/admin/lesson/$lessonId" params={{ lessonId: l.id }}>
             <Button size="sm" variant="outline"><Pencil className="h-3 w-3 mr-1" />Edit</Button>
