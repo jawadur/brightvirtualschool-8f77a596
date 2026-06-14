@@ -108,7 +108,7 @@ function HomeworkCard({ row, onDone, hideAction }: { row: HomeworkRow; onDone: (
         </div>
       </div>
       <div className="flex gap-2">
-        <Link {...(target as never)}>
+        <Link {...(target as unknown as { to: string })}>
           <Button size="sm" variant="secondary" className="rounded-2xl">Open <ArrowRight className="ml-1 h-4 w-4" /></Button>
         </Link>
         {!hideAction && (
