@@ -24,6 +24,7 @@ import { Route as AuthenticatedStudentTestsRouteImport } from './routes/_authent
 import { Route as AuthenticatedStudentRewardsRouteImport } from './routes/_authenticated/student.rewards'
 import { Route as AuthenticatedStudentReadingRouteImport } from './routes/_authenticated/student.reading'
 import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
+import { Route as AuthenticatedStudentBrushUpRouteImport } from './routes/_authenticated/student.brush-up'
 import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
 import { Route as AuthenticatedStudentAiTeacherRouteImport } from './routes/_authenticated/student.ai-teacher'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
@@ -120,6 +121,12 @@ const AuthenticatedStudentProgressRoute =
   AuthenticatedStudentProgressRouteImport.update({
     id: '/progress',
     path: '/progress',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentBrushUpRoute =
+  AuthenticatedStudentBrushUpRouteImport.update({
+    id: '/brush-up',
+    path: '/brush-up',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentAttendanceRoute =
@@ -240,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
@@ -270,6 +278,7 @@ export interface FileRoutesByTo {
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
@@ -305,6 +314,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
+  '/_authenticated/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
   '/_authenticated/student/reading': typeof AuthenticatedStudentReadingRoute
   '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
@@ -340,6 +350,7 @@ export interface FileRouteTypes {
     | '/admin/tests'
     | '/student/ai-teacher'
     | '/student/attendance'
+    | '/student/brush-up'
     | '/student/progress'
     | '/student/reading'
     | '/student/rewards'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/admin/tests'
     | '/student/ai-teacher'
     | '/student/attendance'
+    | '/student/brush-up'
     | '/student/progress'
     | '/student/reading'
     | '/student/rewards'
@@ -404,6 +416,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/tests'
     | '/_authenticated/student/ai-teacher'
     | '/_authenticated/student/attendance'
+    | '/_authenticated/student/brush-up'
     | '/_authenticated/student/progress'
     | '/_authenticated/student/reading'
     | '/_authenticated/student/rewards'
@@ -534,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/student/progress'
       preLoaderRoute: typeof AuthenticatedStudentProgressRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/brush-up': {
+      id: '/_authenticated/student/brush-up'
+      path: '/brush-up'
+      fullPath: '/student/brush-up'
+      preLoaderRoute: typeof AuthenticatedStudentBrushUpRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/attendance': {
@@ -704,6 +724,7 @@ const AuthenticatedParentRouteWithChildren =
 interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentAiTeacherRoute: typeof AuthenticatedStudentAiTeacherRoute
   AuthenticatedStudentAttendanceRoute: typeof AuthenticatedStudentAttendanceRoute
+  AuthenticatedStudentBrushUpRoute: typeof AuthenticatedStudentBrushUpRoute
   AuthenticatedStudentProgressRoute: typeof AuthenticatedStudentProgressRoute
   AuthenticatedStudentReadingRoute: typeof AuthenticatedStudentReadingRoute
   AuthenticatedStudentRewardsRoute: typeof AuthenticatedStudentRewardsRoute
@@ -719,6 +740,7 @@ interface AuthenticatedStudentRouteChildren {
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentAiTeacherRoute: AuthenticatedStudentAiTeacherRoute,
   AuthenticatedStudentAttendanceRoute: AuthenticatedStudentAttendanceRoute,
+  AuthenticatedStudentBrushUpRoute: AuthenticatedStudentBrushUpRoute,
   AuthenticatedStudentProgressRoute: AuthenticatedStudentProgressRoute,
   AuthenticatedStudentReadingRoute: AuthenticatedStudentReadingRoute,
   AuthenticatedStudentRewardsRoute: AuthenticatedStudentRewardsRoute,
