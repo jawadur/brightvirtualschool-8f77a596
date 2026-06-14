@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, CalendarCheck, BookOpen, ClipboardList, ClipboardCheck } from "lucide-react";
+import { ChevronLeft, CalendarCheck, BookOpen, ClipboardList, ClipboardCheck, Clock, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/parent/child/$childId")({
   component: ChildDetail,
@@ -39,7 +39,7 @@ function ChildDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("progress")
-        .select("lesson_id, status, score, completed_at, lessons(units(subject_id))")
+        .select("lesson_id, status, score, completed_at, time_spent_seconds, lessons(units(subject_id))")
         .eq("student_profile_id", childId);
       if (error) throw error; return data ?? [];
     },
@@ -88,6 +88,20 @@ function ChildDetail() {
     if (!p.completed_at) return false;
     return new Date(p.completed_at).getTime() > Date.now() - 7 * 24 * 3600 * 1000;
   }).length;
+  const completedLastWeek = (progress.data ?? []).filter((p) => {
+    if (!p.completed_at) return false;
+    const t = new Date(p.completed_at).getTime();
+    return t > Date.now() - 14 * 24 * 3600 * 1000 && t <= Date.now() - 7 * 24 * 3600 * 1000;
+  }).length;
+  const completedThisMonth = (progress.data ?? []).filter((p) => {
+    if (!p.completed_at) return false;
+    return new Date(p.completed_at).getTime() > Date.now() - 30 * 24 * 3600 * 1000;
+  }).length;
+  const weeklyGrowth = completedLastWeek === 0
+    ? (completedThisWeek > 0 ? "+100%" : "0%")
+    : `${completedThisWeek - completedLastWeek >= 0 ? "+" : ""}${Math.round(((completedThisWeek - completedLastWeek) / completedLastWeek) * 100)}%`;
+  const totalSeconds = (progress.data ?? []).reduce((acc, p: any) => acc + (p.time_spent_seconds ?? 0), 0);
+  const learningTime = totalSeconds >= 3600 ? `${Math.round(totalSeconds / 360) / 10}h` : `${Math.round(totalSeconds / 60)}m`;
 
   return (
     <div className="space-y-6">
@@ -96,11 +110,17 @@ function ChildDetail() {
       </Link>
       <h1 className="text-3xl font-extrabold">{child.data.display_name}</h1>
 
-      <section className="grid sm:grid-cols-4 gap-3">
+      <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <SummaryCard icon={<CalendarCheck className="h-5 w-5" />} label="Present (7d)" value={`${presentDays}/7`} />
         <SummaryCard icon={<BookOpen className="h-5 w-5" />} label="Lessons this week" value={completedThisWeek} />
         <SummaryCard icon={<ClipboardList className="h-5 w-5" />} label="Assignments done" value={submissions.data?.filter((s) => s.status === "completed").length ?? 0} />
         <SummaryCard icon={<ClipboardCheck className="h-5 w-5" />} label="Tests taken" value={attempts.data?.length ?? 0} />
+      </section>
+
+      <section className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <SummaryCard icon={<TrendingUp className="h-5 w-5" />} label="Weekly growth" value={weeklyGrowth} />
+        <SummaryCard icon={<TrendingUp className="h-5 w-5" />} label="Monthly lessons" value={completedThisMonth} />
+        <SummaryCard icon={<Clock className="h-5 w-5" />} label="Learning time" value={learningTime} />
       </section>
 
       <section>
