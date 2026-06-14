@@ -27,6 +27,7 @@ import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_auth
 import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
 import { Route as AuthenticatedStudentAiTeacherRouteImport } from './routes/_authenticated/student.ai-teacher'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
+import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
 import { Route as AuthenticatedAdminQuestionsRouteImport } from './routes/_authenticated/admin.questions'
 import { Route as AuthenticatedAdminHomeworkRouteImport } from './routes/_authenticated/admin.homework'
 import { Route as AuthenticatedAdminBadgesRouteImport } from './routes/_authenticated/admin.badges'
@@ -138,6 +139,12 @@ const AuthenticatedAdminTestsRoute = AuthenticatedAdminTestsRouteImport.update({
   path: '/tests',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminScheduleRoute =
+  AuthenticatedAdminScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminQuestionsRoute =
   AuthenticatedAdminQuestionsRouteImport.update({
     id: '/questions',
@@ -229,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/admin/homework': typeof AuthenticatedAdminHomeworkRoute
   '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
@@ -258,6 +266,7 @@ export interface FileRoutesByTo {
   '/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/admin/homework': typeof AuthenticatedAdminHomeworkRoute
   '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
@@ -292,6 +301,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/_authenticated/admin/homework': typeof AuthenticatedAdminHomeworkRoute
   '/_authenticated/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
   '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
@@ -326,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/badges'
     | '/admin/homework'
     | '/admin/questions'
+    | '/admin/schedule'
     | '/admin/tests'
     | '/student/ai-teacher'
     | '/student/attendance'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/admin/badges'
     | '/admin/homework'
     | '/admin/questions'
+    | '/admin/schedule'
     | '/admin/tests'
     | '/student/ai-teacher'
     | '/student/attendance'
@@ -388,6 +400,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/badges'
     | '/_authenticated/admin/homework'
     | '/_authenticated/admin/questions'
+    | '/_authenticated/admin/schedule'
     | '/_authenticated/admin/tests'
     | '/_authenticated/student/ai-teacher'
     | '/_authenticated/student/attendance'
@@ -544,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTestsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/schedule': {
+      id: '/_authenticated/admin/schedule'
+      path: '/schedule'
+      fullPath: '/admin/schedule'
+      preLoaderRoute: typeof AuthenticatedAdminScheduleRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/questions': {
       id: '/_authenticated/admin/questions'
       path: '/questions'
@@ -643,6 +663,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBadgesRoute: typeof AuthenticatedAdminBadgesRoute
   AuthenticatedAdminHomeworkRoute: typeof AuthenticatedAdminHomeworkRoute
   AuthenticatedAdminQuestionsRoute: typeof AuthenticatedAdminQuestionsRoute
+  AuthenticatedAdminScheduleRoute: typeof AuthenticatedAdminScheduleRoute
   AuthenticatedAdminTestsRoute: typeof AuthenticatedAdminTestsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminAssignmentAssignmentIdRoute: typeof AuthenticatedAdminAssignmentAssignmentIdRoute
@@ -655,6 +676,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBadgesRoute: AuthenticatedAdminBadgesRoute,
   AuthenticatedAdminHomeworkRoute: AuthenticatedAdminHomeworkRoute,
   AuthenticatedAdminQuestionsRoute: AuthenticatedAdminQuestionsRoute,
+  AuthenticatedAdminScheduleRoute: AuthenticatedAdminScheduleRoute,
   AuthenticatedAdminTestsRoute: AuthenticatedAdminTestsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminAssignmentAssignmentIdRoute:
