@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/app/AppHeader";
 import { useStudents } from "@/lib/student-context";
 import { useI18n } from "@/lib/i18n";
 import { StudentPrefsProvider } from "@/lib/student-prefs";
-import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck, Sparkles, Settings as SettingsIcon, LineChart } from "lucide-react";
+import { Home, Trophy, BarChart3, CalendarCheck, ClipboardCheck, Sparkles, Settings as SettingsIcon, LineChart, GraduationCap, RefreshCcw } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student")({
   component: StudentShell,
@@ -30,6 +30,8 @@ function StudentShell() {
   const tabs = [
     { to: "/student", icon: Home, label: t("todays_school"), exact: true },
     { to: "/student/brush-up", icon: Sparkles, label: "Brush-Up" },
+    { to: "/student/readiness", icon: GraduationCap, label: "Readiness" },
+    { to: "/student/revision-center", icon: RefreshCcw, label: "Revision" },
     { to: "/student/tests", icon: ClipboardCheck, label: t("tests") },
     { to: "/student/progress", icon: BarChart3, label: t("progress") },
     { to: "/student/analytics", icon: LineChart, label: "Analytics" },
