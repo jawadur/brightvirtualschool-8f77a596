@@ -45,6 +45,7 @@ import { Route as AuthenticatedStudentProgramClassIdRouteImport } from './routes
 import { Route as AuthenticatedStudentLessonLessonIdRouteImport } from './routes/_authenticated/student.lesson.$lessonId'
 import { Route as AuthenticatedStudentClassroomLessonIdRouteImport } from './routes/_authenticated/student.classroom.$lessonId'
 import { Route as AuthenticatedStudentAssignmentAssignmentIdRouteImport } from './routes/_authenticated/student.assignment.$assignmentId'
+import { Route as AuthenticatedParentReportChildIdRouteImport } from './routes/_authenticated/parent.report.$childId'
 import { Route as AuthenticatedParentChildChildIdRouteImport } from './routes/_authenticated/parent.child.$childId'
 import { Route as AuthenticatedAdminTestTestIdRouteImport } from './routes/_authenticated/admin.test.$testId'
 import { Route as AuthenticatedAdminLessonLessonIdRouteImport } from './routes/_authenticated/admin.lesson.$lessonId'
@@ -255,6 +256,12 @@ const AuthenticatedStudentAssignmentAssignmentIdRoute =
     path: '/assignment/$assignmentId',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedParentReportChildIdRoute =
+  AuthenticatedParentReportChildIdRouteImport.update({
+    id: '/report/$childId',
+    path: '/report/$childId',
+    getParentRoute: () => AuthenticatedParentRoute,
+  } as any)
 const AuthenticatedParentChildChildIdRoute =
   AuthenticatedParentChildChildIdRouteImport.update({
     id: '/child/$childId',
@@ -314,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
   '/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
   '/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
+  '/parent/report/$childId': typeof AuthenticatedParentReportChildIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/student/classroom/$lessonId': typeof AuthenticatedStudentClassroomLessonIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
@@ -352,6 +360,7 @@ export interface FileRoutesByTo {
   '/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
   '/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
   '/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
+  '/parent/report/$childId': typeof AuthenticatedParentReportChildIdRoute
   '/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/student/classroom/$lessonId': typeof AuthenticatedStudentClassroomLessonIdRoute
   '/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
@@ -395,6 +404,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/lesson/$lessonId': typeof AuthenticatedAdminLessonLessonIdRoute
   '/_authenticated/admin/test/$testId': typeof AuthenticatedAdminTestTestIdRoute
   '/_authenticated/parent/child/$childId': typeof AuthenticatedParentChildChildIdRoute
+  '/_authenticated/parent/report/$childId': typeof AuthenticatedParentReportChildIdRoute
   '/_authenticated/student/assignment/$assignmentId': typeof AuthenticatedStudentAssignmentAssignmentIdRoute
   '/_authenticated/student/classroom/$lessonId': typeof AuthenticatedStudentClassroomLessonIdRoute
   '/_authenticated/student/lesson/$lessonId': typeof AuthenticatedStudentLessonLessonIdRoute
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/admin/lesson/$lessonId'
     | '/admin/test/$testId'
     | '/parent/child/$childId'
+    | '/parent/report/$childId'
     | '/student/assignment/$assignmentId'
     | '/student/classroom/$lessonId'
     | '/student/lesson/$lessonId'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/admin/lesson/$lessonId'
     | '/admin/test/$testId'
     | '/parent/child/$childId'
+    | '/parent/report/$childId'
     | '/student/assignment/$assignmentId'
     | '/student/classroom/$lessonId'
     | '/student/lesson/$lessonId'
@@ -518,6 +530,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/lesson/$lessonId'
     | '/_authenticated/admin/test/$testId'
     | '/_authenticated/parent/child/$childId'
+    | '/_authenticated/parent/report/$childId'
     | '/_authenticated/student/assignment/$assignmentId'
     | '/_authenticated/student/classroom/$lessonId'
     | '/_authenticated/student/lesson/$lessonId'
@@ -787,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/parent/report/$childId': {
+      id: '/_authenticated/parent/report/$childId'
+      path: '/report/$childId'
+      fullPath: '/parent/report/$childId'
+      preLoaderRoute: typeof AuthenticatedParentReportChildIdRouteImport
+      parentRoute: typeof AuthenticatedParentRoute
+    }
     '/_authenticated/parent/child/$childId': {
       id: '/_authenticated/parent/child/$childId'
       path: '/child/$childId'
@@ -856,11 +876,13 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedParentRouteChildren {
   AuthenticatedParentIndexRoute: typeof AuthenticatedParentIndexRoute
   AuthenticatedParentChildChildIdRoute: typeof AuthenticatedParentChildChildIdRoute
+  AuthenticatedParentReportChildIdRoute: typeof AuthenticatedParentReportChildIdRoute
 }
 
 const AuthenticatedParentRouteChildren: AuthenticatedParentRouteChildren = {
   AuthenticatedParentIndexRoute: AuthenticatedParentIndexRoute,
   AuthenticatedParentChildChildIdRoute: AuthenticatedParentChildChildIdRoute,
+  AuthenticatedParentReportChildIdRoute: AuthenticatedParentReportChildIdRoute,
 }
 
 const AuthenticatedParentRouteWithChildren =
