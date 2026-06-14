@@ -150,7 +150,7 @@ export async function computeSchoolReadiness(
       .then((r) => r.data ?? []),
     supabase
       .from("revision_progress")
-      .select("revision_item_id, status")
+      .select("revision_item_id, mastery")
       .eq("student_profile_id", studentId)
       .then((r) => r.data ?? []),
   ]);
@@ -212,7 +212,7 @@ export async function computeSchoolReadiness(
   // Attendance % (last 30 days, counting weekdays)
   const presentDays = attendance.filter((a: any) => a.present).length;
   const attendancePct = Math.min(100, Math.round((presentDays / 22) * 100)); // ~22 schooldays
-  const revCount = (revProg as any[]).filter((r) => r.status === "mastered" || r.status === "completed").length;
+  const revCount = (revProg as any[]).filter((r) => r.mastery === "mastered" || r.mastery === "practicing").length;
   const revisionBonus = Math.min(10, Math.round(revCount / 2));
 
   const subjects = Array.from(subjectMap.values()).sort((a, b) => a.subject_code.localeCompare(b.subject_code));
