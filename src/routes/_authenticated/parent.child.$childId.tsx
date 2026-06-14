@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, CalendarCheck, BookOpen, ClipboardList, ClipboardCheck, Clock, TrendingUp, GraduationCap, AlertTriangle, Target, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { computeSchoolReadiness } from "@/lib/readiness";
+import { fetchHomework, summarizeHomework } from "@/lib/homework";
 
 export const Route = createFileRoute("/_authenticated/parent/child/$childId")({
   component: ChildDetail,
@@ -88,6 +89,11 @@ function ChildDetail() {
     queryFn: () => computeSchoolReadiness(childId, [child.data!.class_id!]),
   });
 
+  const homework = useQuery({
+    queryKey: ["parent-homework", childId],
+    queryFn: () => fetchHomework(childId),
+  });
+
   if (child.isLoading || !child.data) return <p className="text-muted-foreground">Loading…</p>;
 
   const completedLessonIds = new Set(progress.data?.filter((p) => p.status === "completed").map((p) => p.lesson_id));
@@ -130,6 +136,21 @@ function ChildDetail() {
         <SummaryCard icon={<TrendingUp className="h-5 w-5" />} label="Monthly lessons" value={completedThisMonth} />
         <SummaryCard icon={<Clock className="h-5 w-5" />} label="Learning time" value={learningTime} />
       </section>
+
+      {homework.data && homework.data.length > 0 && (() => {
+        const s = summarizeHomework(homework.data);
+        return (
+          <section>
+            <h2 className="text-lg font-extrabold mb-2 flex items-center gap-2"><ClipboardList className="h-5 w-5 text-primary" /> Homework</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <SummaryCard icon={<Clock className="h-5 w-5" />} label="Pending" value={s.pending.length} />
+              <SummaryCard icon={<ClipboardCheck className="h-5 w-5" />} label="Completed" value={s.completed.length} />
+              <SummaryCard icon={<AlertTriangle className="h-5 w-5" />} label="Overdue" value={s.overdue.length} />
+              <SummaryCard icon={<TrendingUp className="h-5 w-5" />} label="Avg score" value={s.avgScore != null ? `${s.avgScore}%` : "—"} />
+            </div>
+          </section>
+        );
+      })()}
 
       {readiness.data && (
         <section className="space-y-4">
