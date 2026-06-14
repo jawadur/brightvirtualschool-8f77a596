@@ -24,6 +24,7 @@ type Klass = { id: string; board_id: string; code: string; name: Record<string, 
 type Subject = { id: string; class_id: string; code: string; name: Record<string, string>; icon: string | null; color: string | null; sort_order: number };
 type Unit = { id: string; subject_id: string; code: string; title: Record<string, string>; sort_order: number };
 type Lesson = { id: string; unit_id: string; code: string; title: Record<string, string>; lesson_type: string; estimated_minutes: number; sort_order: number };
+type LessonRow = Lesson & { is_published: boolean };
 
 function CurriculumPage() {
   const { tr } = useI18n();
@@ -73,7 +74,21 @@ function CurriculumPage() {
             <Row
               open={openBoardId === b.id}
               onToggle={() => setOpenBoardId(openBoardId === b.id ? null : b.id)}
-              label={`${b.code} · ${tr(b.name)}`}
+              label={`${b.code} · ${tr(b.name)}${b.is_active ? "" : " · (inactive)"}`}
+              extra={
+                <label className="flex items-center gap-1 text-xs font-bold">
+                  <input
+                    type="checkbox"
+                    checked={b.is_active}
+                    onChange={async (e) => {
+                      const { error } = await supabase.from("boards").update({ is_active: e.target.checked }).eq("id", b.id);
+                      if (error) { toast.error(error.message); return; }
+                      qc.invalidateQueries({ queryKey: ["admin-boards"] });
+                    }}
+                  />
+                  Active
+                </label>
+              }
               edit={
                 <EditEntity
                   title="Edit board"
@@ -112,8 +127,8 @@ function CurriculumPage() {
   );
 }
 
-function Row({ open, onToggle, label, edit, onDelete }: {
-  open: boolean; onToggle: () => void; label: string; edit?: React.ReactNode; onDelete?: () => void;
+function Row({ open, onToggle, label, edit, onDelete, extra }: {
+  open: boolean; onToggle: () => void; label: string; edit?: React.ReactNode; onDelete?: () => void; extra?: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -121,6 +136,7 @@ function Row({ open, onToggle, label, edit, onDelete }: {
         <ChevronRight className={`h-4 w-4 transition ${open ? "rotate-90" : ""}`} />
         {label}
       </button>
+      {extra}
       {edit}
       {onDelete && (
         <Button size="icon" variant="ghost" onClick={onDelete} aria-label="Delete">
@@ -360,8 +376,8 @@ function LessonsPanel({ unitId }: { unitId: string }) {
   const q = useQuery({
     queryKey: key,
     queryFn: async () => {
-      const { data, error } = await supabase.from("lessons").select("id, unit_id, code, title, lesson_type, estimated_minutes, sort_order").eq("unit_id", unitId).order("sort_order");
-      if (error) throw error; return (data ?? []) as Lesson[];
+      const { data, error } = await supabase.from("lessons").select("id, unit_id, code, title, lesson_type, estimated_minutes, sort_order, is_published").eq("unit_id", unitId).order("sort_order");
+      if (error) throw error; return (data ?? []) as LessonRow[];
     },
   });
 
@@ -394,6 +410,9 @@ function LessonsPanel({ unitId }: { unitId: string }) {
         <div key={l.id} className="flex items-center gap-2 py-1.5">
           <BookOpen className="h-4 w-4 text-muted-foreground" />
           <span className="flex-1 font-bold">{l.code} · {tr(l.title)}</span>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${l.is_published ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"}`}>
+            {l.is_published ? "Published" : "Draft"}
+          </span>
           <span className="text-xs text-muted-foreground">{l.lesson_type} · {l.estimated_minutes}m</span>
           <Link to="/admin/lesson/$lessonId" params={{ lessonId: l.id }}>
             <Button size="sm" variant="outline"><Pencil className="h-3 w-3 mr-1" />Edit</Button>
