@@ -334,6 +334,84 @@ export type Database = {
           },
         ]
       }
+      daily_schedule: {
+        Row: {
+          assignment_id: string | null
+          class_id: string
+          created_at: string
+          date: string
+          id: string
+          lesson_id: string | null
+          metadata: Json
+          sort_order: number
+          subject_id: string
+          test_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          class_id: string
+          created_at?: string
+          date: string
+          id?: string
+          lesson_id?: string | null
+          metadata?: Json
+          sort_order?: number
+          subject_id: string
+          test_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assignment_id?: string | null
+          class_id?: string
+          created_at?: string
+          date?: string
+          id?: string
+          lesson_id?: string | null
+          metadata?: Json
+          sort_order?: number
+          subject_id?: string
+          test_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_schedule_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_schedule_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_schedule_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_schedule_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_schedule_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lesson_objectives: {
         Row: {
           id: string
