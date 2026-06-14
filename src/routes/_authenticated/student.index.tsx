@@ -22,7 +22,9 @@ import {
   CheckCircle2,
   Lock,
   CalendarX,
+  ArrowRight,
 } from "lucide-react";
+import { fetchTodayRevision } from "@/lib/revision";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -113,6 +115,8 @@ function TodaysSchool() {
       </section>
 
       {nextUp && <ContinueLearningCard next={nextUp} tr={tr} />}
+
+      {activeStudent && <TodaysRevisionWidget studentId={activeStudent.id} />}
 
       {pct === 100 && totalSubjects > 0 && <DailySummary enriched={enriched} tr={tr} />}
 
