@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
+import { ReadAloud } from "@/components/app/ReadAloud";
+import { useStudentPrefs } from "@/lib/student-prefs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
@@ -10,11 +12,14 @@ import type { LessonStep } from "@/lib/data";
 export function LessonPlayer({
   steps,
   onFinished,
+  lang = "en",
 }: {
   steps: LessonStep[];
   onFinished: (result: { score: number; coinsEarned: number }) => void;
+  lang?: "en" | "hi" | "te";
 }) {
   const { t, tr } = useI18n();
+  const { prefs } = useStudentPrefs();
   const [idx, setIdx] = useState(0);
   const [coins, setCoins] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -30,6 +35,8 @@ export function LessonPlayer({
 
   const step = steps[idx];
   const pct = Math.round(((idx + 1) / steps.length) * 100);
+
+  const readableText = useMemo(() => extractReadableText(step, tr), [step, tr]);
 
   const reset = () => {
     setFeedback(null); setCanAdvance(false); setSelected(null); setText(""); setMatches({});
@@ -85,6 +92,17 @@ export function LessonPlayer({
       </div>
 
       <Card className="p-6 min-h-[280px]">
+        {readableText && (
+          <div className="flex justify-end mb-2">
+            <ReadAloud
+              text={readableText}
+              lang={lang}
+              variant="controls"
+              label="🔊 Read Aloud"
+              autoStart={idx === 0 && prefs.auto_read_lesson}
+            />
+          </div>
+        )}
         {step.type === "introduction" && (
           <div className="text-center py-6">
             <div className="text-6xl mb-4">👋</div>
