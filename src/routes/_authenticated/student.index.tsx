@@ -8,6 +8,8 @@ import {
   markAttendance,
   fetchTodaySchedule,
   fetchScheduleStatuses,
+  fetchPendingAssignments,
+  fetchPendingTests,
 } from "@/lib/data";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
