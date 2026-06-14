@@ -18,7 +18,7 @@ export async function logJourney(input: Omit<JourneyEvent, "id" | "occurred_at" 
     title: input.title,
     description: input.description ?? null,
     icon: input.icon ?? null,
-    payload: input.payload ?? {},
+    payload: (input.payload ?? {}) as never,
   });
 }
 

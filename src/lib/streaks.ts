@@ -34,5 +34,6 @@ export async function bumpStreak(
     .eq("id", studentId)
     .maybeSingle();
   const current = (data as Record<string, number> | null)?.[kind] ?? 0;
-  await supabase.from("student_profiles").update({ [kind]: current + 1 }).eq("id", studentId);
+  const patch = { [kind]: current + 1 } as never;
+  await supabase.from("student_profiles").update(patch).eq("id", studentId);
 }
