@@ -138,7 +138,104 @@ export function LessonPlayer({
             <Button onClick={() => { setCorrectCount((c) => c + 1); next(); }}>{t("done")}</Button>
           </div>
         )}
+        {step.type === "drag_drop" && (
+          <DragDrop step={step} matches={matches} setMatches={setMatches} feedback={feedback} canAdvance={canAdvance}
+            onCheck={() => {
+              const ok = step.mapping.every((targetIdx, itemIdx) => matches[itemIdx] === targetIdx);
+              setFeedback(ok ? "correct" : "wrong");
+              if (ok) {
+                setCorrectCount((c) => c + 1);
+                if (step.coins) setCoins((c) => c + step.coins!);
+                setCanAdvance(true);
+              }
+            }}
+            onNext={next}
+          />
+        )}
+        {step.type === "picture_question" && (
+          <div>
+            <img src={step.image_url} alt="" className="rounded-2xl mx-auto max-h-56 object-contain mb-4" />
+            <p className="text-lg font-bold mb-4">{tr(step.question)}</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {step.options.map((opt, i) => (
+                <button
+                  key={i}
+                  disabled={feedback === "correct"}
+                  onClick={() => setSelected(i)}
+                  className={`rounded-2xl border-2 p-4 text-left font-bold transition ${
+                    selected === i ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  {tr(opt)}
+                </button>
+              ))}
+            </div>
+            <ActionRow feedback={feedback} canAdvance={canAdvance} disabled={selected == null}
+              onCheck={() => {
+                const ok = selected === step.answer;
+                setFeedback(ok ? "correct" : "wrong");
+                if (ok) {
+                  setCorrectCount((c) => c + 1);
+                  if (step.coins) setCoins((c) => c + step.coins!);
+                  setCanAdvance(true);
+                }
+              }}
+              onNext={next} />
+          </div>
+        )}
+        {step.type === "audio_placeholder" && (
+          <div className="text-center py-6">
+            <div className="text-6xl mb-4">🔊</div>
+            <p className="text-sm text-muted-foreground">{tr(step.instructions)}</p>
+            <p className="mt-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold">Audio activity — coming soon</p>
+            <div className="mt-6"><Button onClick={() => { setCanAdvance(true); next(); }}>{t("next")}</Button></div>
+          </div>
+        )}
+        {step.type === "speaking_placeholder" && (
+          <div className="text-center py-6">
+            <div className="text-6xl mb-4">🎤</div>
+            <p className="text-lg font-bold">{tr(step.prompt)}</p>
+            <p className="mt-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold">Speaking activity — coming soon</p>
+            <div className="mt-6"><Button onClick={() => { setCanAdvance(true); next(); }}>{t("next")}</Button></div>
+          </div>
+        )}
       </Card>
+    </div>
+  );
+}
+
+function DragDrop({
+  step, matches, setMatches, feedback, canAdvance, onCheck, onNext,
+}: {
+  step: Extract<LessonStep, { type: "drag_drop" }>;
+  matches: Record<number, number>;
+  setMatches: (m: Record<number, number>) => void;
+  feedback: null | "correct" | "wrong";
+  canAdvance: boolean;
+  onCheck: () => void;
+  onNext: () => void;
+}) {
+  const { tr } = useI18n();
+  return (
+    <div>
+      <p className="text-lg font-bold mb-4">{tr(step.question)}</p>
+      <div className="space-y-3">
+        {step.items.map((it, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="flex-1 rounded-2xl bg-accent px-4 py-3 font-bold">{tr(it)}</div>
+            <span className="text-muted-foreground">→</span>
+            <select
+              value={matches[i] ?? ""}
+              onChange={(e) => setMatches({ ...matches, [i]: Number(e.target.value) })}
+              className="flex-1 rounded-2xl border-2 border-border bg-card px-4 py-3 font-bold"
+            >
+              <option value="">Drop here…</option>
+              {step.targets.map((t, idx) => <option key={idx} value={idx}>{tr(t)}</option>)}
+            </select>
+          </div>
+        ))}
+      </div>
+      <ActionRow feedback={feedback} canAdvance={canAdvance} disabled={Object.keys(matches).length !== step.items.length} onCheck={onCheck} onNext={onNext} />
     </div>
   );
 }

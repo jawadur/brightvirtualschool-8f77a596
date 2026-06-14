@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { fetchSubjectsForClass, fetchStudentProgress, markAttendance } from "@/lib/data";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, PlayCircle } from "lucide-react";
+import { CheckCircle2, PlayCircle, Sparkles, Mic } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: Dashboard,
@@ -83,6 +83,30 @@ function Dashboard() {
               </Link>
             );
           })}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-xl font-extrabold mb-3">Try something new</h2>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Link to="/student/ai-teacher">
+            <Card className="p-5 hover:shadow-pop transition cursor-pointer flex items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center"><Sparkles className="h-6 w-6 text-primary" /></div>
+              <div>
+                <div className="font-extrabold">AI Teacher</div>
+                <div className="text-xs text-muted-foreground">Ask anything, get help</div>
+              </div>
+            </Card>
+          </Link>
+          <Link to="/student/reading">
+            <Card className="p-5 hover:shadow-pop transition cursor-pointer flex items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-secondary/40 flex items-center justify-center"><Mic className="h-6 w-6 text-foreground" /></div>
+              <div>
+                <div className="font-extrabold">Reading Check</div>
+                <div className="text-xs text-muted-foreground">Read aloud & earn stars</div>
+              </div>
+            </Card>
+          </Link>
         </div>
       </section>
     </div>

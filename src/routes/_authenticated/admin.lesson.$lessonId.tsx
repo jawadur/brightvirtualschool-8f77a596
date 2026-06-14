@@ -28,6 +28,10 @@ const STEP_TYPES: { value: LessonStep["type"]; label: string }[] = [
   { value: "fill_blank", label: "Fill the blank" },
   { value: "match_pairs", label: "Match pairs" },
   { value: "tracing_activity", label: "Tracing" },
+  { value: "drag_drop", label: "Drag & drop" },
+  { value: "picture_question", label: "Picture question" },
+  { value: "audio_placeholder", label: "Audio (placeholder)" },
+  { value: "speaking_placeholder", label: "Speaking (placeholder)" },
 ];
 
 function LessonEditor() {
@@ -98,6 +102,10 @@ function LessonEditor() {
       case "fill_blank": s = { type, question: { en: "" }, answer: "", coins: 5 }; break;
       case "match_pairs": s = { type, pairs: [{ left: { en: "" }, right: { en: "" } }], coins: 5 }; break;
       case "tracing_activity": s = { type, letter: "A", instructions: { en: "Trace the letter" } }; break;
+      case "drag_drop": s = { type, question: { en: "Match each item to its group" }, items: [{ en: "" }], targets: [{ en: "" }], mapping: [0], coins: 5 }; break;
+      case "picture_question": s = { type, image_url: "", question: { en: "" }, options: [{ en: "" }, { en: "" }], answer: 0, coins: 5 }; break;
+      case "audio_placeholder": s = { type, instructions: { en: "Listen carefully" } }; break;
+      case "speaking_placeholder": s = { type, prompt: { en: "Say it aloud" } }; break;
     }
     setSteps([...steps, s!]);
   };
@@ -264,6 +272,93 @@ function StepFields({ step, onChange }: { step: LessonStep; onChange: (p: Partia
         <I18nField label="Instructions" value={step.instructions} onChange={(v) => onChange({ instructions: v } as any)} required />
       </div>
     );
+  }
+  if (step.type === "drag_drop") {
+    return (
+      <div className="space-y-3">
+        <I18nField label="Question" value={step.question} onChange={(v) => onChange({ question: v } as any)} required />
+        <Label>Items (each maps to a target index)</Label>
+        {step.items.map((it, i) => (
+          <div key={i} className="grid sm:grid-cols-[1fr,140px,auto] gap-2 items-end rounded-xl border p-3">
+            <I18nField label={`Item ${i + 1}`} value={it} onChange={(v) => {
+              const items = [...step.items]; items[i] = v;
+              onChange({ items } as any);
+            }} required />
+            <div>
+              <Label>Target index</Label>
+              <Input type="number" min={0} max={step.targets.length - 1} value={step.mapping[i] ?? 0} onChange={(e) => {
+                const mapping = [...step.mapping]; mapping[i] = Number(e.target.value) || 0;
+                onChange({ mapping } as any);
+              }} />
+            </div>
+            <Button size="icon" variant="ghost" onClick={() => {
+              onChange({
+                items: step.items.filter((_, k) => k !== i),
+                mapping: step.mapping.filter((_, k) => k !== i),
+              } as any);
+            }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </div>
+        ))}
+        <Button size="sm" variant="outline" onClick={() => onChange({ items: [...step.items, { en: "" }], mapping: [...step.mapping, 0] } as any)}>
+          <Plus className="h-3 w-3 mr-1" />Item
+        </Button>
+        <Label>Targets / groups</Label>
+        {step.targets.map((tg, i) => (
+          <div key={i} className="flex items-end gap-2 rounded-xl border p-3">
+            <div className="flex-1">
+              <I18nField label={`Target ${i}`} value={tg} onChange={(v) => {
+                const targets = [...step.targets]; targets[i] = v;
+                onChange({ targets } as any);
+              }} required />
+            </div>
+            <Button size="icon" variant="ghost" onClick={() => {
+              onChange({ targets: step.targets.filter((_, k) => k !== i) } as any);
+            }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </div>
+        ))}
+        <Button size="sm" variant="outline" onClick={() => onChange({ targets: [...step.targets, { en: "" }] } as any)}>
+          <Plus className="h-3 w-3 mr-1" />Target
+        </Button>
+        <CoinsField value={step.coins ?? 0} onChange={(v) => onChange({ coins: v } as any)} />
+      </div>
+    );
+  }
+  if (step.type === "picture_question") {
+    return (
+      <div className="space-y-3">
+        <div>
+          <Label>Image URL</Label>
+          <Input value={step.image_url} onChange={(e) => onChange({ image_url: e.target.value } as any)} placeholder="https://…" />
+        </div>
+        <I18nField label="Question" value={step.question} onChange={(v) => onChange({ question: v } as any)} required />
+        <Label>Options (select correct)</Label>
+        {step.options.map((opt, i) => (
+          <div key={i} className="flex items-start gap-2 rounded-xl border p-3">
+            <input type="radio" checked={step.answer === i} onChange={() => onChange({ answer: i } as any)} className="mt-3" />
+            <div className="flex-1">
+              <I18nField label={`Option ${i + 1}`} value={opt} onChange={(v) => {
+                const options = [...step.options]; options[i] = v;
+                onChange({ options } as any);
+              }} required />
+            </div>
+            <Button size="icon" variant="ghost" onClick={() => {
+              const options = step.options.filter((_, k) => k !== i);
+              onChange({ options, answer: Math.min(step.answer, options.length - 1) } as any);
+            }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </div>
+        ))}
+        <Button size="sm" variant="outline" onClick={() => onChange({ options: [...step.options, { en: "" }] } as any)}>
+          <Plus className="h-3 w-3 mr-1" />Option
+        </Button>
+        <CoinsField value={step.coins ?? 0} onChange={(v) => onChange({ coins: v } as any)} />
+      </div>
+    );
+  }
+  if (step.type === "audio_placeholder") {
+    return <I18nField label="Instructions" value={step.instructions} onChange={(v) => onChange({ instructions: v } as any)} required />;
+  }
+  if (step.type === "speaking_placeholder") {
+    return <I18nField label="Prompt" value={step.prompt} onChange={(v) => onChange({ prompt: v } as any)} required />;
   }
   return null;
 }
