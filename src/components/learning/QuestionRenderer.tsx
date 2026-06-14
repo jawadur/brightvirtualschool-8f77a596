@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ReadAloud } from "@/components/app/ReadAloud";
 
 export type I18nText = Record<string, string> | string;
 
@@ -97,7 +98,6 @@ export function QuestionRenderer({
 }) {
   const { tr } = useI18n();
   const correct = useMemo(() => scoreQuestion(question, answer), [question, answer]);
-  const ReadAloud = require("@/components/app/ReadAloud").ReadAloud as typeof import("@/components/app/ReadAloud").ReadAloud;
 
   const feedbackClass = showFeedback
     ? correct
