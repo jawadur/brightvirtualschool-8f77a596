@@ -8,6 +8,8 @@ import {
   markAttendance,
   fetchTodaySchedule,
   fetchScheduleStatuses,
+  fetchPendingAssignments,
+  fetchPendingTests,
 } from "@/lib/data";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -143,6 +145,10 @@ function TodaysSchool() {
           </div>
         )}
       </section>
+
+      {activeStudent && classIds.length > 0 && (
+        <PendingLists studentId={activeStudent.id} classIds={classIds} tr={tr} />
+      )}
 
       <section>
         <h2 className="text-xl font-extrabold mb-3">Try something new</h2>
@@ -359,5 +365,67 @@ function TodaysRevisionWidget({ studentId }: { studentId: string }) {
         </div>
       </Card>
     </Link>
+  );
+}
+
+function PendingLists({ studentId, classIds, tr }: { studentId: string; classIds: string[]; tr: (v: any) => string }) {
+  const { data: pa = [] } = useQuery({
+    queryKey: ["pending-assignments", studentId, classIds.join(",")],
+    queryFn: () => fetchPendingAssignments(studentId, classIds),
+  });
+  const { data: pt = [] } = useQuery({
+    queryKey: ["pending-tests", studentId, classIds.join(",")],
+    queryFn: () => fetchPendingTests(studentId, classIds),
+  });
+  if (pa.length === 0 && pt.length === 0) return null;
+  return (
+    <section className="grid sm:grid-cols-2 gap-4">
+      {pa.length > 0 && (
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <PencilLine className="h-5 w-5 text-primary" />
+            <h3 className="font-extrabold">Pending Assignments</h3>
+            <span className="ml-auto text-xs font-bold bg-primary/15 text-primary rounded-full px-2 py-0.5">{pa.length}</span>
+          </div>
+          <div className="space-y-2">
+            {pa.map((a: any) => (
+              <Link key={a.id} to="/student/assignment/$assignmentId" params={{ assignmentId: a.id }}>
+                <div className="rounded-xl border-2 border-primary/20 p-2 hover:bg-primary/5 flex items-center gap-2">
+                  <span className="text-lg">{a.subject?.icon || "📘"}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-bold truncate">{tr(a.title)}</div>
+                    <div className="text-xs text-muted-foreground truncate">{tr(a.subject?.name)}</div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Card>
+      )}
+      {pt.length > 0 && (
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <ClipboardCheck className="h-5 w-5 text-accent-foreground" />
+            <h3 className="font-extrabold">Pending Tests</h3>
+            <span className="ml-auto text-xs font-bold bg-accent/40 rounded-full px-2 py-0.5">{pt.length}</span>
+          </div>
+          <div className="space-y-2">
+            {pt.map((t: any) => (
+              <Link key={t.id} to="/student/test/$testId" params={{ testId: t.id }}>
+                <div className="rounded-xl border-2 border-accent/40 p-2 hover:bg-accent/20 flex items-center gap-2">
+                  <span className="text-lg">{t.subject?.icon || "📝"}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-bold truncate">{tr(t.title)}</div>
+                    <div className="text-xs text-muted-foreground truncate">{tr(t.subject?.name)} · {t.scope}</div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Card>
+      )}
+    </section>
   );
 }
