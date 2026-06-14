@@ -24,6 +24,7 @@ import { Route as AuthenticatedStudentTestsRouteImport } from './routes/_authent
 import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student.settings'
 import { Route as AuthenticatedStudentRewardsRouteImport } from './routes/_authenticated/student.rewards'
 import { Route as AuthenticatedStudentReadingRouteImport } from './routes/_authenticated/student.reading'
+import { Route as AuthenticatedStudentReadinessRouteImport } from './routes/_authenticated/student.readiness'
 import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
 import { Route as AuthenticatedStudentBrushUpRouteImport } from './routes/_authenticated/student.brush-up'
 import { Route as AuthenticatedStudentAttendanceRouteImport } from './routes/_authenticated/student.attendance'
@@ -126,6 +127,12 @@ const AuthenticatedStudentReadingRoute =
   AuthenticatedStudentReadingRouteImport.update({
     id: '/reading',
     path: '/reading',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentReadinessRoute =
+  AuthenticatedStudentReadinessRouteImport.update({
+    id: '/readiness',
+    path: '/readiness',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentProgressRoute =
@@ -287,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/student/readiness': typeof AuthenticatedStudentReadinessRoute
   '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
@@ -323,6 +331,7 @@ export interface FileRoutesByTo {
   '/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/student/readiness': typeof AuthenticatedStudentReadinessRoute
   '/student/reading': typeof AuthenticatedStudentReadingRoute
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
@@ -364,6 +373,7 @@ export interface FileRoutesById {
   '/_authenticated/student/attendance': typeof AuthenticatedStudentAttendanceRoute
   '/_authenticated/student/brush-up': typeof AuthenticatedStudentBrushUpRoute
   '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
+  '/_authenticated/student/readiness': typeof AuthenticatedStudentReadinessRoute
   '/_authenticated/student/reading': typeof AuthenticatedStudentReadingRoute
   '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/student/attendance'
     | '/student/brush-up'
     | '/student/progress'
+    | '/student/readiness'
     | '/student/reading'
     | '/student/rewards'
     | '/student/settings'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/student/attendance'
     | '/student/brush-up'
     | '/student/progress'
+    | '/student/readiness'
     | '/student/reading'
     | '/student/rewards'
     | '/student/settings'
@@ -481,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/attendance'
     | '/_authenticated/student/brush-up'
     | '/_authenticated/student/progress'
+    | '/_authenticated/student/readiness'
     | '/_authenticated/student/reading'
     | '/_authenticated/student/rewards'
     | '/_authenticated/student/settings'
@@ -612,6 +625,13 @@ declare module '@tanstack/react-router' {
       path: '/reading'
       fullPath: '/student/reading'
       preLoaderRoute: typeof AuthenticatedStudentReadingRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/readiness': {
+      id: '/_authenticated/student/readiness'
+      path: '/readiness'
+      fullPath: '/student/readiness'
+      preLoaderRoute: typeof AuthenticatedStudentReadinessRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/progress': {
@@ -832,6 +852,7 @@ interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentAttendanceRoute: typeof AuthenticatedStudentAttendanceRoute
   AuthenticatedStudentBrushUpRoute: typeof AuthenticatedStudentBrushUpRoute
   AuthenticatedStudentProgressRoute: typeof AuthenticatedStudentProgressRoute
+  AuthenticatedStudentReadinessRoute: typeof AuthenticatedStudentReadinessRoute
   AuthenticatedStudentReadingRoute: typeof AuthenticatedStudentReadingRoute
   AuthenticatedStudentRewardsRoute: typeof AuthenticatedStudentRewardsRoute
   AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
@@ -851,6 +872,7 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentAttendanceRoute: AuthenticatedStudentAttendanceRoute,
   AuthenticatedStudentBrushUpRoute: AuthenticatedStudentBrushUpRoute,
   AuthenticatedStudentProgressRoute: AuthenticatedStudentProgressRoute,
+  AuthenticatedStudentReadinessRoute: AuthenticatedStudentReadinessRoute,
   AuthenticatedStudentReadingRoute: AuthenticatedStudentReadingRoute,
   AuthenticatedStudentRewardsRoute: AuthenticatedStudentRewardsRoute,
   AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
