@@ -43,6 +43,8 @@ function LessonEditor() {
   const [lessonType, setLessonType] = useState("mixed");
   const [estimated, setEstimated] = useState(15);
   const [sortOrder, setSortOrder] = useState(0);
+  const [isPublished, setIsPublished] = useState(true);
+  const [prereqIds, setPrereqIds] = useState<string[]>([]);
   const [steps, setSteps] = useState<LessonStep[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -55,6 +57,35 @@ function LessonEditor() {
     },
   });
 
+  const siblingsQ = useQuery({
+    queryKey: ["admin-lesson-siblings", lessonId, (q.data as any)?.unit_id],
+    enabled: !!(q.data as any)?.unit_id,
+    queryFn: async () => {
+      const { data: unit } = await supabase.from("units").select("subject_id").eq("id", (q.data as any).unit_id).single();
+      if (!unit) return [];
+      const { data, error } = await supabase
+        .from("lessons")
+        .select("id, code, title, units!inner(title, sort_order, subject_id)")
+        .eq("units.subject_id", (unit as any).subject_id)
+        .neq("id", lessonId)
+        .order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const prereqQ = useQuery({
+    queryKey: ["admin-lesson-prereqs", lessonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("lesson_prerequisites")
+        .select("prerequisite_lesson_id")
+        .eq("lesson_id", lessonId);
+      if (error) throw error;
+      return (data ?? []).map((r: any) => r.prerequisite_lesson_id as string);
+    },
+  });
+
   useEffect(() => {
     if (!q.data) return;
     const d: any = q.data;
@@ -64,9 +95,14 @@ function LessonEditor() {
     setLessonType(d.lesson_type);
     setEstimated(d.estimated_minutes);
     setSortOrder(d.sort_order);
+    setIsPublished(d.is_published ?? true);
     const content = d.content || {};
     setSteps(Array.isArray(content.steps) ? content.steps : []);
   }, [q.data]);
+
+  useEffect(() => {
+    if (prereqQ.data) setPrereqIds(prereqQ.data);
+  }, [prereqQ.data]);
 
   const save = async () => {
     setSaving(true);
@@ -74,9 +110,17 @@ function LessonEditor() {
       const { error } = await supabase.from("lessons").update({
         code, title, description, lesson_type: lessonType as any,
         estimated_minutes: Number(estimated) || 0, sort_order: Number(sortOrder) || 0,
+        is_published: isPublished,
         content: { steps },
       }).eq("id", lessonId);
       if (error) throw error;
+      // Sync prerequisites
+      await supabase.from("lesson_prerequisites").delete().eq("lesson_id", lessonId);
+      if (prereqIds.length > 0) {
+        await supabase.from("lesson_prerequisites").insert(
+          prereqIds.map((pid) => ({ lesson_id: lessonId, prerequisite_lesson_id: pid })),
+        );
+      }
       toast.success("Lesson saved");
     } catch (e) { toast.error((e as Error).message); }
     finally { setSaving(false); }
@@ -140,9 +184,38 @@ function LessonEditor() {
             <Label>Sort order</Label>
             <Input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} />
           </div>
+          <div className="flex items-end">
+            <label className="flex items-center gap-2 font-bold">
+              <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="h-4 w-4" />
+              Published (visible to students)
+            </label>
+          </div>
         </div>
         <I18nField label="Title" value={title} onChange={setTitle} required />
         <I18nField label="Description" value={description} onChange={setDescription} textarea />
+        <div>
+          <Label>Prerequisite lessons</Label>
+          <p className="text-xs text-muted-foreground mb-2">Student must complete these before this lesson unlocks. Leave empty for sequential order.</p>
+          <div className="max-h-44 overflow-y-auto rounded-md border p-2 space-y-1">
+            {(siblingsQ.data ?? []).map((sib: any) => {
+              const checked = prereqIds.includes(sib.id);
+              return (
+                <label key={sib.id} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) =>
+                      setPrereqIds(e.target.checked ? [...prereqIds, sib.id] : prereqIds.filter((id) => id !== sib.id))
+                    }
+                  />
+                  <span className="font-mono text-xs text-muted-foreground">{sib.code}</span>
+                  <span>{(sib.title as any)?.en ?? sib.code}</span>
+                </label>
+              );
+            })}
+            {(siblingsQ.data ?? []).length === 0 && <p className="text-xs text-muted-foreground">No other lessons in this subject yet.</p>}
+          </div>
+        </div>
       </Card>
 
       <div className="flex items-center justify-between">
