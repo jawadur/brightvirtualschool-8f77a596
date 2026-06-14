@@ -27,11 +27,85 @@ export async function fetchSubjectsForClass(classId: string) {
 export async function fetchLessonsForSubject(subjectId: string) {
   const { data, error } = await supabase
     .from("lessons")
-    .select("id, code, title, description, lesson_type, estimated_minutes, sort_order, content, unit_id, units!inner(id, title, sort_order, subject_id)")
+    .select("id, code, title, description, lesson_type, estimated_minutes, sort_order, content, is_published, unit_id, units!inner(id, title, sort_order, subject_id)")
     .eq("units.subject_id", subjectId)
+    .eq("is_published", true)
     .order("sort_order", { ascending: true });
   if (error) throw error;
   return data ?? [];
+}
+
+export async function fetchActivePrograms() {
+  const { data, error } = await supabase
+    .from("boards")
+    .select("id, code, name, description, sort_order, classes(id, code, name, sort_order)")
+    .eq("is_active", true)
+    .order("sort_order");
+  if (error) throw error;
+  return (data ?? []).map((b: any) => ({
+    ...b,
+    classes: [...(b.classes ?? [])].sort((a: any, z: any) => a.sort_order - z.sort_order),
+  }));
+}
+
+export async function fetchClassLessonIds(classId: string) {
+  const { data, error } = await supabase
+    .from("lessons")
+    .select("id, units!inner(subjects!inner(class_id))")
+    .eq("units.subjects.class_id", classId)
+    .eq("is_published", true);
+  if (error) throw error;
+  return (data ?? []).map((l: any) => l.id as string);
+}
+
+export async function fetchProgramProgress(studentId: string, classId: string) {
+  const lessonIds = await fetchClassLessonIds(classId);
+  if (lessonIds.length === 0) return { total: 0, done: 0, pct: 0 };
+  const { data, error } = await supabase
+    .from("progress")
+    .select("lesson_id")
+    .eq("student_profile_id", studentId)
+    .eq("status", "completed")
+    .in("lesson_id", lessonIds);
+  if (error) throw error;
+  const done = data?.length ?? 0;
+  return { total: lessonIds.length, done, pct: Math.round((done / lessonIds.length) * 100) };
+}
+
+export async function fetchReadinessScore(studentId: string, classId: string) {
+  const lessonIds = await fetchClassLessonIds(classId);
+  if (lessonIds.length === 0) return { score: 0, breakdown: { lessons: 0, assignments: 0, tests: 0 } };
+
+  const [{ data: prog }, { data: subs }, { data: attempts }] = await Promise.all([
+    supabase.from("progress").select("lesson_id, score, status").eq("student_profile_id", studentId).in("lesson_id", lessonIds),
+    supabase.from("assignment_submissions").select("score, completed_at, assignments!inner(lesson_id)").eq("student_profile_id", studentId).in("assignments.lesson_id", lessonIds).not("completed_at", "is", null),
+    supabase.from("test_attempts").select("score, completed_at, tests!inner(subject_id, subjects!inner(class_id))").eq("student_profile_id", studentId).eq("tests.subjects.class_id", classId).not("completed_at", "is", null),
+  ]);
+
+  const doneLessons = (prog ?? []).filter((p: any) => p.status === "completed").length;
+  const lessonPct = Math.round((doneLessons / lessonIds.length) * 100);
+  const aScores = (subs ?? []).map((s: any) => s.score ?? 0);
+  const aAvg = aScores.length ? Math.round(aScores.reduce((a, b) => a + b, 0) / aScores.length) : 0;
+  const tScores = (attempts ?? []).map((a: any) => a.score ?? 0);
+  const tAvg = tScores.length ? Math.round(tScores.reduce((a, b) => a + b, 0) / tScores.length) : 0;
+  // weights: lessons 50%, assignments 25%, tests 25%
+  const score = Math.round(lessonPct * 0.5 + aAvg * 0.25 + tAvg * 0.25);
+  return { score, breakdown: { lessons: lessonPct, assignments: aAvg, tests: tAvg } };
+}
+
+export async function checkProgramGraduation(studentId: string, boardCode: string, badgeCode: string) {
+  const { data: board } = await supabase.from("boards").select("id, classes(id)").eq("code", boardCode).maybeSingle();
+  if (!board) return false;
+  for (const c of (board as any).classes ?? []) {
+    const p = await fetchProgramProgress(studentId, c.id);
+    if (p.total === 0 || p.done < p.total) return false;
+  }
+  const { data: badge } = await supabase.from("badges").select("id").eq("code", badgeCode).maybeSingle();
+  if (!badge) return false;
+  const { data: existing } = await supabase.from("student_badges").select("id").eq("student_profile_id", studentId).eq("badge_id", (badge as any).id).maybeSingle();
+  if (existing) return false;
+  await supabase.from("student_badges").insert({ student_profile_id: studentId, badge_id: (badge as any).id });
+  return true;
 }
 
 export async function fetchStudentProgress(studentId: string) {
@@ -116,4 +190,10 @@ export async function completeLesson(studentId: string, lessonId: string, score:
     },
     { onConflict: "student_profile_id,lesson_id" }
   );
+  // Check if KG2 Bridge Course is now complete and award the badge
+  try {
+    await checkProgramGraduation(studentId, "kg2-bridge", "kg2-bridge-complete");
+  } catch (e) {
+    console.warn("graduation check failed", e);
+  }
 }
