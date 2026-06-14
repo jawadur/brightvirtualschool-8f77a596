@@ -96,8 +96,7 @@ function TestEditor() {
               <option value="weekly">weekly</option>
               <option value="monthly">monthly</option>
               <option value="unit">unit</option>
-              <option value="term">term</option>
-              <option value="annual">annual</option>
+              <option value="custom">custom</option>
             </select>
           </div>
           <label className="flex items-center gap-2 mt-6 font-bold">
