@@ -57,6 +57,7 @@ import { Route as AuthenticatedParentChildChildIdRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminTestTestIdRouteImport } from './routes/_authenticated/admin.test.$testId'
 import { Route as AuthenticatedAdminLessonLessonIdRouteImport } from './routes/_authenticated/admin.lesson.$lessonId'
 import { Route as AuthenticatedAdminAssignmentAssignmentIdRouteImport } from './routes/_authenticated/admin.assignment.$assignmentId'
+import { Route as AuthenticatedStudentDailyProgramSubjectIdRouteImport } from './routes/_authenticated/student.daily.$program.$subjectId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -335,6 +336,12 @@ const AuthenticatedAdminAssignmentAssignmentIdRoute =
     path: '/assignment/$assignmentId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedStudentDailyProgramSubjectIdRoute =
+  AuthenticatedStudentDailyProgramSubjectIdRouteImport.update({
+    id: '/daily/$program/$subjectId',
+    path: '/daily/$program/$subjectId',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByFullPath {
   '/student/program/$classId': typeof AuthenticatedStudentProgramClassIdRoute
   '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
   '/student/test/$testId': typeof AuthenticatedStudentTestTestIdRoute
+  '/student/daily/$program/$subjectId': typeof AuthenticatedStudentDailyProgramSubjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -430,6 +438,7 @@ export interface FileRoutesByTo {
   '/student/program/$classId': typeof AuthenticatedStudentProgramClassIdRoute
   '/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
   '/student/test/$testId': typeof AuthenticatedStudentTestTestIdRoute
+  '/student/daily/$program/$subjectId': typeof AuthenticatedStudentDailyProgramSubjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -481,6 +490,7 @@ export interface FileRoutesById {
   '/_authenticated/student/program/$classId': typeof AuthenticatedStudentProgramClassIdRoute
   '/_authenticated/student/subject/$subjectId': typeof AuthenticatedStudentSubjectSubjectIdRoute
   '/_authenticated/student/test/$testId': typeof AuthenticatedStudentTestTestIdRoute
+  '/_authenticated/student/daily/$program/$subjectId': typeof AuthenticatedStudentDailyProgramSubjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -532,6 +542,7 @@ export interface FileRouteTypes {
     | '/student/program/$classId'
     | '/student/subject/$subjectId'
     | '/student/test/$testId'
+    | '/student/daily/$program/$subjectId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -578,6 +589,7 @@ export interface FileRouteTypes {
     | '/student/program/$classId'
     | '/student/subject/$subjectId'
     | '/student/test/$testId'
+    | '/student/daily/$program/$subjectId'
   id:
     | '__root__'
     | '/'
@@ -628,6 +640,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/program/$classId'
     | '/_authenticated/student/subject/$subjectId'
     | '/_authenticated/student/test/$testId'
+    | '/_authenticated/student/daily/$program/$subjectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -975,6 +988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAssignmentAssignmentIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/student/daily/$program/$subjectId': {
+      id: '/_authenticated/student/daily/$program/$subjectId'
+      path: '/daily/$program/$subjectId'
+      fullPath: '/student/daily/$program/$subjectId'
+      preLoaderRoute: typeof AuthenticatedStudentDailyProgramSubjectIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
   }
 }
 
@@ -1068,6 +1088,7 @@ interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentProgramClassIdRoute: typeof AuthenticatedStudentProgramClassIdRoute
   AuthenticatedStudentSubjectSubjectIdRoute: typeof AuthenticatedStudentSubjectSubjectIdRoute
   AuthenticatedStudentTestTestIdRoute: typeof AuthenticatedStudentTestTestIdRoute
+  AuthenticatedStudentDailyProgramSubjectIdRoute: typeof AuthenticatedStudentDailyProgramSubjectIdRoute
 }
 
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
@@ -1102,6 +1123,8 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentSubjectSubjectIdRoute:
     AuthenticatedStudentSubjectSubjectIdRoute,
   AuthenticatedStudentTestTestIdRoute: AuthenticatedStudentTestTestIdRoute,
+  AuthenticatedStudentDailyProgramSubjectIdRoute:
+    AuthenticatedStudentDailyProgramSubjectIdRoute,
 }
 
 const AuthenticatedStudentRouteWithChildren =
