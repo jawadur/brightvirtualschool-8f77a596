@@ -29,6 +29,7 @@ import {
 import { fetchTodayRevision } from "@/lib/revision";
 import { fetchHomework, summarizeHomework } from "@/lib/homework";
 import { ClipboardList } from "lucide-react";
+import { fetchActiveProgram, PROGRAMS } from "@/lib/program";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -46,6 +47,12 @@ function TodaysSchool() {
   const { data: programs = [] } = useQuery({
     queryKey: ["active-programs"],
     queryFn: fetchActivePrograms,
+  });
+
+  const { data: activeProgram } = useQuery({
+    queryKey: ["active-program", activeStudent?.id],
+    enabled: !!activeStudent,
+    queryFn: () => fetchActiveProgram(activeStudent!.id),
   });
 
   const classIds = useMemo(
@@ -119,6 +126,8 @@ function TodaysSchool() {
       </section>
 
       {nextUp && <ContinueLearningCard next={nextUp} tr={tr} />}
+
+      <ProgramBanner activeProgram={activeProgram ?? null} />
 
       {activeStudent && <TodaysRevisionWidget studentId={activeStudent.id} />}
 
@@ -389,6 +398,25 @@ function TodaysHomeworkWidget({ studentId }: { studentId: string }) {
             <div className="font-extrabold truncate">{s.pending.length} pending · {s.completed.length} done{s.overdue.length ? ` · ${s.overdue.length} overdue` : ""}</div>
           </div>
           <ArrowRight className="h-5 w-5 text-primary" />
+        </div>
+      </Card>
+    </Link>
+  );
+}
+
+function ProgramBanner({ activeProgram }: { activeProgram: string | null }) {
+  const current = PROGRAMS.find((p) => p.code === activeProgram);
+  return (
+    <Link to="/student/today">
+      <Card className="p-5 h-auto bg-gradient-to-r from-primary/10 to-secondary/40 hover:shadow-pop transition cursor-pointer">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+          <div className="text-4xl shrink-0">{current?.emoji ?? "🎒"}</div>
+          <div className="min-w-0">
+            <div className="text-xs font-bold uppercase text-primary">Current Program</div>
+            <div className="font-extrabold truncate">{current?.name ?? "Choose a program"}</div>
+            <div className="text-xs text-muted-foreground truncate">{current?.tagline ?? "Tap to pick KG2 Brush-Up or Class 1"}</div>
+          </div>
+          <div className="text-sm font-bold text-primary shrink-0">{current ? "Today's Learning →" : "Choose →"}</div>
         </div>
       </Card>
     </Link>
