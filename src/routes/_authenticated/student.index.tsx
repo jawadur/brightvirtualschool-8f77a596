@@ -29,6 +29,7 @@ import {
 import { fetchTodayRevision } from "@/lib/revision";
 import { fetchHomework, summarizeHomework } from "@/lib/homework";
 import { ClipboardList } from "lucide-react";
+import { fetchActiveProgram, PROGRAMS } from "@/lib/program";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -46,6 +47,12 @@ function TodaysSchool() {
   const { data: programs = [] } = useQuery({
     queryKey: ["active-programs"],
     queryFn: fetchActivePrograms,
+  });
+
+  const { data: activeProgram } = useQuery({
+    queryKey: ["active-program", activeStudent?.id],
+    enabled: !!activeStudent,
+    queryFn: () => fetchActiveProgram(activeStudent!.id),
   });
 
   const classIds = useMemo(
@@ -119,6 +126,8 @@ function TodaysSchool() {
       </section>
 
       {nextUp && <ContinueLearningCard next={nextUp} tr={tr} />}
+
+      <ProgramBanner activeProgram={activeProgram ?? null} />
 
       {activeStudent && <TodaysRevisionWidget studentId={activeStudent.id} />}
 
