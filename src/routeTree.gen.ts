@@ -29,6 +29,7 @@ import { Route as AuthenticatedStudentReadingRouteImport } from './routes/_authe
 import { Route as AuthenticatedStudentReadinessRouteImport } from './routes/_authenticated/student.readiness'
 import { Route as AuthenticatedStudentReadAlongRouteImport } from './routes/_authenticated/student.read-along'
 import { Route as AuthenticatedStudentProgressRouteImport } from './routes/_authenticated/student.progress'
+import { Route as AuthenticatedStudentProgramSelectRouteImport } from './routes/_authenticated/student.program-select'
 import { Route as AuthenticatedStudentPortfolioRouteImport } from './routes/_authenticated/student.portfolio'
 import { Route as AuthenticatedStudentHomeworkRouteImport } from './routes/_authenticated/student.homework'
 import { Route as AuthenticatedStudentClassroomRouteImport } from './routes/_authenticated/student.classroom'
@@ -164,6 +165,12 @@ const AuthenticatedStudentProgressRoute =
   AuthenticatedStudentProgressRouteImport.update({
     id: '/progress',
     path: '/progress',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentProgramSelectRoute =
+  AuthenticatedStudentProgramSelectRouteImport.update({
+    id: '/program-select',
+    path: '/program-select',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentPortfolioRoute =
@@ -345,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/student/classroom': typeof AuthenticatedStudentClassroomRouteWithChildren
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/portfolio': typeof AuthenticatedStudentPortfolioRoute
+  '/student/program-select': typeof AuthenticatedStudentProgramSelectRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/read-along': typeof AuthenticatedStudentReadAlongRoute
   '/student/readiness': typeof AuthenticatedStudentReadinessRoute
@@ -389,6 +397,7 @@ export interface FileRoutesByTo {
   '/student/classroom': typeof AuthenticatedStudentClassroomRouteWithChildren
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/portfolio': typeof AuthenticatedStudentPortfolioRoute
+  '/student/program-select': typeof AuthenticatedStudentProgramSelectRoute
   '/student/progress': typeof AuthenticatedStudentProgressRoute
   '/student/read-along': typeof AuthenticatedStudentReadAlongRoute
   '/student/readiness': typeof AuthenticatedStudentReadinessRoute
@@ -438,6 +447,7 @@ export interface FileRoutesById {
   '/_authenticated/student/classroom': typeof AuthenticatedStudentClassroomRouteWithChildren
   '/_authenticated/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/_authenticated/student/portfolio': typeof AuthenticatedStudentPortfolioRoute
+  '/_authenticated/student/program-select': typeof AuthenticatedStudentProgramSelectRoute
   '/_authenticated/student/progress': typeof AuthenticatedStudentProgressRoute
   '/_authenticated/student/read-along': typeof AuthenticatedStudentReadAlongRoute
   '/_authenticated/student/readiness': typeof AuthenticatedStudentReadinessRoute
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/student/classroom'
     | '/student/homework'
     | '/student/portfolio'
+    | '/student/program-select'
     | '/student/progress'
     | '/student/read-along'
     | '/student/readiness'
@@ -531,6 +542,7 @@ export interface FileRouteTypes {
     | '/student/classroom'
     | '/student/homework'
     | '/student/portfolio'
+    | '/student/program-select'
     | '/student/progress'
     | '/student/read-along'
     | '/student/readiness'
@@ -579,6 +591,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/classroom'
     | '/_authenticated/student/homework'
     | '/_authenticated/student/portfolio'
+    | '/_authenticated/student/program-select'
     | '/_authenticated/student/progress'
     | '/_authenticated/student/read-along'
     | '/_authenticated/student/readiness'
@@ -751,6 +764,13 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/student/progress'
       preLoaderRoute: typeof AuthenticatedStudentProgressRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/program-select': {
+      id: '/_authenticated/student/program-select'
+      path: '/program-select'
+      fullPath: '/student/program-select'
+      preLoaderRoute: typeof AuthenticatedStudentProgramSelectRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/portfolio': {
@@ -1011,6 +1031,7 @@ interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentClassroomRoute: typeof AuthenticatedStudentClassroomRouteWithChildren
   AuthenticatedStudentHomeworkRoute: typeof AuthenticatedStudentHomeworkRoute
   AuthenticatedStudentPortfolioRoute: typeof AuthenticatedStudentPortfolioRoute
+  AuthenticatedStudentProgramSelectRoute: typeof AuthenticatedStudentProgramSelectRoute
   AuthenticatedStudentProgressRoute: typeof AuthenticatedStudentProgressRoute
   AuthenticatedStudentReadAlongRoute: typeof AuthenticatedStudentReadAlongRoute
   AuthenticatedStudentReadinessRoute: typeof AuthenticatedStudentReadinessRoute
@@ -1037,6 +1058,8 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
     AuthenticatedStudentClassroomRouteWithChildren,
   AuthenticatedStudentHomeworkRoute: AuthenticatedStudentHomeworkRoute,
   AuthenticatedStudentPortfolioRoute: AuthenticatedStudentPortfolioRoute,
+  AuthenticatedStudentProgramSelectRoute:
+    AuthenticatedStudentProgramSelectRoute,
   AuthenticatedStudentProgressRoute: AuthenticatedStudentProgressRoute,
   AuthenticatedStudentReadAlongRoute: AuthenticatedStudentReadAlongRoute,
   AuthenticatedStudentReadinessRoute: AuthenticatedStudentReadinessRoute,
