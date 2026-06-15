@@ -118,6 +118,7 @@ export type Database = {
           lesson_id: string | null
           metadata: Json
           pass_threshold: number
+          program_code: string | null
           questions: Json
           subject_id: string | null
           title: Json
@@ -130,6 +131,7 @@ export type Database = {
           lesson_id?: string | null
           metadata?: Json
           pass_threshold?: number
+          program_code?: string | null
           questions?: Json
           subject_id?: string | null
           title: Json
@@ -142,6 +144,7 @@ export type Database = {
           lesson_id?: string | null
           metadata?: Json
           pass_threshold?: number
+          program_code?: string | null
           questions?: Json
           subject_id?: string | null
           title?: Json
@@ -153,6 +156,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lessons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_program_code_fkey"
+            columns: ["program_code"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["code"]
           },
           {
             foreignKeyName: "assignments_subject_id_fkey"
@@ -423,6 +433,7 @@ export type Database = {
           kind: string
           lesson_id: string | null
           notes: string | null
+          program_code: string | null
           score: number | null
           student_profile_id: string
           subject_id: string | null
@@ -439,6 +450,7 @@ export type Database = {
           kind: string
           lesson_id?: string | null
           notes?: string | null
+          program_code?: string | null
           score?: number | null
           student_profile_id: string
           subject_id?: string | null
@@ -455,6 +467,7 @@ export type Database = {
           kind?: string
           lesson_id?: string | null
           notes?: string | null
+          program_code?: string | null
           score?: number | null
           student_profile_id?: string
           subject_id?: string | null
@@ -475,6 +488,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lessons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "homework_program_code_fkey"
+            columns: ["program_code"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["code"]
           },
           {
             foreignKeyName: "homework_student_profile_id_fkey"
@@ -624,6 +644,7 @@ export type Database = {
           is_published: boolean
           lesson_type: Database["public"]["Enums"]["lesson_type"]
           metadata: Json
+          program_code: string | null
           sort_order: number
           title: Json
           unit_id: string
@@ -638,6 +659,7 @@ export type Database = {
           is_published?: boolean
           lesson_type?: Database["public"]["Enums"]["lesson_type"]
           metadata?: Json
+          program_code?: string | null
           sort_order?: number
           title: Json
           unit_id: string
@@ -652,11 +674,19 @@ export type Database = {
           is_published?: boolean
           lesson_type?: Database["public"]["Enums"]["lesson_type"]
           metadata?: Json
+          program_code?: string | null
           sort_order?: number
           title?: Json
           unit_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lessons_program_code_fkey"
+            columns: ["program_code"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["code"]
+          },
           {
             foreignKeyName: "lessons_unit_id_fkey"
             columns: ["unit_id"]
@@ -737,6 +767,30 @@ export type Database = {
           metadata?: Json
           preferred_language?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      programs: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          name?: string
+          sort_order?: number
         }
         Relationships: []
       }
@@ -1339,6 +1393,42 @@ export type Database = {
           },
         ]
       }
+      student_program: {
+        Row: {
+          active_program_code: string
+          started_at: string
+          student_profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          active_program_code: string
+          started_at?: string
+          student_profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          active_program_code?: string
+          started_at?: string
+          student_profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_program_active_program_code_fkey"
+            columns: ["active_program_code"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "student_program_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: true
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_stage_progress: {
         Row: {
           attempts: number
@@ -1403,6 +1493,7 @@ export type Database = {
           id: string
           metadata: Json
           name: Json
+          program_code: string | null
           sort_order: number
         }
         Insert: {
@@ -1414,6 +1505,7 @@ export type Database = {
           id?: string
           metadata?: Json
           name: Json
+          program_code?: string | null
           sort_order?: number
         }
         Update: {
@@ -1425,6 +1517,7 @@ export type Database = {
           id?: string
           metadata?: Json
           name?: Json
+          program_code?: string | null
           sort_order?: number
         }
         Relationships: [
@@ -1434,6 +1527,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "classes"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subjects_program_code_fkey"
+            columns: ["program_code"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -1499,6 +1599,7 @@ export type Database = {
           id: string
           metadata: Json
           pass_threshold: number
+          program_code: string | null
           questions: Json
           scope: Database["public"]["Enums"]["test_scope"]
           subject_id: string | null
@@ -1512,6 +1613,7 @@ export type Database = {
           id?: string
           metadata?: Json
           pass_threshold?: number
+          program_code?: string | null
           questions?: Json
           scope?: Database["public"]["Enums"]["test_scope"]
           subject_id?: string | null
@@ -1525,6 +1627,7 @@ export type Database = {
           id?: string
           metadata?: Json
           pass_threshold?: number
+          program_code?: string | null
           questions?: Json
           scope?: Database["public"]["Enums"]["test_scope"]
           subject_id?: string | null
@@ -1532,6 +1635,13 @@ export type Database = {
           unit_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tests_program_code_fkey"
+            columns: ["program_code"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["code"]
+          },
           {
             foreignKeyName: "tests_subject_id_fkey"
             columns: ["subject_id"]
@@ -1609,6 +1719,87 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      weekly_plans: {
+        Row: {
+          assignment_id: string | null
+          class_id: string | null
+          created_at: string
+          homework_titles: string[]
+          id: string
+          lesson_ids: string[]
+          notes: string | null
+          program_code: string
+          subject_id: string | null
+          test_id: string | null
+          updated_at: string
+          week_number: number
+        }
+        Insert: {
+          assignment_id?: string | null
+          class_id?: string | null
+          created_at?: string
+          homework_titles?: string[]
+          id?: string
+          lesson_ids?: string[]
+          notes?: string | null
+          program_code: string
+          subject_id?: string | null
+          test_id?: string | null
+          updated_at?: string
+          week_number: number
+        }
+        Update: {
+          assignment_id?: string | null
+          class_id?: string | null
+          created_at?: string
+          homework_titles?: string[]
+          id?: string
+          lesson_ids?: string[]
+          notes?: string | null
+          program_code?: string
+          subject_id?: string | null
+          test_id?: string | null
+          updated_at?: string
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_plans_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_plans_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_plans_program_code_fkey"
+            columns: ["program_code"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "weekly_plans_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_plans_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       writing_practice_completions: {
         Row: {
