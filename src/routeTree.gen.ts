@@ -21,6 +21,7 @@ import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenticated/parent.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedStudentWritingRouteImport } from './routes/_authenticated/student.writing'
+import { Route as AuthenticatedStudentTodayRouteImport } from './routes/_authenticated/student.today'
 import { Route as AuthenticatedStudentTestsRouteImport } from './routes/_authenticated/student.tests'
 import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student.settings'
 import { Route as AuthenticatedStudentRewardsRouteImport } from './routes/_authenticated/student.rewards'
@@ -117,6 +118,12 @@ const AuthenticatedStudentWritingRoute =
   AuthenticatedStudentWritingRouteImport.update({
     id: '/writing',
     path: '/writing',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentTodayRoute =
+  AuthenticatedStudentTodayRouteImport.update({
+    id: '/today',
+    path: '/today',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 const AuthenticatedStudentTestsRoute =
@@ -361,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/student/tests': typeof AuthenticatedStudentTestsRoute
+  '/student/today': typeof AuthenticatedStudentTodayRoute
   '/student/writing': typeof AuthenticatedStudentWritingRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/parent/': typeof AuthenticatedParentIndexRoute
@@ -406,6 +414,7 @@ export interface FileRoutesByTo {
   '/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/student/tests': typeof AuthenticatedStudentTestsRoute
+  '/student/today': typeof AuthenticatedStudentTodayRoute
   '/student/writing': typeof AuthenticatedStudentWritingRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/parent': typeof AuthenticatedParentIndexRoute
@@ -456,6 +465,7 @@ export interface FileRoutesById {
   '/_authenticated/student/rewards': typeof AuthenticatedStudentRewardsRoute
   '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/_authenticated/student/tests': typeof AuthenticatedStudentTestsRoute
+  '/_authenticated/student/today': typeof AuthenticatedStudentTodayRoute
   '/_authenticated/student/writing': typeof AuthenticatedStudentWritingRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/parent/': typeof AuthenticatedParentIndexRoute
@@ -506,6 +516,7 @@ export interface FileRouteTypes {
     | '/student/rewards'
     | '/student/settings'
     | '/student/tests'
+    | '/student/today'
     | '/student/writing'
     | '/admin/'
     | '/parent/'
@@ -551,6 +562,7 @@ export interface FileRouteTypes {
     | '/student/rewards'
     | '/student/settings'
     | '/student/tests'
+    | '/student/today'
     | '/student/writing'
     | '/admin'
     | '/parent'
@@ -600,6 +612,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/rewards'
     | '/_authenticated/student/settings'
     | '/_authenticated/student/tests'
+    | '/_authenticated/student/today'
     | '/_authenticated/student/writing'
     | '/_authenticated/admin/'
     | '/_authenticated/parent/'
@@ -708,6 +721,13 @@ declare module '@tanstack/react-router' {
       path: '/writing'
       fullPath: '/student/writing'
       preLoaderRoute: typeof AuthenticatedStudentWritingRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/today': {
+      id: '/_authenticated/student/today'
+      path: '/today'
+      fullPath: '/student/today'
+      preLoaderRoute: typeof AuthenticatedStudentTodayRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
     '/_authenticated/student/tests': {
@@ -1040,6 +1060,7 @@ interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentRewardsRoute: typeof AuthenticatedStudentRewardsRoute
   AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
   AuthenticatedStudentTestsRoute: typeof AuthenticatedStudentTestsRoute
+  AuthenticatedStudentTodayRoute: typeof AuthenticatedStudentTodayRoute
   AuthenticatedStudentWritingRoute: typeof AuthenticatedStudentWritingRoute
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
   AuthenticatedStudentAssignmentAssignmentIdRoute: typeof AuthenticatedStudentAssignmentAssignmentIdRoute
@@ -1069,6 +1090,7 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentRewardsRoute: AuthenticatedStudentRewardsRoute,
   AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
   AuthenticatedStudentTestsRoute: AuthenticatedStudentTestsRoute,
+  AuthenticatedStudentTodayRoute: AuthenticatedStudentTodayRoute,
   AuthenticatedStudentWritingRoute: AuthenticatedStudentWritingRoute,
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
   AuthenticatedStudentAssignmentAssignmentIdRoute:
