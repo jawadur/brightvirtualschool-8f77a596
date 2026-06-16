@@ -1,0 +1,1 @@
+ALTER TYPE public.lesson_stage_type ADD VALUE IF NOT EXISTS 'blackboard' BEFORE 'concept';

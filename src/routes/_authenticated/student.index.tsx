@@ -138,11 +138,14 @@ function TodaysSchool() {
       <section>
         <h2 className="text-xl font-extrabold mb-3">📅 Today's Schedule</h2>
         {totalSubjects === 0 ? (
-          <Card className="p-8 text-center">
+          <Card className="p-6 text-center">
             <CalendarX className="h-10 w-10 mx-auto text-muted-foreground" />
-            <div className="mt-3 font-extrabold">No school schedule found for today.</div>
+            <div className="mt-3 font-extrabold">Today's Learning Plan is ready</div>
             <div className="mt-1 text-sm text-muted-foreground">
-              Admin can create a schedule from the Curriculum Manager.
+              Open Today's Learning to start your next lesson, practice, and homework.
+            </div>
+            <div className="mt-4 flex justify-center">
+              <Link to="/student/today"><Button className="rounded-2xl gap-2"><PlayCircle className="h-4 w-4" /> Open Today's Learning</Button></Link>
             </div>
           </Card>
         ) : (

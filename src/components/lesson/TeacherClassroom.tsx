@@ -11,15 +11,17 @@ import { Progress } from "@/components/ui/progress";
 import { Lock, CheckCircle2, Play, Pause, RotateCcw, Square, ThumbsUp, Sparkles } from "lucide-react";
 import teacherAvatar from "@/assets/teacher.png";
 import { toast } from "sonner";
+import { Blackboard, coerceBlackboardSteps } from "@/components/lesson/Blackboard";
 
 export const STAGE_ORDER = [
-  "welcome", "concept", "example1", "example2", "guided", "independent", "assignment", "test", "revision",
+  "welcome", "blackboard", "concept", "example1", "example2", "guided", "independent", "assignment", "test", "revision",
 ] as const;
 
 export type StageType = (typeof STAGE_ORDER)[number];
 
 const STAGE_META: Record<StageType, { label: string; emoji: string; encouragement: string }> = {
   welcome:     { label: "Teacher Welcome",       emoji: "👋", encouragement: "Let's begin together!" },
+  blackboard:  { label: "Blackboard Session",    emoji: "📐", encouragement: "Watch the teacher write on the board." },
   concept:     { label: "Concept Explanation",   emoji: "📖", encouragement: "Listen carefully." },
   example1:    { label: "Example 1",             emoji: "✨", encouragement: "Watch the first example." },
   example2:    { label: "Example 2",             emoji: "🌟", encouragement: "Now another one." },
@@ -84,7 +86,7 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
   });
 
   const completedSet = useMemo(
-    () => new Set((progressQ.data ?? []).filter((p) => p.completed_at).map((p) => p.stage_type)),
+    () => new Set<string>((progressQ.data ?? []).filter((p) => p.completed_at).map((p) => p.stage_type as string)),
     [progressQ.data],
   );
   const scoreByStage = useMemo(() => {
@@ -131,7 +133,7 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
         {
           student_profile_id: activeStudent.id,
           lesson_id: lessonId,
-          stage_type: stage.stage_type,
+          stage_type: stage.stage_type as any,
           completed_at: new Date().toISOString(),
           score,
         } as any,
@@ -228,10 +230,18 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
         <Progress value={Math.round(((activeIdx + 1) / stages.length) * 100)} className="mb-4" />
 
         {/* Slide content */}
-        <StageBody stage={stage} lang={lang} />
+        {stage.stage_type === "blackboard" ? (
+          <Blackboard
+            steps={coerceBlackboardSteps(stage.slides as any)}
+            lang={lang}
+            onComplete={() => handleAdvance(null)}
+          />
+        ) : (
+          <StageBody stage={stage} lang={lang} />
+        )}
 
         {/* Voice controls */}
-        {prefs.voice_reader !== false && narration && (
+        {stage.stage_type !== "blackboard" && prefs.voice_reader !== false && narration && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button size="sm" variant="outline" onClick={() => tts.speak(narration, lang)}>
               <Play className="h-4 w-4 mr-1" /> Play
@@ -253,11 +263,13 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
         )}
 
         {/* Stage actions */}
-        <StageActions
-          stage={stage}
-          completed={completedSet.has(stage.stage_type)}
-          onComplete={handleAdvance}
-        />
+        {stage.stage_type !== "blackboard" && (
+          <StageActions
+            stage={stage}
+            completed={completedSet.has(stage.stage_type)}
+            onComplete={handleAdvance}
+          />
+        )}
       </Card>
     </div>
   );

@@ -1870,6 +1870,7 @@ export type Database = {
       calendar_event_type: "holiday" | "event" | "exam" | "break"
       lesson_stage_type:
         | "welcome"
+        | "blackboard"
         | "concept"
         | "example1"
         | "example2"
@@ -2038,6 +2039,7 @@ export const Constants = {
       calendar_event_type: ["holiday", "event", "exam", "break"],
       lesson_stage_type: [
         "welcome",
+        "blackboard",
         "concept",
         "example1",
         "example2",
