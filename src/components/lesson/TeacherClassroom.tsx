@@ -11,15 +11,17 @@ import { Progress } from "@/components/ui/progress";
 import { Lock, CheckCircle2, Play, Pause, RotateCcw, Square, ThumbsUp, Sparkles } from "lucide-react";
 import teacherAvatar from "@/assets/teacher.png";
 import { toast } from "sonner";
+import { Blackboard, coerceBlackboardSteps } from "@/components/lesson/Blackboard";
 
 export const STAGE_ORDER = [
-  "welcome", "concept", "example1", "example2", "guided", "independent", "assignment", "test", "revision",
+  "welcome", "blackboard", "concept", "example1", "example2", "guided", "independent", "assignment", "test", "revision",
 ] as const;
 
 export type StageType = (typeof STAGE_ORDER)[number];
 
 const STAGE_META: Record<StageType, { label: string; emoji: string; encouragement: string }> = {
   welcome:     { label: "Teacher Welcome",       emoji: "👋", encouragement: "Let's begin together!" },
+  blackboard:  { label: "Blackboard Session",    emoji: "📐", encouragement: "Watch the teacher write on the board." },
   concept:     { label: "Concept Explanation",   emoji: "📖", encouragement: "Listen carefully." },
   example1:    { label: "Example 1",             emoji: "✨", encouragement: "Watch the first example." },
   example2:    { label: "Example 2",             emoji: "🌟", encouragement: "Now another one." },
