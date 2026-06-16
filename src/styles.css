@@ -169,6 +169,22 @@
   .font-indic { font-family: 'Noto Sans Telugu', 'Noto Sans Devanagari', 'Nunito', sans-serif; }
 }
 
+/* Blackboard / chalk animations */
+@keyframes chalk-stroke {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes chalk-write {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.blackboard-draw-in {
+  animation: chalk-write 0.45s ease-out both;
+}
+
+/* Hide scrollbar but keep scroll (used for horizontal tab strips on mobile) */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* Accessibility preferences applied at <html> level */
 html.text-larger { font-size: 18px; }
 html.text-larger body { line-height: 1.6; }
