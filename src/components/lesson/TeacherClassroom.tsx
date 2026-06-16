@@ -241,7 +241,7 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
         )}
 
         {/* Voice controls */}
-        {prefs.voice_reader !== false && narration && (
+        {stage.stage_type !== "blackboard" && prefs.voice_reader !== false && narration && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button size="sm" variant="outline" onClick={() => tts.speak(narration, lang)}>
               <Play className="h-4 w-4 mr-1" /> Play
@@ -263,11 +263,13 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
         )}
 
         {/* Stage actions */}
-        <StageActions
-          stage={stage}
-          completed={completedSet.has(stage.stage_type)}
-          onComplete={handleAdvance}
-        />
+        {stage.stage_type !== "blackboard" && (
+          <StageActions
+            stage={stage}
+            completed={completedSet.has(stage.stage_type)}
+            onComplete={handleAdvance}
+          />
+        )}
       </Card>
     </div>
   );
