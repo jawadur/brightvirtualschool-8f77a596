@@ -86,7 +86,7 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
   });
 
   const completedSet = useMemo(
-    () => new Set((progressQ.data ?? []).filter((p) => p.completed_at).map((p) => p.stage_type)),
+    () => new Set<string>((progressQ.data ?? []).filter((p) => p.completed_at).map((p) => p.stage_type as string)),
     [progressQ.data],
   );
   const scoreByStage = useMemo(() => {
