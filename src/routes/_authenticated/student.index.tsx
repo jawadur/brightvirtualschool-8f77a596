@@ -139,7 +139,7 @@ function TodaysSchool() {
         <h2 className="text-xl font-extrabold mb-3">📅 Today's Schedule</h2>
         {totalSubjects === 0 ? (
           <Card className="p-6 text-center">
-            <GraduationCapEmpty />
+            <CalendarX className="h-10 w-10 mx-auto text-muted-foreground" />
             <div className="mt-3 font-extrabold">Today's Learning Plan is ready</div>
             <div className="mt-1 text-sm text-muted-foreground">
               Open Today's Learning to start your next lesson, practice, and homework.
