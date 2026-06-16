@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { ReadAloud } from "@/components/app/ReadAloud";
 import { GraduationCap, PlayCircle, CheckCircle2, Clock } from "lucide-react";
 import teacherImg from "@/assets/teacher.png";
+import { fetchActiveProgram, fetchSubjectsForProgram, PROGRAMS } from "@/lib/program";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/student/classroom")({
   component: ClassroomHub,
@@ -15,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/student/classroom")({
 
 function ClassroomHub() {
   const { activeStudent } = useStudents();
+  const { tr } = useI18n();
   const { data: programs = [] } = useQuery({ queryKey: ["active-programs"], queryFn: fetchActivePrograms });
   const classIds = useMemo(
     () => programs.flatMap((b: any) => (b.classes ?? []).map((c: any) => c.id)),
@@ -31,6 +34,20 @@ function ClassroomHub() {
     queryFn: () => fetchScheduleStatuses(activeStudent!.id, schedule),
   });
   const lessonMap = statuses?.lessonMap ?? new Map();
+
+  // Auto-derived "Today's Learning Plan" — used when no manual schedule exists.
+  const { data: activeProgram } = useQuery({
+    queryKey: ["active-program", activeStudent?.id],
+    enabled: !!activeStudent,
+    queryFn: () => fetchActiveProgram(activeStudent!.id),
+  });
+  const programCode = (activeProgram ?? "class1") as "kg2_brushup" | "class1";
+  const programInfo = PROGRAMS.find((p) => p.code === programCode)!;
+  const { data: autoSubjects = [] } = useQuery({
+    queryKey: ["program-subjects", programCode],
+    enabled: schedule.length === 0,
+    queryFn: () => fetchSubjectsForProgram(programCode),
+  });
 
   return (
     <div className="space-y-5">
@@ -55,7 +72,34 @@ function ClassroomHub() {
       </Card>
 
       {schedule.length === 0 ? (
-        <Card className="p-8 text-center text-muted-foreground">No classes scheduled today.</Card>
+        <div className="space-y-3">
+          <Card className="p-4 bg-accent/40">
+            <div className="text-xs font-bold uppercase text-primary">{programInfo.emoji} {programInfo.name}</div>
+            <div className="font-extrabold">Today's Learning Plan</div>
+            <div className="text-xs text-muted-foreground">Auto-generated from your published curriculum.</div>
+          </Card>
+          {autoSubjects.length === 0 ? (
+            <Card className="p-8 text-center text-muted-foreground">No lessons available yet for this program.</Card>
+          ) : (
+            autoSubjects.map((s: any) => (
+              <Link key={s.id} to="/student/daily/$program/$subjectId" params={{ program: programCode, subjectId: s.id }}>
+                <Card className="p-4 hover:shadow-pop transition cursor-pointer">
+                  <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+                    <div className="h-12 w-12 rounded-2xl grid place-items-center text-2xl shrink-0" style={{ backgroundColor: (s.color || "#FDE68A") + "33" }}>
+                      {s.icon || "📘"}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold uppercase text-muted-foreground">{programCode === "kg2_brushup" ? "Revision" : "Class"}</div>
+                      <div className="font-extrabold truncate">{tr(s.name)}</div>
+                      <div className="text-xs text-muted-foreground">Teacher Lesson · Practice · Homework</div>
+                    </div>
+                    <Button size="sm" className="rounded-2xl gap-1"><PlayCircle className="h-4 w-4" /> Enter Class</Button>
+                  </div>
+                </Card>
+              </Link>
+            ))
+          )}
+        </div>
       ) : (
         <div className="space-y-3">
           {schedule.map((row: any) => {
