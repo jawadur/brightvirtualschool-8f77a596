@@ -133,7 +133,7 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
         {
           student_profile_id: activeStudent.id,
           lesson_id: lessonId,
-          stage_type: stage.stage_type,
+          stage_type: stage.stage_type as any,
           completed_at: new Date().toISOString(),
           score,
         } as any,
@@ -230,7 +230,15 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
         <Progress value={Math.round(((activeIdx + 1) / stages.length) * 100)} className="mb-4" />
 
         {/* Slide content */}
-        <StageBody stage={stage} lang={lang} />
+        {stage.stage_type === "blackboard" ? (
+          <Blackboard
+            steps={coerceBlackboardSteps(stage.slides as any)}
+            lang={lang}
+            onComplete={() => handleAdvance(null)}
+          />
+        ) : (
+          <StageBody stage={stage} lang={lang} />
+        )}
 
         {/* Voice controls */}
         {prefs.voice_reader !== false && narration && (
