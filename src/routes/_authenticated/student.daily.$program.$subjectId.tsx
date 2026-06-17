@@ -143,9 +143,9 @@ function StepCard({ step, icon: Icon, title, subtitle, status, action }: {
           <div className="text-sm text-muted-foreground break-words">{subtitle}</div>
         </div>
         {action && !locked && (
-          <Link to={action.to as any} params={action.params as any}>
-            <Button size="sm" className="rounded-2xl">{action.label}</Button>
-          </Link>
+          <Button asChild size="sm" className="rounded-2xl">
+            <Link to={action.to as any} params={action.params as any}>{action.label}</Link>
+          </Button>
         )}
         {locked && <span className="text-xs font-bold text-muted-foreground">Locked</span>}
       </div>

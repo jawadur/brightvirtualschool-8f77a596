@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,19 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/student/lesson/$lessonId")({
   component: LessonPage,
+  errorComponent: ({ error }) => (
+    <Card className="p-6 max-w-lg mx-auto text-center">
+      <h1 className="text-xl font-extrabold">Couldn't open this lesson</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{(error as Error)?.message ?? "Unknown error"}</p>
+      <Link to="/student" className="mt-4 inline-block text-primary underline">Back to school</Link>
+    </Card>
+  ),
+  notFoundComponent: () => (
+    <Card className="p-6 max-w-lg mx-auto text-center">
+      <h1 className="text-xl font-extrabold">Lesson not found</h1>
+      <Link to="/student" className="mt-3 inline-block text-primary underline">Back to school</Link>
+    </Card>
+  ),
 });
 
 function LessonPage() {
@@ -29,13 +42,22 @@ function LessonPage() {
       const { data, error } = await supabase
         .from("lessons")
         .select("id, title, content, units(subject_id, subjects(id, name))")
-        .eq("id", lessonId).single();
+        .eq("id", lessonId).maybeSingle();
       if (error) throw error;
       return data;
     },
   });
 
-  if (isLoading || !lesson) return <div className="text-muted-foreground">{t("loading")}</div>;
+  if (isLoading) return <div className="text-muted-foreground">{t("loading")}</div>;
+  if (!lesson) {
+    return (
+      <Card className="p-6 max-w-lg mx-auto text-center">
+        <h1 className="text-xl font-extrabold">This lesson isn't available yet</h1>
+        <p className="mt-1 text-sm text-muted-foreground">It may not be published. Please pick another lesson.</p>
+        <Link to="/student" className="mt-4 inline-block text-primary underline">Back to school</Link>
+      </Card>
+    );
+  }
   const content = lesson.content as LessonContent;
   const steps = Array.isArray(content?.steps) ? content.steps : [];
 

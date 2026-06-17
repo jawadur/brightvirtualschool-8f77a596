@@ -11,6 +11,19 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/student/classroom/$lessonId")({
   component: ClassroomPage,
+  errorComponent: ({ error }) => (
+    <Card className="p-6 max-w-lg mx-auto text-center">
+      <h1 className="text-xl font-extrabold">Couldn't open this lesson</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{(error as Error)?.message ?? "Unknown error"}</p>
+      <Link to="/student" className="mt-4 inline-block text-primary underline">Back to school</Link>
+    </Card>
+  ),
+  notFoundComponent: () => (
+    <Card className="p-6 max-w-lg mx-auto text-center">
+      <h1 className="text-xl font-extrabold">Lesson not found</h1>
+      <Link to="/student" className="mt-3 inline-block text-primary underline">Back to school</Link>
+    </Card>
+  ),
 });
 
 function ClassroomPage() {
@@ -24,8 +37,9 @@ function ClassroomPage() {
     queryKey: ["lesson-meta", lessonId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("lessons").select("id, title, content").eq("id", lessonId).single();
-      if (error) throw error; return data;
+        .from("lessons").select("id, title, content").eq("id", lessonId).maybeSingle();
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -44,6 +58,17 @@ function ClassroomPage() {
   const lang = (activeStudent?.preferred_language as "en" | "hi" | "te") ?? "en";
 
   if (lesson.isLoading || stagesCount.isLoading) return <p className="text-muted-foreground">Loading classroom…</p>;
+
+  if (!lesson.data) {
+    return (
+      <Card className="p-6 max-w-lg mx-auto text-center">
+        <GraduationCap className="h-10 w-10 mx-auto text-muted-foreground" />
+        <h1 className="mt-3 text-xl font-extrabold">This lesson isn't available yet</h1>
+        <p className="mt-1 text-sm text-muted-foreground">It may not be published. Please pick another lesson.</p>
+        <Link to="/student" className="mt-4 inline-block text-primary underline">Back to school</Link>
+      </Card>
+    );
+  }
 
   // Fallback: if this lesson has no teacher-led stages, send the student to the
   // standard lesson player so "Enter Class" always opens something useful.
