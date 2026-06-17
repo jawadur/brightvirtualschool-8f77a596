@@ -1,41 +1,28 @@
-import type { TtsLang } from "@/hooks/use-tts";
-import type { ChalkPrimitive } from "@/components/lesson/Blackboard";
+export type LessonScriptLang = 'en' | 'hi' | 'te';
 
-export type LessonScriptStepType =
-  | "speech"
-  | "pause"
-  | "draw"
-  | "count"
-  | "question"
-  | "praise"
-  | "highlight"
-  | "clear_board";
-
-export type LocalizedText = string | Partial<Record<TtsLang, string>>;
+export type LessonScriptText = string | Partial<Record<LessonScriptLang, string>>;
 
 export type LessonScriptStep = {
   id?: string;
-  type: LessonScriptStepType;
-  text?: LocalizedText;
-  caption?: LocalizedText;
-  durationSeconds?: number;
-  primitive?: ChalkPrimitive;
-  primitives?: ChalkPrimitive[];
+  type: 'speech' | 'pause' | 'draw' | 'count' | 'question' | 'praise' | 'highlight';
+  text?: LessonScriptText;
+  narration?: LessonScriptText;
+  boardText?: LessonScriptText;
+  caption?: LessonScriptText;
+  prompt?: LessonScriptText;
+  emoji?: string;
+  object?: string;
+  count?: number;
   values?: Array<string | number>;
+  seconds?: number;
   options?: string[];
-  answer?: string | number;
-  hint?: LocalizedText;
+  correctAnswer?: string | number;
+  hint?: LessonScriptText;
+  primitives?: Array<Record<string, any>>;
 };
 
-export function pickLocalized(value: LocalizedText | undefined | null, lang: TtsLang, fallback = "") {
-  if (!value) return fallback;
-  if (typeof value === "string") return value;
-  return value[lang] || value.en || value.hi || value.te || fallback;
-}
-
-export function coerceLessonScript(input: unknown): LessonScriptStep[] {
-  if (!Array.isArray(input)) return [];
-  return input
-    .filter((item): item is LessonScriptStep => !!item && typeof item === "object" && "type" in item)
-    .map((item, index) => ({ id: item.id ?? `script-step-${index}`, ...item }));
+export function resolveScriptText(value: LessonScriptText | null | undefined, lang: LessonScriptLang = 'en') {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value[lang] || value.en || value.hi || value.te || '';
 }
