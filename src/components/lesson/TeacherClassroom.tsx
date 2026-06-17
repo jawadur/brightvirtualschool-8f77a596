@@ -13,6 +13,7 @@ import teacherAvatar from "@/assets/teacher.png";
 import { toast } from "sonner";
 import { Blackboard, coerceBlackboardSteps } from "@/components/lesson/Blackboard";
 import { LessonScriptPlayer } from "@/components/lesson/LessonScriptPlayer";
+import type { LessonScriptStep } from "@/types/lesson-script";
 
 export const STAGE_ORDER = [
   "welcome", "blackboard", "concept", "example1", "example2", "guided", "independent", "assignment", "test", "revision",
@@ -23,18 +24,17 @@ export type StageType = (typeof STAGE_ORDER)[number];
 const TEACHER_STAGE_TYPES = new Set<StageType>(["welcome", "blackboard", "concept", "example1", "example2"]);
 
 const MIN_STAGE_SECONDS: Record<StageType, number> = {
-  // The first five stages make up the minimum 5-minute teacher-led lesson.
-  welcome: 30,
-  blackboard: 120,
-  concept: 75,
-  example1: 60,
-  example2: 60,
-  // Practice/homework/test stages are paced by student interaction.
+  // Manual lesson mode: do not stretch stages with artificial timers.
+  welcome: 0,
+  blackboard: 0,
+  concept: 0,
+  example1: 0,
+  example2: 0,
   guided: 0,
   independent: 0,
   assignment: 0,
   test: 0,
-  revision: 20,
+  revision: 0,
 };
 
 function formatTime(totalSeconds: number) {
@@ -52,7 +52,34 @@ function splitTeachingText(text: string) {
     .filter(Boolean);
 }
 
-function buildTeachingSegments(stage: Stage, lang: TtsLang, tr: (value: any) => string) {
+const TEACHER_FILLER_LINES: Record<string, string[]> = {
+  en: [
+    "Look carefully at the board.",
+    "Say it with me slowly.",
+    "Let us think for a moment.",
+    "Can you explain it in your own words?",
+    "Very good. We will try one more time.",
+    "Now watch how the teacher does it step by step.",
+  ],
+  hi: [
+    "बोर्ड को ध्यान से देखो.",
+    "मेरे साथ धीरे-धीरे बोलो.",
+    "थोड़ा सोचो.",
+    "क्या तुम इसे अपने शब्दों में बता सकते हो?",
+    "बहुत अच्छा. हम इसे एक बार फिर करेंगे.",
+    "अब teacher इसे step by step दिखाएंगी.",
+  ],
+  te: [
+    "బోర్డును జాగ్రత్తగా చూడండి.",
+    "నాతో కలిసి నెమ్మదిగా చెప్పండి.",
+    "ఒక్కసారి ఆలోచించండి.",
+    "మీ మాటల్లో చెప్పగలరా?",
+    "చాలా బాగుంది. మళ్లీ ఒకసారి చూద్దాం.",
+    "ఇప్పుడు టీచర్ step by step చూపిస్తారు.",
+  ],
+};
+
+function buildTeachingSegments(stage: Stage, lang: TtsLang, tr: (value: any) => string, meta: { encouragement: string }) {
   const lines: string[] = [];
   const explanation = tr(stage.explanation);
   const narration =
@@ -67,8 +94,20 @@ function buildTeachingSegments(stage: Stage, lang: TtsLang, tr: (value: any) => 
   }
   if (lines.length === 0 && explanation) lines.push(explanation);
 
-  // Important: do not invent filler narration. If a lesson is too short, add real script content in lesson_stages.script.
-  return Array.from(new Set(lines.filter(Boolean)));
+  const unique = Array.from(new Set(lines.filter(Boolean)));
+  const filler = TEACHER_FILLER_LINES[lang] ?? TEACHER_FILLER_LINES.en;
+
+  // Thin content should not freeze on one sentence for the entire timer.
+  // Add teacher-like prompts so the child sees a changing classroom flow.
+  while (unique.length < 8) {
+    unique.push(filler[(unique.length - 1 + filler.length) % filler.length]);
+  }
+
+  if (!unique.some((line) => line.toLowerCase().includes("good") || line.includes("अच्छ") || line.includes("బాగ"))) {
+    unique.push(lang === "hi" ? "बहुत अच्छा!" : lang === "te" ? "చాలా బాగుంది!" : "Great job!");
+  }
+
+  return unique;
 }
 
 const STAGE_META: Record<StageType, { label: string; emoji: string; encouragement: string }> = {
@@ -94,9 +133,9 @@ type Stage = {
   narration_hi: string | null;
   narration_te: string | null;
   image_url: string | null;
+  script?: LessonScriptStep[] | null;
   slides: { title?: string; body?: string; image?: string }[];
   questions: { prompt: string; options?: string[]; answer: number | string; hint?: string }[];
-  script?: unknown;
   pass_threshold: number;
 };
 
@@ -307,30 +346,29 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
           <div className="mb-4 rounded-2xl border bg-primary/5 px-4 py-3">
             <div className="flex flex-wrap items-center gap-2 text-sm font-bold">
               <Clock className="h-4 w-4 text-primary" />
-              <span>Teacher lesson in progress</span>
-              <span className="ml-auto text-primary">Remaining: {formatTime(teacherLessonRemaining)}</span>
+              <span>Teacher lesson</span>
+              <span className="ml-auto text-primary">Step-by-step</span>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">Practice and homework unlock after the teacher explains the topic slowly with examples.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Listen to each teacher step and move forward when the child understands.</p>
           </div>
         )}
 
-        {/* Scripted lessons use real teacher script steps from lesson_stages.script. */}
+        {/* Teaching content */}
         {Array.isArray(stage.script) && stage.script.length > 0 ? (
           <LessonScriptPlayer
             script={stage.script}
             lang={lang}
-            title={tr(stage.title) || meta.label}
             onComplete={() => handleAdvance(null)}
           />
         ) : stage.stage_type === "blackboard" ? (
           <Blackboard
             steps={coerceBlackboardSteps(stage.slides as any)}
             lang={lang}
-            minDurationSeconds={minSeconds}
+            minDurationSeconds={0}
             onComplete={() => handleAdvance(null)}
           />
         ) : (
-          <StageBody stage={stage} lang={lang} elapsedSeconds={stageElapsed} minSeconds={minSeconds} onSpeakLine={(line) => tts.speak(line, lang)} />
+          <StageBody stage={stage} lang={lang} onSpeakLine={(line) => tts.speak(line, lang)} />
         )}
 
         {/* Voice controls */}
@@ -360,8 +398,8 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
           <StageActions
             stage={stage}
             completed={completedSet.has(stage.stage_type)}
-            minRemaining={minRemaining}
-            minMet={minMet}
+            minRemaining={0}
+            minMet={true}
             onComplete={handleAdvance}
           />
         )}
@@ -373,25 +411,20 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
 function StageBody({
   stage,
   lang,
-  elapsedSeconds,
-  minSeconds,
   onSpeakLine,
 }: {
   stage: Stage;
   lang: TtsLang;
-  elapsedSeconds: number;
-  minSeconds: number;
   onSpeakLine: (line: string) => void;
 }) {
   const { tr } = useI18n();
-  const meta = STAGE_META[stage.stage_type];
   const slides = stage.slides ?? [];
-  const isTeacherExplanation = ["welcome", "concept", "example1", "example2", "revision"].includes(stage.stage_type);
-  const segments = useMemo(() => buildTeachingSegments(stage, lang, tr), [stage, lang, tr, meta]);
-  const segmentSeconds = Math.max(5, Math.floor(Math.max(minSeconds || 20, 20) / Math.max(segments.length, 1)));
-  const activeSegmentIndex = Math.min(segments.length - 1, Math.floor(elapsedSeconds / segmentSeconds));
-  const activeLine = segments[activeSegmentIndex] ?? tr(stage.explanation);
-  const segmentProgress = Math.round(((activeSegmentIndex + 1) / Math.max(segments.length, 1)) * 100);
+  const explanation = tr(stage.explanation);
+  const narration =
+    (lang === "hi" && stage.narration_hi) ||
+    (lang === "te" && stage.narration_te) ||
+    stage.narration_en ||
+    explanation;
 
   return (
     <div className="space-y-3">
@@ -399,27 +432,21 @@ function StageBody({
         <img src={stage.image_url} alt="" loading="lazy" className="rounded-xl max-h-72 object-contain mx-auto" />
       )}
 
-      {isTeacherExplanation ? (
+      {explanation && (
         <div className="rounded-3xl border bg-gradient-to-br from-amber-50 to-orange-50 p-4 sm:p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="text-3xl" aria-hidden="true">👩‍🏫</div>
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-extrabold uppercase text-primary mb-1">Teacher is explaining · Line {activeSegmentIndex + 1} of {segments.length}</div>
-              <p className="text-xl sm:text-2xl font-extrabold leading-relaxed no-clip font-indic" lang={lang}>{activeLine}</p>
-              <Progress value={segmentProgress} className="mt-3" />
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button size="sm" variant="secondary" onClick={() => onSpeakLine(activeLine)}>
-                  <Volume2 className="h-4 w-4 mr-1" /> Listen to this line
+              <div className="text-xs font-extrabold uppercase text-primary mb-1">Teacher explanation</div>
+              <p className="text-xl sm:text-2xl font-extrabold leading-relaxed no-clip font-indic" lang={lang}>{explanation}</p>
+              {narration && (
+                <Button size="sm" variant="secondary" className="mt-3" onClick={() => onSpeakLine(narration)}>
+                  <Volume2 className="h-4 w-4 mr-1" /> Listen
                 </Button>
-                <span className="text-xs text-muted-foreground self-center">The line changes automatically during the teaching timer.</span>
-              </div>
+              )}
             </div>
           </div>
         </div>
-      ) : (
-        <p className="text-base sm:text-lg leading-relaxed no-clip font-indic" lang={lang}>
-          {tr(stage.explanation)}
-        </p>
       )}
 
       {slides.length > 0 && (
