@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchHomework } from "@/lib/homework";
-import { GraduationCap, BookOpen, ClipboardList, Lock, CheckCircle2, ArrowLeft } from "lucide-react";
+import { GraduationCap, BookOpen, ClipboardList, CheckCircle2, ArrowLeft } from "lucide-react";
 import type { ProgramCode } from "@/lib/program";
 
 export const Route = createFileRoute("/_authenticated/student/daily/$program/$subjectId")({
@@ -67,8 +67,7 @@ function SubjectDailyFlow() {
   const lessonDone = nextLesson && progress.some((p) => p.lesson_id === nextLesson.id && p.status === "completed");
   const subjectHomework = homework.filter((h: any) => h.subject_id === subjectId);
   const homeworkPending = subjectHomework.some((h: any) => !h.completed_at);
-  const practiceUnlocked = !!lessonDone;
-  const homeworkUnlocked = practiceUnlocked; // practice completion equates to attempt for now
+  const hasHomework = subjectHomework.length > 0;
 
   const isKg2 = programCode === "kg2_brushup";
 
@@ -98,16 +97,18 @@ function SubjectDailyFlow() {
         icon={BookOpen}
         title="Practice"
         subtitle="Short activities to reinforce the lesson"
-        status={!practiceUnlocked ? "locked" : "open"}
-        action={practiceUnlocked && nextLesson ? { label: "Practice", to: "/student/lesson/$lessonId", params: { lessonId: nextLesson.id } } : undefined}
+        status="open"
+        action={nextLesson ? { label: "Start Practice", to: "/student/lesson/$lessonId", params: { lessonId: nextLesson.id } } : undefined}
+        emptyLabel="No Practice Available"
       />
       <StepCard
         step={3}
         icon={ClipboardList}
         title="Homework"
         subtitle={subjectHomework.length === 0 ? "No homework set" : homeworkPending ? `${subjectHomework.filter((h: any) => !h.completed_at).length} pending` : "All done"}
-        status={!homeworkUnlocked ? "locked" : homeworkPending ? "open" : "done"}
-        action={homeworkUnlocked ? { label: "Open Homework", to: "/student/homework" } : undefined}
+        status={hasHomework && !homeworkPending ? "done" : "open"}
+        action={hasHomework ? { label: "Start Homework", to: "/student/homework" } : undefined}
+        emptyLabel="No Homework Available"
       />
 
       {!isKg2 && (
@@ -121,33 +122,34 @@ function SubjectDailyFlow() {
   );
 }
 
-function StepCard({ step, icon: Icon, title, subtitle, status, action }: {
+function StepCard({ step, icon: Icon, title, subtitle, status, action, emptyLabel }: {
   step: number;
   icon: any;
   title: string;
   subtitle: string;
-  status: "open" | "locked" | "done";
+  status: "open" | "done";
   action?: { label: string; to: string; params?: Record<string, string> };
+  emptyLabel?: string;
 }) {
-  const locked = status === "locked";
   const done = status === "done";
   return (
-    <Card className={`p-4 h-auto ${locked ? "opacity-60" : ""}`}>
+    <Card className="p-4 h-auto">
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
-        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 ${done ? "bg-success/15 text-success" : locked ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"}`}>
-          {done ? <CheckCircle2 className="h-6 w-6" /> : locked ? <Lock className="h-5 w-5" /> : <Icon className="h-6 w-6" />}
+        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 ${done ? "bg-success/15 text-success" : "bg-primary/10 text-primary"}`}>
+          {done ? <CheckCircle2 className="h-6 w-6" /> : <Icon className="h-6 w-6" />}
         </div>
         <div className="min-w-0">
           <div className="text-xs font-bold uppercase text-muted-foreground">Step {step}</div>
           <div className="font-extrabold truncate">{title}</div>
           <div className="text-sm text-muted-foreground break-words">{subtitle}</div>
         </div>
-        {action && !locked && (
+        {action ? (
           <Button asChild size="sm" className="rounded-2xl">
             <Link to={action.to as any} params={action.params as any}>{action.label}</Link>
           </Button>
+        ) : (
+          emptyLabel && <span className="text-xs font-bold text-muted-foreground">{emptyLabel}</span>
         )}
-        {locked && <span className="text-xs font-bold text-muted-foreground">Locked</span>}
       </div>
     </Card>
   );
