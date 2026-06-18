@@ -583,6 +583,7 @@ export type Database = {
           narration_te: string | null
           pass_threshold: number
           questions: Json
+          script: Json | null
           slides: Json
           sort_order: number
           stage_type: Database["public"]["Enums"]["lesson_stage_type"]
@@ -600,6 +601,7 @@ export type Database = {
           narration_te?: string | null
           pass_threshold?: number
           questions?: Json
+          script?: Json | null
           slides?: Json
           sort_order?: number
           stage_type: Database["public"]["Enums"]["lesson_stage_type"]
@@ -617,6 +619,7 @@ export type Database = {
           narration_te?: string | null
           pass_threshold?: number
           questions?: Json
+          script?: Json | null
           slides?: Json
           sort_order?: number
           stage_type?: Database["public"]["Enums"]["lesson_stage_type"]
