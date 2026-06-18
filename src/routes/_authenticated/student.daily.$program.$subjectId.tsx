@@ -67,7 +67,52 @@ function SubjectDailyFlow() {
   const lessonDone = nextLesson && progress.some((p) => p.lesson_id === nextLesson.id && p.status === "completed");
   const subjectHomework = homework.filter((h: any) => h.subject_id === subjectId);
   const homeworkPending = subjectHomework.some((h: any) => !h.completed_at);
-  const hasHomework = subjectHomework.length > 0;
+
+  const { data: nextLessonStages = [] } = useQuery({
+    queryKey: ["lesson-stages-homework", nextLesson?.id],
+    enabled: !!nextLesson,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("lesson_stages")
+        .select("id, stage_type")
+        .eq("lesson_id", nextLesson!.id);
+      return (data ?? []) as Array<{ id: string; stage_type: string }>;
+    },
+  });
+  const homeworkStage =
+    nextLessonStages.find((s) => s.stage_type === "assignment") ||
+    nextLessonStages.find((s) => s.stage_type === "homework");
+
+  const { data: homeworkStageProgress } = useQuery({
+    queryKey: ["homework-stage-progress", activeStudent?.id, nextLesson?.id, homeworkStage?.stage_type],
+    enabled: !!activeStudent && !!nextLesson && !!homeworkStage,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("student_stage_progress")
+        .select("completed_at")
+        .eq("student_profile_id", activeStudent!.id)
+        .eq("lesson_id", nextLesson!.id)
+        .eq("stage_type", homeworkStage!.stage_type as any)
+        .maybeSingle();
+      return data;
+    },
+  });
+  const homeworkStageDone = !!homeworkStageProgress?.completed_at;
+
+  const hasHomework = subjectHomework.length > 0 || !!homeworkStage;
+  const homeworkAllDone = !homeworkPending && !!homeworkStage && homeworkStageDone;
+  const homeworkAction = homeworkStage && nextLesson
+    ? { label: homeworkStageDone ? "Revisit Homework" : "Start Homework", to: "/student/classroom/$lessonId", params: { lessonId: nextLesson.id } }
+    : subjectHomework.length > 0
+    ? { label: "Start Homework", to: "/student/homework" }
+    : undefined;
+  const homeworkSubtitle = homeworkStage
+    ? (homeworkStageDone ? "Homework completed" : "Practice questions from this lesson")
+    : subjectHomework.length === 0
+    ? "No homework set"
+    : homeworkPending
+    ? `${subjectHomework.filter((h: any) => !h.completed_at).length} pending`
+    : "All done";
 
   const isKg2 = programCode === "kg2_brushup";
 
@@ -105,9 +150,9 @@ function SubjectDailyFlow() {
         step={3}
         icon={ClipboardList}
         title="Homework"
-        subtitle={subjectHomework.length === 0 ? "No homework set" : homeworkPending ? `${subjectHomework.filter((h: any) => !h.completed_at).length} pending` : "All done"}
-        status={hasHomework && !homeworkPending ? "done" : "open"}
-        action={hasHomework ? { label: "Start Homework", to: "/student/homework" } : undefined}
+        subtitle={homeworkSubtitle}
+        status={hasHomework && (homeworkAllDone || (!homeworkStage && !homeworkPending)) ? "done" : "open"}
+        action={homeworkAction}
         emptyLabel="No Homework Available"
       />
 
