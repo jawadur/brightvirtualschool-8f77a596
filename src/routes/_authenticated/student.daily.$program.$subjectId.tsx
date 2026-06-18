@@ -92,7 +92,7 @@ function SubjectDailyFlow() {
         .select("completed_at")
         .eq("student_profile_id", activeStudent!.id)
         .eq("lesson_id", nextLesson!.id)
-        .eq("stage_type", homeworkStage!.stage_type)
+        .eq("stage_type", homeworkStage!.stage_type as any)
         .maybeSingle();
       return data;
     },
