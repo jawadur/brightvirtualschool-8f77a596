@@ -36,7 +36,7 @@ function HomeworkPage() {
       const { data: stages } = await supabase
         .from("lesson_stages")
         .select("id, lesson_id, stage_type, lessons!inner(id, title, is_published)")
-        .in("stage_type", ["assignment", "homework"]);
+        .in("stage_type", ["assignment", "homework"] as any);
       const rows = (stages ?? []).filter((s: any) => s.lessons?.is_published);
       // dedupe per lesson, prefer assignment
       const byLesson = new Map<string, any>();
