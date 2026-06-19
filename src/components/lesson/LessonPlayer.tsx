@@ -295,6 +295,7 @@ function Badge({ children, className }: { children: React.ReactNode; className?:
 }
 
 function extractReadableText(step: LessonStep, tr: (v: any) => string): string {
+  if (!step || !(step as any).type) return "";
   switch (step.type) {
     case "introduction":
     case "teacher_explanation":
