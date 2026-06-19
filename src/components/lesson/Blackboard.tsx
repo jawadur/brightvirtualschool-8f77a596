@@ -70,7 +70,9 @@ export function Blackboard({ steps, lang = "en", minDurationSeconds = 0, onCompl
   const visible = useMemo(() => {
     const out: { p: ChalkPrimitive; step: number }[] = [];
     for (let i = 0; i <= idx; i++) {
-      for (const p of steps[i]?.primitives ?? []) out.push({ p, step: i });
+      for (const p of steps[i]?.primitives ?? []) {
+        if (p && (p as any).type) out.push({ p, step: i });
+      }
     }
     return out;
   }, [idx, steps]);
