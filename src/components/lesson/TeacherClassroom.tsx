@@ -207,6 +207,22 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
   const [stageElapsed, setStageElapsed] = useState(0);
 
   useEffect(() => {
+    if (!stage) return;
+    const hasScript = Array.isArray(stage.script) && stage.script.length > 0;
+    const hasSlides = Array.isArray(stage.slides) && stage.slides.length > 0;
+    const hasQuestions = Array.isArray(stage.questions) && stage.questions.length > 0;
+    const hasNarration = !!(stage.narration_en || stage.narration_hi || stage.narration_te);
+    const hasExplanation = !!stage.explanation && Object.values(stage.explanation || {}).some((v) => !!v);
+    if (!hasScript && !hasSlides && !hasQuestions && !hasNarration && !hasExplanation) {
+      console.warn("[TeacherClassroom] Malformed stage data — empty content", {
+        lesson_id: stage.lesson_id,
+        stage_id: stage.id,
+        stage_type: stage.stage_type,
+      });
+    }
+  }, [stage?.id]);
+
+  useEffect(() => {
     setStageElapsed(0);
     const timer = window.setInterval(() => setStageElapsed((v) => v + 1), 1000);
     return () => window.clearInterval(timer);
@@ -430,6 +446,13 @@ function StageBody({
     <div className="space-y-3">
       {stage.image_url && (
         <img src={stage.image_url} alt="" loading="lazy" className="rounded-xl max-h-72 object-contain mx-auto" />
+      )}
+
+      {!explanation && slides.length === 0 && !narration && !stage.image_url && (
+        <div className="rounded-3xl border bg-muted/30 p-6 text-center">
+          <p className="font-bold">No content available for this stage</p>
+          <p className="mt-1 text-sm text-muted-foreground">You can mark this step complete and continue.</p>
+        </div>
       )}
 
       {explanation && (

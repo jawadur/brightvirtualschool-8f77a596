@@ -13,10 +13,12 @@ export function LessonPlayer({
   steps,
   onFinished,
   lang = "en",
+  lessonId,
 }: {
   steps: LessonStep[];
   onFinished: (result: { score: number; coinsEarned: number }) => void;
   lang?: "en" | "hi" | "te";
+  lessonId?: string;
 }) {
   const { t, tr } = useI18n();
   const { prefs } = useStudentPrefs();
@@ -24,7 +26,7 @@ export function LessonPlayer({
   const [coins, setCoins] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [interactiveCount, setInteractiveCount] = useState(
-    steps.filter((s) => ["multiple_choice", "match_pairs", "fill_blank"].includes(s.type)).length || 1,
+    (steps ?? []).filter((s) => s && ["multiple_choice", "match_pairs", "fill_blank"].includes((s as any).type)).length || 1,
   );
   const [feedback, setFeedback] = useState<null | "correct" | "wrong">(null);
   const [canAdvance, setCanAdvance] = useState(false);
@@ -33,17 +35,29 @@ export function LessonPlayer({
   const [text, setText] = useState("");
   const [matches, setMatches] = useState<Record<number, number>>({});
 
-  const step = steps[idx];
-  const pct = Math.round(((idx + 1) / steps.length) * 100);
+  const safeSteps = Array.isArray(steps) ? steps.filter((s) => s && (s as any).type) : [];
+  const step = safeSteps[idx];
+  const pct = safeSteps.length ? Math.round(((idx + 1) / safeSteps.length) * 100) : 0;
 
-  const readableText = useMemo(() => extractReadableText(step, tr), [step, tr]);
+  const readableText = useMemo(() => (step ? extractReadableText(step, tr) : ""), [step, tr]);
+
+  if (!step) {
+    console.warn("[LessonPlayer] No content available", { lessonId, stepIndex: idx, rawSteps: steps });
+    return (
+      <Card className="p-8 text-center">
+        <p className="text-lg font-bold">No content available for this stage</p>
+        <p className="mt-2 text-sm text-muted-foreground">This lesson is being prepared. Please try another lesson or come back soon.</p>
+        <Button className="mt-4" onClick={() => onFinished({ score: 0, coinsEarned: 0 })}>Back</Button>
+      </Card>
+    );
+  }
 
   const reset = () => {
     setFeedback(null); setCanAdvance(false); setSelected(null); setText(""); setMatches({});
   };
 
   const next = () => {
-    if (idx + 1 >= steps.length) {
+    if (idx + 1 >= safeSteps.length) {
       const score = Math.round((correctCount / Math.max(1, interactiveCount)) * 100);
       onFinished({ score, coinsEarned: coins });
       return;
@@ -281,6 +295,7 @@ function Badge({ children, className }: { children: React.ReactNode; className?:
 }
 
 function extractReadableText(step: LessonStep, tr: (v: any) => string): string {
+  if (!step || !(step as any).type) return "";
   switch (step.type) {
     case "introduction":
     case "teacher_explanation":

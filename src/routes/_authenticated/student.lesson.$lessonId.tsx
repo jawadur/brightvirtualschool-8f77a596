@@ -86,6 +86,7 @@ function LessonPage() {
       <p className="text-xs text-muted-foreground">For a teacher-led, step-by-step lesson, open the Virtual Classroom.</p>
       <LessonPlayer
         steps={steps}
+        lessonId={lessonId}
         onFinished={async ({ score, coinsEarned }) => {
           if (!activeStudent) return;
           try {
