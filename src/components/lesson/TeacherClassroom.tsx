@@ -448,6 +448,13 @@ function StageBody({
         <img src={stage.image_url} alt="" loading="lazy" className="rounded-xl max-h-72 object-contain mx-auto" />
       )}
 
+      {!explanation && slides.length === 0 && !narration && !stage.image_url && (
+        <div className="rounded-3xl border bg-muted/30 p-6 text-center">
+          <p className="font-bold">No content available for this stage</p>
+          <p className="mt-1 text-sm text-muted-foreground">You can mark this step complete and continue.</p>
+        </div>
+      )}
+
       {explanation && (
         <div className="rounded-3xl border bg-gradient-to-br from-amber-50 to-orange-50 p-4 sm:p-5 shadow-sm">
           <div className="flex items-start gap-3">
