@@ -57,7 +57,7 @@ export function LessonPlayer({
   };
 
   const next = () => {
-    if (idx + 1 >= steps.length) {
+    if (idx + 1 >= safeSteps.length) {
       const score = Math.round((correctCount / Math.max(1, interactiveCount)) * 100);
       onFinished({ score, coinsEarned: coins });
       return;
