@@ -207,6 +207,22 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
   const [stageElapsed, setStageElapsed] = useState(0);
 
   useEffect(() => {
+    if (!stage) return;
+    const hasScript = Array.isArray(stage.script) && stage.script.length > 0;
+    const hasSlides = Array.isArray(stage.slides) && stage.slides.length > 0;
+    const hasQuestions = Array.isArray(stage.questions) && stage.questions.length > 0;
+    const hasNarration = !!(stage.narration_en || stage.narration_hi || stage.narration_te);
+    const hasExplanation = !!stage.explanation && Object.values(stage.explanation || {}).some((v) => !!v);
+    if (!hasScript && !hasSlides && !hasQuestions && !hasNarration && !hasExplanation) {
+      console.warn("[TeacherClassroom] Malformed stage data — empty content", {
+        lesson_id: stage.lesson_id,
+        stage_id: stage.id,
+        stage_type: stage.stage_type,
+      });
+    }
+  }, [stage?.id]);
+
+  useEffect(() => {
     setStageElapsed(0);
     const timer = window.setInterval(() => setStageElapsed((v) => v + 1), 1000);
     return () => window.clearInterval(timer);
