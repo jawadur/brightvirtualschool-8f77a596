@@ -555,7 +555,7 @@ function QuestionRunner({ stage, onDone }: { stage: Stage; onDone: (score: numbe
   return (
     <div className="mt-5 space-y-3">
       <div className="text-xs text-muted-foreground">Question {idx + 1} of {questions.length}</div>
-      <p className="text-lg font-extrabold no-clip">{q.prompt}</p>
+      <p className="text-lg font-extrabold no-clip">{getText(q.prompt)}</p>
       <div className="grid sm:grid-cols-2 gap-2">
         {(q.options ?? []).map((opt, i) => (
           <button
@@ -566,7 +566,7 @@ function QuestionRunner({ stage, onDone }: { stage: Stage; onDone: (score: numbe
               picked === i ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/40"
             }`}
           >
-            {opt}
+            {getText(opt)}
           </button>
         ))}
       </div>
@@ -574,7 +574,7 @@ function QuestionRunner({ stage, onDone }: { stage: Stage; onDone: (score: numbe
       {isGuided && q.hint && (
         <div>
           <Button variant="outline" size="sm" onClick={() => setShowHint(true)}><Sparkles className="h-4 w-4 mr-1" />Teacher's hint</Button>
-          {showHint && <p className="mt-2 text-sm bg-accent/40 rounded-lg p-3 no-clip">👩‍🏫 {q.hint}</p>}
+          {showHint && <p className="mt-2 text-sm bg-accent/40 rounded-lg p-3 no-clip">👩‍🏫 {getText(q.hint)}</p>}
         </div>
       )}
 
@@ -583,7 +583,7 @@ function QuestionRunner({ stage, onDone }: { stage: Stage; onDone: (score: numbe
       )}
       {feedback === "wrong" && (
         <p className="text-sm text-destructive font-bold">
-          👩‍🏫 Let me explain again. {isGuided && q.hint ? q.hint : "Try once more."}
+          👩‍🏫 Let me explain again. {isGuided && q.hint ? getText(q.hint) : "Try once more."}
         </p>
       )}
 
