@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useStudents } from "@/lib/student-context";
 import { useI18n } from "@/lib/i18n";
 import { LessonPlayer } from "@/components/lesson/LessonPlayer";
+import { TeacherClassroom } from "@/components/lesson/TeacherClassroom";
 import { awardCoins, awardStar, completeLesson, type LessonContent } from "@/lib/data";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,19 @@ function LessonPage() {
     },
   });
 
-  if (isLoading) return <div className="text-muted-foreground">{t("loading")}</div>;
+  const { data: stagesCount, isLoading: stagesLoading } = useQuery({
+    queryKey: ["lesson-stages-count", lessonId],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("lesson_stages")
+        .select("id", { count: "exact", head: true })
+        .eq("lesson_id", lessonId);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  if (isLoading || stagesLoading) return <div className="text-muted-foreground">{t("loading")}</div>;
   if (!lesson) {
     return (
       <Card className="p-6 max-w-lg mx-auto text-center">
@@ -60,6 +73,10 @@ function LessonPage() {
   }
   const content = lesson.content as LessonContent;
   const steps = Array.isArray(content?.steps) ? content.steps : [];
+  const lang = (activeStudent?.preferred_language as "en" | "hi" | "te") ?? "en";
+  // Primary source: lesson_stages (KG2/Class-1 curriculum). Fallback: lessons.content.steps.
+  const preferStages = (stagesCount ?? 0) > 0;
+  console.log("[LessonPage]", { lessonId, stageCount: stagesCount, legacyStepCount: steps.length, preferStages });
 
   if (finished) {
     return (
@@ -71,6 +88,40 @@ function LessonPage() {
         <div className="mt-6 flex justify-center gap-3">
           <Button onClick={() => navigate({ to: "/student" })}>{t("todays_school")}</Button>
         </div>
+      </Card>
+    );
+  }
+
+  if (preferStages) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-extrabold no-clip">{tr(lesson.title)}</h1>
+        <TeacherClassroom
+          lessonId={lessonId}
+          lang={lang}
+          onAllComplete={async () => {
+            if (!activeStudent) return;
+            try {
+              await completeLesson(activeStudent.id, lessonId, 100);
+              await awardCoins(activeStudent.id, 10, { en: "Lesson completed" }, lessonId, "lesson");
+              refresh();
+              qc.invalidateQueries({ queryKey: ["progress"] });
+              setFinished({ score: 100, coinsEarned: 10 });
+            } catch (e) {
+              toast.error((e as Error).message);
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (steps.length === 0) {
+    return (
+      <Card className="p-8 text-center max-w-lg mx-auto">
+        <p className="text-lg font-bold">No content available for this lesson</p>
+        <p className="mt-2 text-sm text-muted-foreground">This lesson is being prepared. Please pick another.</p>
+        <Link to="/student" className="mt-4 inline-block text-primary underline">Back to school</Link>
       </Card>
     );
   }
