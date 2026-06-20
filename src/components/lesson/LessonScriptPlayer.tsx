@@ -6,6 +6,7 @@ import { CheckCircle2, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Volume
 import { useTts, type TtsLang } from '@/hooks/use-tts';
 import type { LessonScriptStep } from '@/types/lesson-script';
 import { resolveScriptText } from '@/types/lesson-script';
+import { getText } from '@/lib/text';
 
 type Props = {
   script: LessonScriptStep[];
@@ -35,7 +36,7 @@ function renderPrimitive(primitive: Record<string, any>, i: number) {
   const type = primitive.type;
   const color = primitive.color || '#fde68a';
   if (type === 'shape') {
-    return <text key={i} x={primitive.x || 100} y={primitive.y || 100} fontSize={primitive.size || 72}>{primitive.emoji || '⭐'}</text>;
+    return <text key={i} x={primitive.x || 100} y={primitive.y || 100} fontSize={primitive.size || 72}>{getText(primitive.emoji) || '⭐'}</text>;
   }
   if (type === 'text' || type === 'equation') {
     return (
@@ -47,7 +48,7 @@ function renderPrimitive(primitive: Record<string, any>, i: number) {
         fill={primitive.color || '#fff7cc'}
         fontWeight={800}
       >
-        {primitive.text || ''}
+        {getText(primitive.text) || ''}
       </text>
     );
   }
@@ -77,7 +78,7 @@ function StepVisual({ step, lang }: { step: LessonScriptStep; lang: TtsLang }) {
         </div>
       );
     }
-    const emoji = step.emoji || step.object || '⭐';
+    const emoji = getText(step.emoji) || getText(step.object) || '⭐';
     const count = Math.max(1, Math.min(step.count || 1, 10));
     return (
       <div className="rounded-3xl bg-emerald-950 text-white p-5 min-h-[220px] flex flex-col justify-center items-center shadow-inner">
@@ -96,7 +97,7 @@ function StepVisual({ step, lang }: { step: LessonScriptStep; lang: TtsLang }) {
         <div className="flex flex-wrap justify-center gap-3">
           {(step.values || []).map((value, i) => (
             <span key={i} className="h-16 w-16 rounded-full bg-amber-200 text-emerald-950 grid place-items-center text-3xl font-black">
-              {value}
+              {getText(value)}
             </span>
           ))}
         </div>
