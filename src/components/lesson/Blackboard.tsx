@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Volume2, Square } from "lucide-react";
 import { useTts, type TtsLang } from "@/hooks/use-tts";
 import { useStudentPrefs } from "@/lib/student-prefs";
+import { getText } from "@/lib/text";
 
 /**
  * Virtual Blackboard: SVG-based chalk demo with step-by-step reveal.
@@ -167,7 +168,7 @@ export function Blackboard({ steps, lang = "en", minDurationSeconds = 0, onCompl
                         style={{ fontFamily: "'Caveat','Patrick Hand','Comic Sans MS','Noto Sans Telugu','Noto Sans Devanagari',cursive" }}
                         lang={(p as any).lang}
                       >
-                        {p.text}
+                        {getText((p as any).text, lang)}
                       </text>
                     );
                   }
@@ -245,7 +246,7 @@ export function Blackboard({ steps, lang = "en", minDurationSeconds = 0, onCompl
                         fontSize={p.size ?? 60}
                         className={drawIn}
                       >
-                        {p.emoji}
+                        {getText((p as any).emoji, lang) || "⭐"}
                       </text>
                     );
                   default:
@@ -264,7 +265,7 @@ export function Blackboard({ steps, lang = "en", minDurationSeconds = 0, onCompl
         {/* Caption strip */}
         {step?.caption && (
           <div className="bg-emerald-950/90 text-emerald-50 px-4 py-2 text-sm sm:text-base font-bold no-clip font-indic" lang={lang}>
-            👩‍🏫 {step.caption}
+            👩‍🏫 {getText(step.caption, lang)}
           </div>
         )}
       </div>
@@ -287,10 +288,10 @@ export function Blackboard({ steps, lang = "en", minDurationSeconds = 0, onCompl
         </Button>
         {step?.narration && (
           <>
-            <Button size="sm" variant="outline" onClick={() => tts.speak(step.narration!, lang)}>
+            <Button size="sm" variant="outline" onClick={() => tts.speak(getText(step.narration, lang), lang)}>
               <Volume2 className="h-4 w-4 mr-1" /> Listen
             </Button>
-            <Button size="sm" variant="outline" onClick={() => tts.speak(step.narration!, lang)}>
+            <Button size="sm" variant="outline" onClick={() => tts.speak(getText(step.narration, lang), lang)}>
               <RotateCcw className="h-4 w-4 mr-1" /> Replay
             </Button>
           </>
