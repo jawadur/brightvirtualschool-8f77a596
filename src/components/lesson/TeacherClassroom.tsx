@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Blackboard, coerceBlackboardSteps } from "@/components/lesson/Blackboard";
 import { LessonScriptPlayer } from "@/components/lesson/LessonScriptPlayer";
 import type { LessonScriptStep } from "@/types/lesson-script";
+import { getText } from "@/lib/text";
 
 export const STAGE_ORDER = [
   "welcome", "blackboard", "concept", "example1", "example2", "guided", "independent", "assignment", "test", "revision",
@@ -286,10 +287,13 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
 
   const meta = STAGE_META[stage.stage_type];
   const narration =
-    (lang === "hi" && stage.narration_hi) ||
-    (lang === "te" && stage.narration_te) ||
-    stage.narration_en ||
-    tr(stage.explanation);
+    getText(
+      (lang === "hi" && stage.narration_hi) ||
+        (lang === "te" && stage.narration_te) ||
+        stage.narration_en ||
+        stage.explanation,
+      lang,
+    );
 
   const handleAdvance = async (score: number | null) => {
     tts.stop();
@@ -435,12 +439,14 @@ function StageBody({
 }) {
   const { tr } = useI18n();
   const slides = stage.slides ?? [];
-  const explanation = tr(stage.explanation);
-  const narration =
+  const explanation = getText(stage.explanation, lang);
+  const narration = getText(
     (lang === "hi" && stage.narration_hi) ||
-    (lang === "te" && stage.narration_te) ||
-    stage.narration_en ||
-    explanation;
+      (lang === "te" && stage.narration_te) ||
+      stage.narration_en ||
+      stage.explanation,
+    lang,
+  );
 
   return (
     <div className="space-y-3">
@@ -476,9 +482,9 @@ function StageBody({
         <div className="grid gap-3 sm:grid-cols-2">
           {slides.map((s, i) => (
             <Card key={i} className="p-4 bg-muted/40 min-h-[120px]">
-              {s.title && <div className="font-extrabold mb-1 no-clip">{s.title}</div>}
-              {s.image && <img src={s.image} alt="" loading="lazy" className="my-2 max-h-32 mx-auto" />}
-              {s.body && <p className="text-sm no-clip" lang={lang}>{s.body}</p>}
+              {s.title && <div className="font-extrabold mb-1 no-clip">{getText(s.title, lang)}</div>}
+              {s.image && typeof s.image === "string" && <img src={s.image} alt="" loading="lazy" className="my-2 max-h-32 mx-auto" />}
+              {s.body && <p className="text-sm no-clip" lang={lang}>{getText(s.body, lang)}</p>}
             </Card>
           ))}
         </div>
