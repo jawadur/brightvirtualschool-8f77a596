@@ -82,7 +82,7 @@ export function Blackboard({ steps, lang = "en", minDurationSeconds = 0, onCompl
   useEffect(() => {
     advancedRef.current = false;
     if (playing && step?.narration) {
-      tts.speak(step.narration, lang);
+      tts.speak(getText(step.narration, lang), lang);
     }
     return () => tts.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
