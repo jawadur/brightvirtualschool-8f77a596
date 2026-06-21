@@ -232,6 +232,24 @@ function ContinueLearningCard({ next, tr }: { next: any; tr: (v: any) => string 
   );
 }
 
+function ContinueLearningFallback({ ref_, tr }: { ref_: any; tr: (v: any) => string }) {
+  return (
+    <Link to="/student/lesson/$lessonId" params={{ lessonId: ref_.lesson.id }}>
+      <Card className="p-5 hover:shadow-pop transition cursor-pointer flex items-center gap-4 bg-gradient-to-r from-primary/15 to-accent">
+        <div className="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center">
+          <PlayCircle className="h-8 w-8 text-primary" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-xs font-bold uppercase text-primary">Continue Learning · {tr(ref_.subject?.name)}</div>
+          <div className="truncate text-lg font-extrabold">{tr(ref_.lesson.title)}</div>
+          <div className="text-xs text-muted-foreground">{ref_.pct}% done · Pick up where you left off</div>
+        </div>
+        <Button size="sm" className="rounded-2xl">Resume</Button>
+      </Card>
+    </Link>
+  );
+}
+
 function SubjectScheduleCard({ row, classInfo, tr }: { row: any; classInfo: any; tr: (v: any) => string }) {
   const subjectColor = row.subject?.color || "#FDE68A";
   const items = [
