@@ -30,6 +30,7 @@ import { fetchTodayRevision } from "@/lib/revision";
 import { fetchHomework, summarizeHomework } from "@/lib/homework";
 import { ClipboardList } from "lucide-react";
 import { fetchActiveProgram, PROGRAMS } from "@/lib/program";
+import { fetchHierarchyProgress, pickContinueLesson } from "@/lib/progress-tracking";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -108,6 +109,16 @@ function TodaysSchool() {
     return null;
   })();
 
+  // Fallback Continue Learning: last in-progress lesson across the student's classes.
+  const { data: continueRef } = useQuery({
+    queryKey: ["continue-learning", activeStudent?.id, classIds.join(",")],
+    enabled: !!activeStudent && classIds.length > 0 && !nextUp,
+    queryFn: async () => {
+      const tree = await fetchHierarchyProgress(activeStudent!.id, classIds);
+      return pickContinueLesson(tree);
+    },
+  });
+
   return (
     <div className="space-y-6">
       <section className="rounded-3xl bg-hero p-6 shadow-pop">
@@ -126,6 +137,7 @@ function TodaysSchool() {
       </section>
 
       {nextUp && <ContinueLearningCard next={nextUp} tr={tr} />}
+      {!nextUp && continueRef && <ContinueLearningFallback ref_={continueRef} tr={tr} />}
 
       <ProgramBanner activeProgram={activeProgram ?? null} />
 
@@ -215,6 +227,24 @@ function ContinueLearningCard({ next, tr }: { next: any; tr: (v: any) => string 
           <div className="text-xs text-muted-foreground">Next: {stepLabel}</div>
         </div>
         <Button size="sm" className="rounded-2xl">Start</Button>
+      </Card>
+    </Link>
+  );
+}
+
+function ContinueLearningFallback({ ref_, tr }: { ref_: any; tr: (v: any) => string }) {
+  return (
+    <Link to="/student/lesson/$lessonId" params={{ lessonId: ref_.lesson.id }}>
+      <Card className="p-5 hover:shadow-pop transition cursor-pointer flex items-center gap-4 bg-gradient-to-r from-primary/15 to-accent">
+        <div className="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center">
+          <PlayCircle className="h-8 w-8 text-primary" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-xs font-bold uppercase text-primary">Continue Learning · {tr(ref_.subject?.name)}</div>
+          <div className="truncate text-lg font-extrabold">{tr(ref_.lesson.title)}</div>
+          <div className="text-xs text-muted-foreground">{ref_.pct}% done · Pick up where you left off</div>
+        </div>
+        <Button size="sm" className="rounded-2xl">Resume</Button>
       </Card>
     </Link>
   );
