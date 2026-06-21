@@ -11,6 +11,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
+import { findNextLesson } from "@/lib/lesson-nav";
+import { PlayCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/student/lesson/$lessonId")({
   component: LessonPage,
@@ -36,6 +38,12 @@ function LessonPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [finished, setFinished] = useState<null | { score: number; coinsEarned: number }>(null);
+
+  const nextLessonQ = useQuery({
+    queryKey: ["next-lesson", lessonId],
+    enabled: !!finished,
+    queryFn: () => findNextLesson(lessonId),
+  });
 
   const { data: lesson, isLoading } = useQuery({
     queryKey: ["lesson", lessonId],
@@ -85,8 +93,19 @@ function LessonPage() {
         <h1 className="mt-4 text-3xl font-extrabold">{t("great_job")}</h1>
         <p className="mt-2 text-muted-foreground">{t("score")}: {finished.score}%</p>
         <p className="mt-1 font-bold text-coin">+ {finished.coinsEarned} coins</p>
-        <div className="mt-6 flex justify-center gap-3">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Button onClick={() => navigate({ to: "/student" })}>{t("todays_school")}</Button>
+          {nextLessonQ.data && (
+            <Button
+              onClick={() => {
+                setFinished(null);
+                navigate({ to: "/student/lesson/$lessonId", params: { lessonId: nextLessonQ.data!.id } });
+              }}
+              className="gap-1"
+            >
+              <PlayCircle className="h-4 w-4" /> Start Next Lesson
+            </Button>
+          )}
         </div>
       </Card>
     );
