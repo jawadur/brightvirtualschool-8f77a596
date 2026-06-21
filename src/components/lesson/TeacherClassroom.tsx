@@ -8,7 +8,7 @@ import { useTts, type TtsLang } from "@/hooks/use-tts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Lock, CheckCircle2, Play, Pause, RotateCcw, Square, ThumbsUp, Sparkles, Clock, Volume2 } from "lucide-react";
+import { Lock, CheckCircle2, Play, Pause, RotateCcw, Square, ThumbsUp, Sparkles, Clock, Volume2, ChevronLeft, ChevronRight } from "lucide-react";
 import teacherAvatar from "@/assets/teacher.png";
 import { toast } from "sonner";
 import { Blackboard, coerceBlackboardSteps } from "@/components/lesson/Blackboard";
@@ -140,10 +140,11 @@ type Stage = {
   pass_threshold: number;
 };
 
-export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
+export function TeacherClassroom({ lessonId, lang = "en", onAllComplete, initialStageType }: {
   lessonId: string;
   lang?: TtsLang;
   onAllComplete?: () => void;
+  initialStageType?: StageType;
 }) {
   const { activeStudent } = useStudents();
   const { prefs } = useStudentPrefs();
@@ -197,9 +198,13 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
 
   // Resume: jump to first incomplete
   const firstIncompleteIdx = useMemo(() => {
+    if (initialStageType) {
+      const idx = stages.findIndex((s) => s.stage_type === initialStageType);
+      if (idx >= 0) return idx;
+    }
     for (let i = 0; i < stages.length; i++) if (!completedSet.has(stages[i].stage_type)) return i;
     return Math.max(0, stages.length - 1);
-  }, [stages, completedSet]);
+  }, [stages, completedSet, initialStageType]);
 
   const [activeIdx, setActiveIdx] = useState(firstIncompleteIdx);
   useEffect(() => { setActiveIdx(firstIncompleteIdx); }, [firstIncompleteIdx]);
@@ -423,6 +428,28 @@ export function TeacherClassroom({ lessonId, lang = "en", onAllComplete }: {
             onComplete={handleAdvance}
           />
         )}
+
+        {/* Continuous nav: Prev / Next across all stages */}
+        <div className="mt-5 flex items-center justify-between gap-2 border-t pt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { tts.stop(); setActiveIdx(Math.max(0, activeIdx - 1)); }}
+            disabled={activeIdx === 0}
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+          </Button>
+          <span className="text-xs text-muted-foreground">Step {activeIdx + 1} / {stages.length}</span>
+          {activeIdx + 1 < stages.length ? (
+            <Button size="sm" onClick={() => { tts.stop(); setActiveIdx(activeIdx + 1); }}>
+              Next <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          ) : (
+            <Button size="sm" onClick={() => onAllComplete?.()}>
+              Finish lesson <CheckCircle2 className="h-4 w-4 ml-1" />
+            </Button>
+          )}
+        </div>
       </Card>
     </div>
   );
