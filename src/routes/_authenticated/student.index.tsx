@@ -30,6 +30,7 @@ import { fetchTodayRevision } from "@/lib/revision";
 import { fetchHomework, summarizeHomework } from "@/lib/homework";
 import { ClipboardList } from "lucide-react";
 import { fetchActiveProgram, PROGRAMS } from "@/lib/program";
+import { fetchHierarchyProgress, pickContinueLesson } from "@/lib/progress-tracking";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -108,6 +109,16 @@ function TodaysSchool() {
     return null;
   })();
 
+  // Fallback Continue Learning: last in-progress lesson across the student's classes.
+  const { data: continueRef } = useQuery({
+    queryKey: ["continue-learning", activeStudent?.id, classIds.join(",")],
+    enabled: !!activeStudent && classIds.length > 0 && !nextUp,
+    queryFn: async () => {
+      const tree = await fetchHierarchyProgress(activeStudent!.id, classIds);
+      return pickContinueLesson(tree);
+    },
+  });
+
   return (
     <div className="space-y-6">
       <section className="rounded-3xl bg-hero p-6 shadow-pop">
@@ -126,6 +137,7 @@ function TodaysSchool() {
       </section>
 
       {nextUp && <ContinueLearningCard next={nextUp} tr={tr} />}
+      {!nextUp && continueRef && <ContinueLearningFallback ref_={continueRef} tr={tr} />}
 
       <ProgramBanner activeProgram={activeProgram ?? null} />
 
