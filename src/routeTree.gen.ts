@@ -41,6 +41,7 @@ import { Route as AuthenticatedStudentAnalyticsRouteImport } from './routes/_aut
 import { Route as AuthenticatedStudentAiTeacherRouteImport } from './routes/_authenticated/student.ai-teacher'
 import { Route as AuthenticatedAdminWeeklyPlannerRouteImport } from './routes/_authenticated/admin.weekly-planner'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
+import { Route as AuthenticatedAdminTeacherAssignmentsRouteImport } from './routes/_authenticated/admin.teacher-assignments'
 import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
 import { Route as AuthenticatedAdminQuestionsRouteImport } from './routes/_authenticated/admin.questions'
 import { Route as AuthenticatedAdminLessonWizardRouteImport } from './routes/_authenticated/admin.lesson-wizard'
@@ -242,6 +243,12 @@ const AuthenticatedAdminTestsRoute = AuthenticatedAdminTestsRouteImport.update({
   path: '/tests',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminTeacherAssignmentsRoute =
+  AuthenticatedAdminTeacherAssignmentsRouteImport.update({
+    id: '/teacher-assignments',
+    path: '/teacher-assignments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminScheduleRoute =
   AuthenticatedAdminScheduleRouteImport.update({
     id: '/schedule',
@@ -372,6 +379,7 @@ export interface FileRoutesByFullPath {
   '/admin/lesson-wizard': typeof AuthenticatedAdminLessonWizardRoute
   '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
+  '/admin/teacher-assignments': typeof AuthenticatedAdminTeacherAssignmentsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/weekly-planner': typeof AuthenticatedAdminWeeklyPlannerRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
@@ -421,6 +429,7 @@ export interface FileRoutesByTo {
   '/admin/lesson-wizard': typeof AuthenticatedAdminLessonWizardRoute
   '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
+  '/admin/teacher-assignments': typeof AuthenticatedAdminTeacherAssignmentsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/weekly-planner': typeof AuthenticatedAdminWeeklyPlannerRoute
   '/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
@@ -475,6 +484,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/lesson-wizard': typeof AuthenticatedAdminLessonWizardRoute
   '/_authenticated/admin/questions': typeof AuthenticatedAdminQuestionsRoute
   '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
+  '/_authenticated/admin/teacher-assignments': typeof AuthenticatedAdminTeacherAssignmentsRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/admin/weekly-planner': typeof AuthenticatedAdminWeeklyPlannerRoute
   '/_authenticated/student/ai-teacher': typeof AuthenticatedStudentAiTeacherRoute
@@ -529,6 +539,7 @@ export interface FileRouteTypes {
     | '/admin/lesson-wizard'
     | '/admin/questions'
     | '/admin/schedule'
+    | '/admin/teacher-assignments'
     | '/admin/tests'
     | '/admin/weekly-planner'
     | '/student/ai-teacher'
@@ -578,6 +589,7 @@ export interface FileRouteTypes {
     | '/admin/lesson-wizard'
     | '/admin/questions'
     | '/admin/schedule'
+    | '/admin/teacher-assignments'
     | '/admin/tests'
     | '/admin/weekly-planner'
     | '/student/ai-teacher'
@@ -631,6 +643,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/lesson-wizard'
     | '/_authenticated/admin/questions'
     | '/_authenticated/admin/schedule'
+    | '/_authenticated/admin/teacher-assignments'
     | '/_authenticated/admin/tests'
     | '/_authenticated/admin/weekly-planner'
     | '/_authenticated/student/ai-teacher'
@@ -902,6 +915,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTestsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/teacher-assignments': {
+      id: '/_authenticated/admin/teacher-assignments'
+      path: '/teacher-assignments'
+      fullPath: '/admin/teacher-assignments'
+      preLoaderRoute: typeof AuthenticatedAdminTeacherAssignmentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/schedule': {
       id: '/_authenticated/admin/schedule'
       path: '/schedule'
@@ -1046,6 +1066,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminLessonWizardRoute: typeof AuthenticatedAdminLessonWizardRoute
   AuthenticatedAdminQuestionsRoute: typeof AuthenticatedAdminQuestionsRoute
   AuthenticatedAdminScheduleRoute: typeof AuthenticatedAdminScheduleRoute
+  AuthenticatedAdminTeacherAssignmentsRoute: typeof AuthenticatedAdminTeacherAssignmentsRoute
   AuthenticatedAdminTestsRoute: typeof AuthenticatedAdminTestsRoute
   AuthenticatedAdminWeeklyPlannerRoute: typeof AuthenticatedAdminWeeklyPlannerRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -1063,6 +1084,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminLessonWizardRoute: AuthenticatedAdminLessonWizardRoute,
   AuthenticatedAdminQuestionsRoute: AuthenticatedAdminQuestionsRoute,
   AuthenticatedAdminScheduleRoute: AuthenticatedAdminScheduleRoute,
+  AuthenticatedAdminTeacherAssignmentsRoute:
+    AuthenticatedAdminTeacherAssignmentsRoute,
   AuthenticatedAdminTestsRoute: AuthenticatedAdminTestsRoute,
   AuthenticatedAdminWeeklyPlannerRoute: AuthenticatedAdminWeeklyPlannerRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
