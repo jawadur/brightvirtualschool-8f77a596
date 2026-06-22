@@ -1330,6 +1330,7 @@ export type Database = {
           preferred_language: string
           reading_streak: number
           revision_streak: number
+          section: string | null
           stars: number
           updated_at: string
         }
@@ -1353,6 +1354,7 @@ export type Database = {
           preferred_language?: string
           reading_streak?: number
           revision_streak?: number
+          section?: string | null
           stars?: number
           updated_at?: string
         }
@@ -1376,6 +1378,7 @@ export type Database = {
           preferred_language?: string
           reading_streak?: number
           revision_streak?: number
+          section?: string | null
           stars?: number
           updated_at?: string
         }
@@ -1537,6 +1540,134 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "programs"
             referencedColumns: ["code"]
+          },
+        ]
+      }
+      teacher_assignment_targets: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          score: number | null
+          student_profile_id: string
+          teacher_assignment_id: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          score?: number | null
+          student_profile_id: string
+          teacher_assignment_id: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          score?: number | null
+          student_profile_id?: string
+          teacher_assignment_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_assignment_targets_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_assignment_targets_teacher_assignment_id_fkey"
+            columns: ["teacher_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "teacher_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teacher_assignments: {
+        Row: {
+          assigned_date: string
+          class_id: string | null
+          created_at: string
+          created_by: string | null
+          due_date: string | null
+          id: string
+          kind: string
+          lesson_id: string | null
+          notes: string | null
+          scope: string
+          section: string | null
+          subject_id: string | null
+          title: string
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_date?: string
+          class_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          id?: string
+          kind: string
+          lesson_id?: string | null
+          notes?: string | null
+          scope: string
+          section?: string | null
+          subject_id?: string | null
+          title: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_date?: string
+          class_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          id?: string
+          kind?: string
+          lesson_id?: string | null
+          notes?: string | null
+          scope?: string
+          section?: string | null
+          subject_id?: string | null
+          title?: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_assignments_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_assignments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_assignments_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_assignments_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
           },
         ]
       }
