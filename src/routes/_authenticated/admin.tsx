@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-rout
 import { useEffect } from "react";
 import { AppHeader } from "@/components/app/AppHeader";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutGrid, BookOpen, ClipboardList, ClipboardCheck, Library, Wand2, ShieldAlert, CalendarCheck, BarChart3, Sparkles, CalendarRange } from "lucide-react";
+import { LayoutGrid, BookOpen, ClipboardList, ClipboardCheck, Library, Wand2, ShieldAlert, CalendarCheck, BarChart3, Sparkles, CalendarRange, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -60,6 +60,7 @@ function AdminShell() {
     { to: "/admin/lesson-wizard", icon: Sparkles, label: "New Lesson" },
     { to: "/admin/schedule", icon: CalendarCheck, label: "Schedule" },
     { to: "/admin/assignments", icon: ClipboardList, label: "Assignments" },
+    { to: "/admin/teacher-assignments", icon: UserCheck, label: "Teacher Assign" },
     { to: "/admin/tests", icon: ClipboardCheck, label: "Tests" },
     { to: "/admin/questions", icon: Library, label: "Question Bank" },
     { to: "/admin/badges", icon: BookOpen, label: "Badges" },
