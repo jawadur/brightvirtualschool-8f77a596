@@ -23,7 +23,7 @@ import {
   type TeacherAssignmentScope,
   type TeacherAssignmentRow,
 } from "@/lib/teacher-assignments";
-import { tr as trText } from "@/lib/text";
+import { getText as trText } from "@/lib/text";
 
 export const Route = createFileRoute("/_authenticated/admin/teacher-assignments")({
   head: () => ({ meta: [{ title: "Teacher Assignments — Admin" }] }),
