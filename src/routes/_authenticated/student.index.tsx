@@ -441,9 +441,6 @@ function TodaysHomeworkWidget({ studentId }: { studentId: string }) {
 }
 
 function ProgramBanner({ activeProgram }: { activeProgram: string | null }) {
-  return ProgramBannerImpl({ activeProgram });
-}
-function ProgramBannerImpl({ activeProgram }: { activeProgram: string | null }) {
   const current = PROGRAMS.find((p) => p.code === activeProgram);
   return (
     <Link to="/student/today">
