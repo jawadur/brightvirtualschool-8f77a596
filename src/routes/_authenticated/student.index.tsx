@@ -31,6 +31,7 @@ import { fetchHomework, summarizeHomework } from "@/lib/homework";
 import { ClipboardList } from "lucide-react";
 import { fetchActiveProgram, PROGRAMS } from "@/lib/program";
 import { fetchHierarchyProgress, pickContinueLesson } from "@/lib/progress-tracking";
+import { fetchStudentTeacherAssignments } from "@/lib/teacher-assignments";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -144,6 +145,8 @@ function TodaysSchool() {
       {activeStudent && <TodaysRevisionWidget studentId={activeStudent.id} />}
 
       {activeStudent && <TodaysHomeworkWidget studentId={activeStudent.id} />}
+
+      {activeStudent && <TeacherAssignedWidget studentId={activeStudent.id} />}
 
       {pct === 100 && totalSubjects > 0 && <DailySummary enriched={enriched} tr={tr} />}
 
