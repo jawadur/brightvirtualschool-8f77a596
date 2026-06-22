@@ -520,3 +520,52 @@ function PendingLists({ studentId, classIds, tr }: { studentId: string; classIds
     </section>
   );
 }
+
+function TeacherAssignedWidget({ studentId }: { studentId: string }) {
+  const { data = [] } = useQuery({
+    queryKey: ["student-teacher-assignments", studentId],
+    queryFn: () => fetchStudentTeacherAssignments(studentId),
+  });
+  const rows = (data as any[]).filter((r) => !!r.teacher_assignment);
+  const pending = rows.filter((r) => !r.completed_at);
+  if (pending.length === 0) return null;
+  const kindLabel = (k: string) =>
+    k === "lesson" ? "Lesson" : k === "practice" ? "Practice" : k === "homework" ? "Homework" : "Test";
+  return (
+    <section>
+      <h2 className="text-xl font-extrabold mb-3">📌 Assigned by Teacher</h2>
+      <Card className="p-4 space-y-2">
+        {pending.slice(0, 6).map((r) => {
+          const a = r.teacher_assignment;
+          const target =
+            a.kind === "test" && a.lesson_id
+              ? { to: "/student/lesson/$lessonId", params: { lessonId: a.lesson_id }, search: { stage: "test" as const } }
+              : a.lesson_id
+              ? { to: "/student/lesson/$lessonId", params: { lessonId: a.lesson_id } }
+              : a.kind === "homework"
+              ? { to: "/student/homework" }
+              : a.kind === "test"
+              ? { to: "/student/tests" }
+              : { to: "/student/today" };
+          return (
+            <Link key={r.id} {...(target as any)}>
+              <div className="rounded-xl border-2 border-primary/20 p-3 hover:bg-primary/5 flex items-center gap-3">
+                <span className="text-xs font-bold uppercase bg-primary/15 text-primary rounded px-2 py-1">{kindLabel(a.kind)}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold truncate">{a.title}</div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    Assigned {a.assigned_date}{a.due_date ? ` · Due ${a.due_date}` : ""}
+                  </div>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </Link>
+          );
+        })}
+        {pending.length > 6 && (
+          <div className="text-xs text-muted-foreground text-center pt-1">+{pending.length - 6} more</div>
+        )}
+      </Card>
+    </section>
+  );
+}
