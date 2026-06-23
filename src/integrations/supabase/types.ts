@@ -1979,9 +1979,15 @@ export type Database = {
     }
     Functions: {
       _score_question: { Args: { _ans: Json; _q: Json }; Returns: boolean }
+      _strip_answer_keys: { Args: { _questions: Json }; Returns: Json }
       can_access_student: { Args: { _student_id: string }; Returns: boolean }
       get_assignment_admin: { Args: { _assignment_id: string }; Returns: Json }
+      get_assignment_for_student: {
+        Args: { _assignment_id: string }
+        Returns: Json
+      }
       get_test_admin: { Args: { _test_id: string }; Returns: Json }
+      get_test_for_student: { Args: { _test_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
