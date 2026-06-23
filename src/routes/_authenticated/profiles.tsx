@@ -105,15 +105,21 @@ function AddStudentDialog({ onCreated }: { onCreated: () => void }) {
     mutationFn: async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Not signed in");
-      const { error } = await supabase.from("student_profiles").insert({
+      const { data: created, error } = await supabase.from("student_profiles").insert({
         owner_user_id: u.user.id,
         display_name: name.trim(),
         date_of_birth: dob || null,
-        pin: pin || null,
         board_id: boardId || null,
         class_id: classId || null,
-      });
+      }).select("id").single();
       if (error) throw error;
+      if (pin && pin.length > 0 && created?.id) {
+        const { error: pinErr } = await supabase.rpc("set_student_pin", {
+          _student_id: created.id,
+          _pin: pin,
+        } as any);
+        if (pinErr) throw pinErr;
+      }
     },
     onSuccess: () => {
       toast.success("Learner added!");
