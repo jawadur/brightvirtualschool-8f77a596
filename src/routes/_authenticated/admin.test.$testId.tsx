@@ -32,8 +32,9 @@ function TestEditor() {
   const q = useQuery({
     queryKey: ["admin-test", testId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tests").select("*").eq("id", testId).single();
-      if (error) throw error; return data;
+      const { data, error } = await supabase.rpc("get_test_admin", { _test_id: testId } as any);
+      if (error) throw error;
+      return data as any;
     },
   });
 
