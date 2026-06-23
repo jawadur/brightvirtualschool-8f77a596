@@ -32,7 +32,7 @@ function AssignmentsPage() {
   const list = useQuery({
     queryKey: ["assignments-all", subjectId],
     queryFn: async () => {
-      let q = supabase.from("assignments").select("id, title, subject_id, lesson_id, pass_threshold, due_in_days, questions");
+      let q = supabase.from("assignments").select("id, title, subject_id, lesson_id, pass_threshold, due_in_days, metadata");
       if (subjectId) q = q.eq("subject_id", subjectId);
       const { data, error } = await q.order("created_at", { ascending: false });
       if (error) throw error;
@@ -89,7 +89,7 @@ function AssignmentsPage() {
               <div className="flex-1">
                 <h3 className="font-extrabold">{tr(a.title)}</h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {(a.questions ?? []).length} questions · pass {a.pass_threshold}%
+                  pass {a.pass_threshold}%
                   {a.due_in_days ? ` · due in ${a.due_in_days}d` : ""}
                 </p>
               </div>

@@ -29,13 +29,11 @@ function AssignmentPage() {
   const { data: assignment, isLoading } = useQuery({
     queryKey: ["assignment", assignmentId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("assignments")
-        .select("id, title, instructions, questions, pass_threshold, lesson_id, subject_id")
-        .eq("id", assignmentId)
-        .single();
+      const { data, error } = await supabase.rpc("get_assignment_for_student", {
+        _assignment_id: assignmentId,
+      } as any);
       if (error) throw error;
-      return data;
+      return data as any;
     },
   });
 
@@ -47,27 +45,16 @@ function AssignmentPage() {
 
   const submit = async () => {
     if (!activeStudent) return;
-
-    let correct = 0;
-    questions.forEach((question, index) => {
-      if (scoreQuestion(question, answers[index])) correct += 1;
-    });
-
-    const score = Math.round((correct / Math.max(1, questions.length)) * 100);
-    const passed = score >= (assignment.pass_threshold ?? 60);
-
     try {
-      await supabase.from("assignment_submissions").insert({
-        student_profile_id: activeStudent.id,
-        assignment_id: assignmentId,
-        answers: Object.entries(answers).map(([index, answer]) => ({ index: Number(index), answer })),
-        score,
-        max_score: 100,
-        status: "completed",
-        completed_at: new Date().toISOString(),
-        metadata: { correct, total: questions.length },
-      });
-
+      const { data: result, error } = await supabase.rpc("submit_assignment", {
+        _student_id: activeStudent.id,
+        _assignment_id: assignmentId,
+        _answers: Object.entries(answers).map(([index, answer]) => ({ index: Number(index), answer })),
+      } as any);
+      if (error) throw error;
+      const score = (result as any)?.score ?? 0;
+      const correct = (result as any)?.correct ?? 0;
+      const passed = (result as any)?.passed ?? false;
       const coinsEarned = passed ? Math.max(5, Math.round(score / 10)) : Math.max(1, Math.round(score / 20));
       await awardCoins(activeStudent.id, coinsEarned, { en: "Assignment completed", hi: "होमवर्क पूरा", te: "హోంవర్క్ పూర్తయింది" }, assignmentId, "assignment");
       refresh();

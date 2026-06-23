@@ -32,7 +32,7 @@ function TestsAdminPage() {
   const list = useQuery({
     queryKey: ["admin-tests", subjectId],
     queryFn: async () => {
-      let q = supabase.from("tests").select("id, title, subject_id, duration_minutes, pass_threshold, questions, scope");
+      let q = supabase.from("tests").select("id, title, subject_id, duration_minutes, pass_threshold, scope");
       if (subjectId) q = q.eq("subject_id", subjectId);
       const { data, error } = await q.order("created_at", { ascending: false });
       if (error) throw error;
@@ -91,7 +91,7 @@ function TestsAdminPage() {
             <div className="flex-1">
               <h3 className="font-extrabold">{tr(t.title)}</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                {(t.questions ?? []).length} q · {t.duration_minutes}m · pass {t.pass_threshold}% · {t.scope}
+                {t.duration_minutes}m · pass {t.pass_threshold}% · {t.scope}
               </p>
             </div>
             <Link to="/admin/test/$testId" params={{ testId: t.id }}>

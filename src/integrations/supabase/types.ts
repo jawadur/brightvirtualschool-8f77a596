@@ -1326,7 +1326,7 @@ export type Database = {
           longest_streak: number
           metadata: Json
           owner_user_id: string | null
-          pin: string | null
+          pin_hash: string | null
           preferred_language: string
           reading_streak: number
           revision_streak: number
@@ -1350,7 +1350,7 @@ export type Database = {
           longest_streak?: number
           metadata?: Json
           owner_user_id?: string | null
-          pin?: string | null
+          pin_hash?: string | null
           preferred_language?: string
           reading_streak?: number
           revision_streak?: number
@@ -1374,7 +1374,7 @@ export type Database = {
           longest_streak?: number
           metadata?: Json
           owner_user_id?: string | null
-          pin?: string | null
+          pin_hash?: string | null
           preferred_language?: string
           reading_streak?: number
           revision_streak?: number
@@ -1978,13 +1978,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _score_question: { Args: { _ans: Json; _q: Json }; Returns: boolean }
+      _strip_answer_keys: { Args: { _questions: Json }; Returns: Json }
       can_access_student: { Args: { _student_id: string }; Returns: boolean }
+      get_assignment_admin: { Args: { _assignment_id: string }; Returns: Json }
+      get_assignment_for_student: {
+        Args: { _assignment_id: string }
+        Returns: Json
+      }
+      get_test_admin: { Args: { _test_id: string }; Returns: Json }
+      get_test_for_student: { Args: { _test_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      set_student_pin: {
+        Args: { _pin: string; _student_id: string }
+        Returns: undefined
+      }
+      submit_assignment: {
+        Args: { _answers: Json; _assignment_id: string; _student_id: string }
+        Returns: Json
+      }
+      submit_test_attempt: {
+        Args: {
+          _answers: Json
+          _auto?: boolean
+          _started_at?: string
+          _student_id: string
+          _test_id: string
+        }
+        Returns: Json
+      }
+      verify_student_pin: {
+        Args: { _name: string; _pin: string }
+        Returns: string
       }
     }
     Enums: {

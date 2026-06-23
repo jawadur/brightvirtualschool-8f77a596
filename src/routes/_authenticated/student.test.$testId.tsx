@@ -32,13 +32,19 @@ function TestPage() {
   const { data: test, isLoading } = useQuery({
     queryKey: ["test", testId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Read base fields directly (no 'questions' column — column-grant blocked for students).
+      const { data: base, error } = await supabase
         .from("tests")
-        .select("id, title, questions, duration_minutes, pass_threshold, subject_id, scope, metadata, subjects(name)")
+        .select("id, title, duration_minutes, pass_threshold, subject_id, scope, metadata, subjects(name)")
         .eq("id", testId)
         .single();
       if (error) throw error;
-      return data;
+      // Fetch answer-stripped questions via RPC.
+      const { data: safeQs, error: qErr } = await supabase.rpc("get_test_for_student", {
+        _test_id: testId,
+      } as any);
+      if (qErr) throw qErr;
+      return { ...base, questions: (safeQs as any)?.questions ?? [] } as any;
     },
   });
 
@@ -74,26 +80,18 @@ function TestPage() {
     if (submittedRef.current || !activeStudent) return;
     submittedRef.current = true;
 
-    let correct = 0;
-    questions.forEach((question, index) => {
-      if (scoreQuestion(question, answers[index])) correct += 1;
-    });
-
-    const score = Math.round((correct / Math.max(1, questions.length)) * 100);
-    const passed = score >= (test!.pass_threshold ?? 60);
-
     try {
-      await supabase.from("test_attempts").insert({
-        student_profile_id: activeStudent.id,
-        test_id: testId,
-        answers: Object.entries(answers).map(([index, answer]) => ({ index: Number(index), answer })),
-        score,
-        max_score: 100,
-        status: "completed",
-        started_at: new Date(startedAt).toISOString(),
-        completed_at: new Date().toISOString(),
-        metadata: { auto_submitted: auto, correct, total: questions.length },
-      });
+      const { data: result, error } = await supabase.rpc("submit_test_attempt", {
+        _student_id: activeStudent.id,
+        _test_id: testId,
+        _answers: Object.entries(answers).map(([index, answer]) => ({ index: Number(index), answer })),
+        _started_at: new Date(startedAt).toISOString(),
+        _auto: auto,
+      } as any);
+      if (error) throw error;
+      const score = (result as any)?.score ?? 0;
+      const correct = (result as any)?.correct ?? 0;
+      const passed = (result as any)?.passed ?? false;
       if (passed) {
         await awardCoins(activeStudent.id, 20, { en: "Test passed", hi: "परीक्षा पास", te: "పరీక్ష ఉత్తీర్ణత" }, testId, "test");
         if (score === 100) await awardStar(activeStudent.id, { en: "Perfect test!", hi: "पूरे अंक!", te: "పూర్తి మార్కులు!" }, testId, "test");
