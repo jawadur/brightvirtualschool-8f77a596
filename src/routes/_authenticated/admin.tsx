@@ -4,8 +4,6 @@ import { AppHeader } from "@/components/app/AppHeader";
 import { useAuth } from "@/hooks/use-auth";
 import { LayoutGrid, BookOpen, ClipboardList, ClipboardCheck, Library, Wand2, ShieldAlert, CalendarCheck, BarChart3, Sparkles, CalendarRange, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — Sunrise Virtual School" }] }),
@@ -30,23 +28,10 @@ function AdminShell() {
           <ShieldAlert className="h-12 w-12 text-primary mx-auto" />
           <h1 className="mt-4 text-2xl font-extrabold">Admin access required</h1>
           <p className="mt-2 text-muted-foreground">
-            Your account doesn't have an admin role yet. If you're setting up this school's content,
-            promote yourself below.
+            Your account doesn't have an admin role yet. Ask an existing admin to grant you access.
           </p>
-          <Button
-            className="mt-6"
-            onClick={async () => {
-              if (!user) return;
-              const { error } = await supabase.from("user_roles").insert({ user_id: user.id, role: "admin" });
-              if (error) { toast.error(error.message); return; }
-              await refreshRole();
-              toast.success("You're now an admin.");
-            }}
-          >
-            Make me an admin (setup)
-          </Button>
           <p className="mt-3 text-xs text-muted-foreground">
-            Tip: in production, remove this button and grant admin only to trusted educators.
+            For initial setup, ask the platform owner to assign you the admin role from the database.
           </p>
         </main>
       </div>
