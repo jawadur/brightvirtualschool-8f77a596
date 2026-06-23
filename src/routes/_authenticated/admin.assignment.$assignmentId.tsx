@@ -32,8 +32,9 @@ function AssignmentEditor() {
   const q = useQuery({
     queryKey: ["admin-assignment", assignmentId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("assignments").select("*").eq("id", assignmentId).single();
-      if (error) throw error; return data;
+      const { data, error } = await supabase.rpc("get_assignment_admin", { _assignment_id: assignmentId } as any);
+      if (error) throw error;
+      return data as any;
     },
   });
 
