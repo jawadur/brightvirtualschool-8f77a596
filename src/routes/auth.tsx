@@ -131,19 +131,16 @@ function StudentPinForm() {
     e.preventDefault();
     setBusy(true);
     try {
-      // Find a student by name+pin (limited to those auth user can see via RLS;
-      // for full student-only login, the student would log in via parent first).
-      const { data, error } = await supabase
-        .from("student_profiles")
-        .select("id, pin, display_name")
-        .ilike("display_name", name.trim());
+      const { data: matchId, error } = await supabase.rpc("verify_student_pin", {
+        _name: name.trim(),
+        _pin: pin.trim(),
+      } as any);
       if (error) throw error;
-      const match = (data ?? []).find((s) => (s.pin ?? "") === pin.trim());
-      if (!match) {
+      if (!matchId) {
         toast.error("Ask a parent to sign in first, then try your PIN.");
         return;
       }
-      setActiveStudentId(match.id);
+      setActiveStudentId(matchId as string);
       refresh();
       navigate({ to: "/student" });
     } catch (err) {
