@@ -101,13 +101,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "assignment_submissions_assignment_id_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "assignments_safe"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "assignment_submissions_student_profile_id_fkey"
             columns: ["student_profile_id"]
             isOneToOne: false
@@ -400,13 +393,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "daily_schedule_assignment_id_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "assignments_safe"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "daily_schedule_class_id_fkey"
             columns: ["class_id"]
             isOneToOne: false
@@ -432,13 +418,6 @@ export type Database = {
             columns: ["test_id"]
             isOneToOne: false
             referencedRelation: "tests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "daily_schedule_test_id_fkey"
-            columns: ["test_id"]
-            isOneToOne: false
-            referencedRelation: "tests_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -501,13 +480,6 @@ export type Database = {
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "assignments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "homework_assignment_id_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "assignments_safe"
             referencedColumns: ["id"]
           },
           {
@@ -1751,13 +1723,6 @@ export type Database = {
             referencedRelation: "tests"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "test_attempts_test_id_fkey"
-            columns: ["test_id"]
-            isOneToOne: false
-            referencedRelation: "tests_safe"
-            referencedColumns: ["id"]
-          },
         ]
       }
       tests: {
@@ -1941,13 +1906,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "weekly_plans_assignment_id_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "assignments_safe"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "weekly_plans_class_id_fkey"
             columns: ["class_id"]
             isOneToOne: false
@@ -1973,13 +1931,6 @@ export type Database = {
             columns: ["test_id"]
             isOneToOne: false
             referencedRelation: "tests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "weekly_plans_test_id_fkey"
-            columns: ["test_id"]
-            isOneToOne: false
-            referencedRelation: "tests_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -2024,139 +1975,13 @@ export type Database = {
       }
     }
     Views: {
-      assignments_safe: {
-        Row: {
-          created_at: string | null
-          due_in_days: number | null
-          id: string | null
-          instructions: Json | null
-          lesson_id: string | null
-          metadata: Json | null
-          pass_threshold: number | null
-          program_code: string | null
-          questions: Json | null
-          subject_id: string | null
-          title: Json | null
-        }
-        Insert: {
-          created_at?: string | null
-          due_in_days?: number | null
-          id?: string | null
-          instructions?: Json | null
-          lesson_id?: string | null
-          metadata?: Json | null
-          pass_threshold?: number | null
-          program_code?: string | null
-          questions?: never
-          subject_id?: string | null
-          title?: Json | null
-        }
-        Update: {
-          created_at?: string | null
-          due_in_days?: number | null
-          id?: string | null
-          instructions?: Json | null
-          lesson_id?: string | null
-          metadata?: Json | null
-          pass_threshold?: number | null
-          program_code?: string | null
-          questions?: never
-          subject_id?: string | null
-          title?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "assignments_lesson_id_fkey"
-            columns: ["lesson_id"]
-            isOneToOne: false
-            referencedRelation: "lessons"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "assignments_program_code_fkey"
-            columns: ["program_code"]
-            isOneToOne: false
-            referencedRelation: "programs"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "assignments_subject_id_fkey"
-            columns: ["subject_id"]
-            isOneToOne: false
-            referencedRelation: "subjects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tests_safe: {
-        Row: {
-          created_at: string | null
-          duration_minutes: number | null
-          id: string | null
-          metadata: Json | null
-          pass_threshold: number | null
-          program_code: string | null
-          questions: Json | null
-          scope: Database["public"]["Enums"]["test_scope"] | null
-          subject_id: string | null
-          title: Json | null
-          unit_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          duration_minutes?: number | null
-          id?: string | null
-          metadata?: Json | null
-          pass_threshold?: number | null
-          program_code?: string | null
-          questions?: never
-          scope?: Database["public"]["Enums"]["test_scope"] | null
-          subject_id?: string | null
-          title?: Json | null
-          unit_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          duration_minutes?: number | null
-          id?: string | null
-          metadata?: Json | null
-          pass_threshold?: number | null
-          program_code?: string | null
-          questions?: never
-          scope?: Database["public"]["Enums"]["test_scope"] | null
-          subject_id?: string | null
-          title?: Json | null
-          unit_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tests_program_code_fkey"
-            columns: ["program_code"]
-            isOneToOne: false
-            referencedRelation: "programs"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "tests_subject_id_fkey"
-            columns: ["subject_id"]
-            isOneToOne: false
-            referencedRelation: "subjects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tests_unit_id_fkey"
-            columns: ["unit_id"]
-            isOneToOne: false
-            referencedRelation: "units"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       _score_question: { Args: { _ans: Json; _q: Json }; Returns: boolean }
-      _strip_answer_keys: { Args: { _questions: Json }; Returns: Json }
       can_access_student: { Args: { _student_id: string }; Returns: boolean }
+      get_assignment_admin: { Args: { _assignment_id: string }; Returns: Json }
+      get_test_admin: { Args: { _test_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
