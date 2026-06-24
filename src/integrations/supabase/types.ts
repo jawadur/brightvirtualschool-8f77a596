@@ -117,7 +117,7 @@ export type Database = {
           id: string
           instructions: Json
           lesson_id: string | null
-          max_attempts: number
+          max_attempts: number | null
           metadata: Json
           pass_threshold: number
           program_code: string | null
@@ -134,7 +134,7 @@ export type Database = {
           id?: string
           instructions?: Json
           lesson_id?: string | null
-          max_attempts?: number
+          max_attempts?: number | null
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
@@ -151,7 +151,7 @@ export type Database = {
           id?: string
           instructions?: Json
           lesson_id?: string | null
-          max_attempts?: number
+          max_attempts?: number | null
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
@@ -1756,7 +1756,7 @@ export type Database = {
           description: Json
           duration_minutes: number
           id: string
-          max_attempts: number
+          max_attempts: number | null
           metadata: Json
           pass_threshold: number
           program_code: string | null
@@ -1774,7 +1774,7 @@ export type Database = {
           description?: Json
           duration_minutes?: number
           id?: string
-          max_attempts?: number
+          max_attempts?: number | null
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
@@ -1792,7 +1792,7 @@ export type Database = {
           description?: Json
           duration_minutes?: number
           id?: string
-          max_attempts?: number
+          max_attempts?: number | null
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
