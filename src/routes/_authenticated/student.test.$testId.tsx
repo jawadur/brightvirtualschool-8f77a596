@@ -30,7 +30,7 @@ function TestPage() {
   const submittedRef = useRef(false);
 
   const { data: test, isLoading } = useQuery({
-    queryKey: ["test", testId],
+    queryKey: ["test", testId, activeStudent?.id ?? null],
     queryFn: async () => {
       // Read base fields directly (no 'questions' column — column-grant blocked for students).
       const { data: base, error } = await supabase
@@ -42,9 +42,14 @@ function TestPage() {
       // Fetch answer-stripped questions via RPC.
       const { data: safeQs, error: qErr } = await supabase.rpc("get_test_for_student", {
         _test_id: testId,
+        _student_id: activeStudent?.id ?? null,
       } as any);
       if (qErr) throw qErr;
-      return { ...base, questions: (safeQs as any)?.questions ?? [] } as any;
+      const s = (safeQs as any) ?? {};
+      return { ...base, questions: s.questions ?? [], allow_retake: s.allow_retake,
+        retake_mode: s.retake_mode, max_attempts: s.max_attempts,
+        attempt_count: s.attempt_count ?? 0, best_score: s.best_score,
+        latest_score: s.latest_score, attempts_remaining: s.attempts_remaining } as any;
     },
   });
 
@@ -76,6 +81,14 @@ function TestPage() {
 
   if (isLoading || !test) return <div className="text-muted-foreground">{t("loading")}</div>;
 
+  const attemptCount = (test as any).attempt_count ?? 0;
+  const maxAttempts = (test as any).max_attempts as number | null;
+  const allowRetake = !!(test as any).allow_retake;
+  const bestScore = (test as any).best_score as number | null;
+  const latestScore = (test as any).latest_score as number | null;
+  const attemptsLeft = (test as any).attempts_remaining as number | null;
+  const canRetake = allowRetake && (maxAttempts == null || attemptCount < maxAttempts);
+
   async function submit(auto = false) {
     if (submittedRef.current || !activeStudent) return;
     submittedRef.current = true;
@@ -105,14 +118,6 @@ function TestPage() {
     }
   }
 
-  const resetTest = () => {
-    submittedRef.current = false;
-    setAnswers({});
-    setResult(null);
-    setShowFeedback(false);
-    setStartedAt(Date.now());
-    setSecondsLeft(test.duration_minutes * 60);
-  };
 
   const mm = Math.floor((secondsLeft ?? 0) / 60).toString().padStart(2, "0");
   const ss = ((secondsLeft ?? 0) % 60).toString().padStart(2, "0");
@@ -129,13 +134,19 @@ function TestPage() {
           <p className="mt-2 text-muted-foreground">
             {t("score")}: {result.score}% · {result.correct}/{result.total}
           </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Attempt {attemptCount + 1}{maxAttempts ? ` of ${maxAttempts}` : ""}
+            {bestScore != null && <> · Best {Math.max(bestScore, result.score)}%</>}
+          </p>
           <Badge className="mt-3" variant={result.passed ? "default" : "secondary"}>
             {result.passed ? "Ready for next lesson" : "Needs practice"}
           </Badge>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <Button variant="outline" onClick={resetTest}>
-              <RotateCcw className="mr-1 h-4 w-4" /> Retry
-            </Button>
+            {allowRetake && (maxAttempts == null || attemptCount + 1 < maxAttempts) && (
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RotateCcw className="mr-1 h-4 w-4" /> Retake Test
+              </Button>
+            )}
             <Button onClick={() => navigate({ to: "/student/tests" })}>{t("tests")}</Button>
           </div>
         </Card>
@@ -160,6 +171,17 @@ function TestPage() {
       <Link to="/student/tests" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ChevronLeft className="h-4 w-4" /> {t("back")}
       </Link>
+      {(attemptCount > 0 || maxAttempts) && (
+        <Card className="p-3 text-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant="secondary">Attempt {attemptCount + 1}{maxAttempts ? ` of ${maxAttempts}` : ""}</Badge>
+            {bestScore != null && <span><b>Best</b> {bestScore}%</span>}
+            {latestScore != null && <span><b>Latest</b> {latestScore}%</span>}
+            {attemptsLeft != null && <span className="text-muted-foreground">{attemptsLeft} left</span>}
+            {!canRetake && attemptCount > 0 && <span className="text-destructive font-bold">No retakes remaining</span>}
+          </div>
+        </Card>
+      )}
       <div className="sticky top-16 z-10 rounded-2xl bg-background/80 p-3 backdrop-blur">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h1 className="truncate text-xl font-extrabold sm:text-2xl">{tr(test.title)}</h1>
