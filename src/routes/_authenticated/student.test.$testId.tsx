@@ -118,21 +118,6 @@ function TestPage() {
     }
   }
 
-  const resetTest = async () => {
-    if (!canRetake) {
-      toast.error("No more attempts left");
-      return;
-    }
-    submittedRef.current = false;
-    setAnswers({});
-    setResult(null);
-    setShowFeedback(false);
-    setStartedAt(Date.now());
-    setSecondsLeft(test.duration_minutes * 60);
-    // refetch to draw a fresh random set when applicable
-    await (queryRefetch.current?.());
-  };
-  const queryRefetch = useRef<null | (() => Promise<unknown>)>(null);
 
   const mm = Math.floor((secondsLeft ?? 0) / 60).toString().padStart(2, "0");
   const ss = ((secondsLeft ?? 0) % 60).toString().padStart(2, "0");
