@@ -27,10 +27,11 @@ function AssignmentPage() {
   const [result, setResult] = useState<null | { score: number; correct: number; total: number; passed: boolean }>(null);
 
   const { data: assignment, isLoading } = useQuery({
-    queryKey: ["assignment", assignmentId],
+    queryKey: ["assignment", assignmentId, activeStudent?.id ?? null],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_assignment_for_student", {
         _assignment_id: assignmentId,
+        _student_id: activeStudent?.id ?? null,
       } as any);
       if (error) throw error;
       return data as any;
@@ -42,6 +43,14 @@ function AssignmentPage() {
   const progress = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0;
 
   if (isLoading || !assignment) return <div className="text-muted-foreground">{t("loading")}</div>;
+
+  const attemptCount = (assignment as any).attempt_count ?? 0;
+  const maxAttempts = (assignment as any).max_attempts as number | null;
+  const allowRetake = !!(assignment as any).allow_retake;
+  const bestScore = (assignment as any).best_score as number | null;
+  const latestScore = (assignment as any).latest_score as number | null;
+  const attemptsLeft = (assignment as any).attempts_remaining as number | null;
+  const canRetake = allowRetake && (maxAttempts == null || attemptCount < maxAttempts);
 
   const submit = async () => {
     if (!activeStudent) return;
@@ -81,16 +90,11 @@ function AssignmentPage() {
             {result.passed ? "Passed" : "Practice again"}
           </Badge>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setAnswers({});
-                setResult(null);
-                setShowFeedback(false);
-              }}
-            >
-              <RotateCcw className="mr-1 h-4 w-4" /> Retry
-            </Button>
+            {allowRetake && (maxAttempts == null || attemptCount + 1 < maxAttempts) && (
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RotateCcw className="mr-1 h-4 w-4" /> Retake Homework
+              </Button>
+            )}
             <Button onClick={() => navigate({ to: "/student" })}>{t("todays_school")}</Button>
           </div>
         </Card>
