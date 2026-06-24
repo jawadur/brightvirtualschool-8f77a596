@@ -26,6 +26,10 @@ function AssignmentEditor() {
   const [dueInDays, setDueInDays] = useState<number | "">("");
   const [retryAllowed, setRetryAllowed] = useState(true);
   const [published, setPublished] = useState(true);
+  const [allowRetake, setAllowRetake] = useState(false);
+  const [retakeMode, setRetakeMode] = useState<"none"|"same_questions"|"random_questions">("none");
+  const [maxAttempts, setMaxAttempts] = useState<number | "">(1);
+  const [questionsPerAttempt, setQuestionsPerAttempt] = useState<number | "">("");
   const [questions, setQuestions] = useState<LearningQuestion[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -48,6 +52,10 @@ function AssignmentEditor() {
     setQuestions(Array.isArray(d.questions) ? d.questions : []);
     setRetryAllowed(d.metadata?.retry_allowed ?? true);
     setPublished(d.metadata?.published ?? true);
+    setAllowRetake(!!d.allow_retake);
+    setRetakeMode((d.retake_mode ?? "none") as any);
+    setMaxAttempts(d.max_attempts ?? "");
+    setQuestionsPerAttempt(d.questions_per_attempt ?? "");
   }, [q.data]);
 
   const save = async () => {
@@ -58,6 +66,10 @@ function AssignmentEditor() {
         due_in_days: dueInDays === "" ? null : Number(dueInDays),
         questions: questions as any,
         metadata: { retry_allowed: retryAllowed, published } as any,
+        allow_retake: allowRetake,
+        retake_mode: retakeMode,
+        max_attempts: maxAttempts === "" ? null : Number(maxAttempts),
+        questions_per_attempt: questionsPerAttempt === "" ? null : Number(questionsPerAttempt),
       }).eq("id", assignmentId);
       if (error) throw error;
       toast.success("Assignment saved");
@@ -98,6 +110,31 @@ function AssignmentEditor() {
             <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4" />
             Published
           </label>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 border-t pt-3">
+          <label className="flex items-center gap-2 font-bold">
+            <input type="checkbox" checked={allowRetake} onChange={(e)=>setAllowRetake(e.target.checked)} className="h-4 w-4" />
+            Allow Retake
+          </label>
+          <div>
+            <Label>Retake Type</Label>
+            <select value={retakeMode} onChange={(e)=>setRetakeMode(e.target.value as any)} disabled={!allowRetake}
+              className="w-full rounded-md border border-input bg-card px-3 py-2 disabled:opacity-50">
+              <option value="none">none</option>
+              <option value="same_questions">same questions</option>
+              <option value="random_questions">random questions</option>
+            </select>
+          </div>
+          <div>
+            <Label>Maximum Attempts (blank = unlimited)</Label>
+            <Input type="number" min={1} value={maxAttempts}
+              onChange={(e)=>setMaxAttempts(e.target.value===""?"":Number(e.target.value))} />
+          </div>
+          <div>
+            <Label>Questions Per Attempt (blank = all)</Label>
+            <Input type="number" min={1} value={questionsPerAttempt}
+              onChange={(e)=>setQuestionsPerAttempt(e.target.value===""?"":Number(e.target.value))} />
+          </div>
         </div>
       </Card>
 
