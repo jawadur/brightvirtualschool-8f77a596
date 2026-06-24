@@ -68,8 +68,8 @@ function AssignmentEditor() {
         metadata: { retry_allowed: retryAllowed, published } as any,
         allow_retake: allowRetake,
         retake_mode: retakeMode,
-        max_attempts: maxAttempts === "" ? null : Number(maxAttempts),
-        questions_per_attempt: questionsPerAttempt === "" ? null : Number(questionsPerAttempt),
+        max_attempts: maxAttempts === "" ? null as any : Number(maxAttempts),
+        questions_per_attempt: questionsPerAttempt === "" ? null as any : Number(questionsPerAttempt),
       }).eq("id", assignmentId);
       if (error) throw error;
       toast.success("Assignment saved");
