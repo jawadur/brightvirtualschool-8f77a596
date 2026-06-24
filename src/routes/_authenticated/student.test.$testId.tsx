@@ -30,7 +30,7 @@ function TestPage() {
   const submittedRef = useRef(false);
 
   const { data: test, isLoading } = useQuery({
-    queryKey: ["test", testId],
+    queryKey: ["test", testId, activeStudent?.id ?? null],
     queryFn: async () => {
       // Read base fields directly (no 'questions' column — column-grant blocked for students).
       const { data: base, error } = await supabase
@@ -42,9 +42,14 @@ function TestPage() {
       // Fetch answer-stripped questions via RPC.
       const { data: safeQs, error: qErr } = await supabase.rpc("get_test_for_student", {
         _test_id: testId,
+        _student_id: activeStudent?.id ?? null,
       } as any);
       if (qErr) throw qErr;
-      return { ...base, questions: (safeQs as any)?.questions ?? [] } as any;
+      const s = (safeQs as any) ?? {};
+      return { ...base, questions: s.questions ?? [], allow_retake: s.allow_retake,
+        retake_mode: s.retake_mode, max_attempts: s.max_attempts,
+        attempt_count: s.attempt_count ?? 0, best_score: s.best_score,
+        latest_score: s.latest_score, attempts_remaining: s.attempts_remaining } as any;
     },
   });
 
@@ -76,6 +81,14 @@ function TestPage() {
 
   if (isLoading || !test) return <div className="text-muted-foreground">{t("loading")}</div>;
 
+  const attemptCount = (test as any).attempt_count ?? 0;
+  const maxAttempts = (test as any).max_attempts as number | null;
+  const allowRetake = !!(test as any).allow_retake;
+  const bestScore = (test as any).best_score as number | null;
+  const latestScore = (test as any).latest_score as number | null;
+  const attemptsLeft = (test as any).attempts_remaining as number | null;
+  const canRetake = allowRetake && (maxAttempts == null || attemptCount < maxAttempts);
+
   async function submit(auto = false) {
     if (submittedRef.current || !activeStudent) return;
     submittedRef.current = true;
@@ -105,14 +118,21 @@ function TestPage() {
     }
   }
 
-  const resetTest = () => {
+  const resetTest = async () => {
+    if (!canRetake) {
+      toast.error("No more attempts left");
+      return;
+    }
     submittedRef.current = false;
     setAnswers({});
     setResult(null);
     setShowFeedback(false);
     setStartedAt(Date.now());
     setSecondsLeft(test.duration_minutes * 60);
+    // refetch to draw a fresh random set when applicable
+    await (queryRefetch.current?.());
   };
+  const queryRefetch = useRef<null | (() => Promise<unknown>)>(null);
 
   const mm = Math.floor((secondsLeft ?? 0) / 60).toString().padStart(2, "0");
   const ss = ((secondsLeft ?? 0) % 60).toString().padStart(2, "0");
@@ -129,13 +149,19 @@ function TestPage() {
           <p className="mt-2 text-muted-foreground">
             {t("score")}: {result.score}% · {result.correct}/{result.total}
           </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Attempt {attemptCount + 1}{maxAttempts ? ` of ${maxAttempts}` : ""}
+            {bestScore != null && <> · Best {Math.max(bestScore, result.score)}%</>}
+          </p>
           <Badge className="mt-3" variant={result.passed ? "default" : "secondary"}>
             {result.passed ? "Ready for next lesson" : "Needs practice"}
           </Badge>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <Button variant="outline" onClick={resetTest}>
-              <RotateCcw className="mr-1 h-4 w-4" /> Retry
-            </Button>
+            {allowRetake && (maxAttempts == null || attemptCount + 1 < maxAttempts) && (
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RotateCcw className="mr-1 h-4 w-4" /> Retake Test
+              </Button>
+            )}
             <Button onClick={() => navigate({ to: "/student/tests" })}>{t("tests")}</Button>
           </div>
         </Card>
