@@ -111,41 +111,53 @@ export type Database = {
       }
       assignments: {
         Row: {
+          allow_retake: boolean
           created_at: string
           due_in_days: number | null
           id: string
           instructions: Json
           lesson_id: string | null
+          max_attempts: number
           metadata: Json
           pass_threshold: number
           program_code: string | null
           questions: Json
+          questions_per_attempt: number | null
+          retake_mode: string
           subject_id: string | null
           title: Json
         }
         Insert: {
+          allow_retake?: boolean
           created_at?: string
           due_in_days?: number | null
           id?: string
           instructions?: Json
           lesson_id?: string | null
+          max_attempts?: number
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
           questions?: Json
+          questions_per_attempt?: number | null
+          retake_mode?: string
           subject_id?: string | null
           title: Json
         }
         Update: {
+          allow_retake?: boolean
           created_at?: string
           due_in_days?: number | null
           id?: string
           instructions?: Json
           lesson_id?: string | null
+          max_attempts?: number
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
           questions?: Json
+          questions_per_attempt?: number | null
+          retake_mode?: string
           subject_id?: string | null
           title?: Json
         }
@@ -573,16 +585,20 @@ export type Database = {
       }
       lesson_stages: {
         Row: {
+          allow_retake: boolean | null
           created_at: string
           explanation: Json
           id: string
           image_url: string | null
           lesson_id: string
+          max_attempts: number | null
           narration_en: string | null
           narration_hi: string | null
           narration_te: string | null
           pass_threshold: number
           questions: Json
+          questions_per_attempt: number | null
+          retake_mode: string | null
           script: Json | null
           slides: Json
           sort_order: number
@@ -591,16 +607,20 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allow_retake?: boolean | null
           created_at?: string
           explanation?: Json
           id?: string
           image_url?: string | null
           lesson_id: string
+          max_attempts?: number | null
           narration_en?: string | null
           narration_hi?: string | null
           narration_te?: string | null
           pass_threshold?: number
           questions?: Json
+          questions_per_attempt?: number | null
+          retake_mode?: string | null
           script?: Json | null
           slides?: Json
           sort_order?: number
@@ -609,16 +629,20 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allow_retake?: boolean | null
           created_at?: string
           explanation?: Json
           id?: string
           image_url?: string | null
           lesson_id?: string
+          max_attempts?: number | null
           narration_en?: string | null
           narration_hi?: string | null
           narration_te?: string | null
           pass_threshold?: number
           questions?: Json
+          questions_per_attempt?: number | null
+          retake_mode?: string | null
           script?: Json | null
           slides?: Json
           sort_order?: number
@@ -1727,42 +1751,54 @@ export type Database = {
       }
       tests: {
         Row: {
+          allow_retake: boolean
           created_at: string
           description: Json
           duration_minutes: number
           id: string
+          max_attempts: number
           metadata: Json
           pass_threshold: number
           program_code: string | null
           questions: Json
+          questions_per_attempt: number | null
+          retake_mode: string
           scope: Database["public"]["Enums"]["test_scope"]
           subject_id: string | null
           title: Json
           unit_id: string | null
         }
         Insert: {
+          allow_retake?: boolean
           created_at?: string
           description?: Json
           duration_minutes?: number
           id?: string
+          max_attempts?: number
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
           questions?: Json
+          questions_per_attempt?: number | null
+          retake_mode?: string
           scope?: Database["public"]["Enums"]["test_scope"]
           subject_id?: string | null
           title: Json
           unit_id?: string | null
         }
         Update: {
+          allow_retake?: boolean
           created_at?: string
           description?: Json
           duration_minutes?: number
           id?: string
+          max_attempts?: number
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
           questions?: Json
+          questions_per_attempt?: number | null
+          retake_mode?: string
           scope?: Database["public"]["Enums"]["test_scope"]
           subject_id?: string | null
           title?: Json
@@ -1978,16 +2014,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _maybe_random_subset: {
+        Args: { _limit: number; _mode: string; _questions: Json }
+        Returns: Json
+      }
       _score_question: { Args: { _ans: Json; _q: Json }; Returns: boolean }
       _strip_answer_keys: { Args: { _questions: Json }; Returns: Json }
       can_access_student: { Args: { _student_id: string }; Returns: boolean }
       get_assignment_admin: { Args: { _assignment_id: string }; Returns: Json }
-      get_assignment_for_student: {
-        Args: { _assignment_id: string }
-        Returns: Json
-      }
+      get_assignment_for_student:
+        | { Args: { _assignment_id: string }; Returns: Json }
+        | {
+            Args: { _assignment_id: string; _student_id?: string }
+            Returns: Json
+          }
       get_test_admin: { Args: { _test_id: string }; Returns: Json }
-      get_test_for_student: { Args: { _test_id: string }; Returns: Json }
+      get_test_for_student:
+        | { Args: { _test_id: string }; Returns: Json }
+        | { Args: { _student_id?: string; _test_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
