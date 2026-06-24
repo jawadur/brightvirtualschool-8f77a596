@@ -171,6 +171,17 @@ function TestPage() {
       <Link to="/student/tests" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ChevronLeft className="h-4 w-4" /> {t("back")}
       </Link>
+      {(attemptCount > 0 || maxAttempts) && (
+        <Card className="p-3 text-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant="secondary">Attempt {attemptCount + 1}{maxAttempts ? ` of ${maxAttempts}` : ""}</Badge>
+            {bestScore != null && <span><b>Best</b> {bestScore}%</span>}
+            {latestScore != null && <span><b>Latest</b> {latestScore}%</span>}
+            {attemptsLeft != null && <span className="text-muted-foreground">{attemptsLeft} left</span>}
+            {!canRetake && attemptCount > 0 && <span className="text-destructive font-bold">No retakes remaining</span>}
+          </div>
+        </Card>
+      )}
       <div className="sticky top-16 z-10 rounded-2xl bg-background/80 p-3 backdrop-blur">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h1 className="truncate text-xl font-extrabold sm:text-2xl">{tr(test.title)}</h1>
