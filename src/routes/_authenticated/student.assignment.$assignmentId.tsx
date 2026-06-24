@@ -124,6 +124,17 @@ function AssignmentPage() {
         <h1 className="text-2xl font-extrabold">{tr(assignment.title)}</h1>
         <p className="text-sm text-muted-foreground">{tr(assignment.instructions)}</p>
       </div>
+      {(attemptCount > 0 || maxAttempts) && (
+        <Card className="p-3 text-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant="secondary">Attempt {attemptCount + 1}{maxAttempts ? ` of ${maxAttempts}` : ""}</Badge>
+            {bestScore != null && <span><b>Best</b> {bestScore}%</span>}
+            {latestScore != null && <span><b>Latest</b> {latestScore}%</span>}
+            {attemptsLeft != null && <span className="text-muted-foreground">{attemptsLeft} left</span>}
+            {!canRetake && attemptCount > 0 && <span className="text-destructive font-bold">No retakes remaining</span>}
+          </div>
+        </Card>
+      )}
       <div className="sticky top-16 z-10 rounded-2xl bg-background/80 p-3 backdrop-blur">
         <div className="mb-2 flex justify-between text-sm font-bold">
           <span>{answeredCount}/{questions.length}</span>
