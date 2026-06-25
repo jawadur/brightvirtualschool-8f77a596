@@ -49,6 +49,7 @@ import { Route as AuthenticatedAdminHomeworkRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminCurriculumProgressRouteImport } from './routes/_authenticated/admin.curriculum-progress'
 import { Route as AuthenticatedAdminBadgesRouteImport } from './routes/_authenticated/admin.badges'
 import { Route as AuthenticatedAdminAssignmentsRouteImport } from './routes/_authenticated/admin.assignments'
+import { Route as AuthenticatedAdminAiQuestionsRouteImport } from './routes/_authenticated/admin.ai-questions'
 import { Route as AuthenticatedStudentTestTestIdRouteImport } from './routes/_authenticated/student.test.$testId'
 import { Route as AuthenticatedStudentSubjectSubjectIdRouteImport } from './routes/_authenticated/student.subject.$subjectId'
 import { Route as AuthenticatedStudentProgramClassIdRouteImport } from './routes/_authenticated/student.program.$classId'
@@ -291,6 +292,12 @@ const AuthenticatedAdminAssignmentsRoute =
     path: '/assignments',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAiQuestionsRoute =
+  AuthenticatedAdminAiQuestionsRouteImport.update({
+    id: '/ai-questions',
+    path: '/ai-questions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedStudentTestTestIdRoute =
   AuthenticatedStudentTestTestIdRouteImport.update({
     id: '/test/$testId',
@@ -372,6 +379,7 @@ export interface FileRoutesByFullPath {
   '/parent': typeof AuthenticatedParentRouteWithChildren
   '/profiles': typeof AuthenticatedProfilesRoute
   '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/admin/ai-questions': typeof AuthenticatedAdminAiQuestionsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/admin/curriculum-progress': typeof AuthenticatedAdminCurriculumProgressRoute
@@ -422,6 +430,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/profiles': typeof AuthenticatedProfilesRoute
+  '/admin/ai-questions': typeof AuthenticatedAdminAiQuestionsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/admin/curriculum-progress': typeof AuthenticatedAdminCurriculumProgressRoute
@@ -477,6 +486,7 @@ export interface FileRoutesById {
   '/_authenticated/parent': typeof AuthenticatedParentRouteWithChildren
   '/_authenticated/profiles': typeof AuthenticatedProfilesRoute
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
+  '/_authenticated/admin/ai-questions': typeof AuthenticatedAdminAiQuestionsRoute
   '/_authenticated/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/_authenticated/admin/badges': typeof AuthenticatedAdminBadgesRoute
   '/_authenticated/admin/curriculum-progress': typeof AuthenticatedAdminCurriculumProgressRoute
@@ -532,6 +542,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/profiles'
     | '/student'
+    | '/admin/ai-questions'
     | '/admin/assignments'
     | '/admin/badges'
     | '/admin/curriculum-progress'
@@ -582,6 +593,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/profiles'
+    | '/admin/ai-questions'
     | '/admin/assignments'
     | '/admin/badges'
     | '/admin/curriculum-progress'
@@ -636,6 +648,7 @@ export interface FileRouteTypes {
     | '/_authenticated/parent'
     | '/_authenticated/profiles'
     | '/_authenticated/student'
+    | '/_authenticated/admin/ai-questions'
     | '/_authenticated/admin/assignments'
     | '/_authenticated/admin/badges'
     | '/_authenticated/admin/curriculum-progress'
@@ -971,6 +984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAssignmentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/ai-questions': {
+      id: '/_authenticated/admin/ai-questions'
+      path: '/ai-questions'
+      fullPath: '/admin/ai-questions'
+      preLoaderRoute: typeof AuthenticatedAdminAiQuestionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/student/test/$testId': {
       id: '/_authenticated/student/test/$testId'
       path: '/test/$testId'
@@ -1059,6 +1079,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAiQuestionsRoute: typeof AuthenticatedAdminAiQuestionsRoute
   AuthenticatedAdminAssignmentsRoute: typeof AuthenticatedAdminAssignmentsRoute
   AuthenticatedAdminBadgesRoute: typeof AuthenticatedAdminBadgesRoute
   AuthenticatedAdminCurriculumProgressRoute: typeof AuthenticatedAdminCurriculumProgressRoute
@@ -1076,6 +1097,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAiQuestionsRoute: AuthenticatedAdminAiQuestionsRoute,
   AuthenticatedAdminAssignmentsRoute: AuthenticatedAdminAssignmentsRoute,
   AuthenticatedAdminBadgesRoute: AuthenticatedAdminBadgesRoute,
   AuthenticatedAdminCurriculumProgressRoute:

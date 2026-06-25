@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-rout
 import { useEffect } from "react";
 import { AppHeader } from "@/components/app/AppHeader";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutGrid, BookOpen, ClipboardList, ClipboardCheck, Library, Wand2, ShieldAlert, CalendarCheck, BarChart3, Sparkles, CalendarRange, UserCheck } from "lucide-react";
+import { LayoutGrid, BookOpen, ClipboardList, ClipboardCheck, Library, Wand2, ShieldAlert, CalendarCheck, BarChart3, Sparkles, CalendarRange, UserCheck, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -48,6 +48,7 @@ function AdminShell() {
     { to: "/admin/teacher-assignments", icon: UserCheck, label: "Teacher Assign" },
     { to: "/admin/tests", icon: ClipboardCheck, label: "Tests" },
     { to: "/admin/questions", icon: Library, label: "Question Bank" },
+    { to: "/admin/ai-questions", icon: Brain, label: "AI Questions" },
     { to: "/admin/badges", icon: BookOpen, label: "Badges" },
     { to: "/admin/homework", icon: Wand2, label: "Homework Gen" },
   ];
