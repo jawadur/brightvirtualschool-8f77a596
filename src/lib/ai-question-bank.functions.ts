@@ -138,7 +138,7 @@ export const generateAiQuestions = createServerFn({ method: "POST" })
       difficulty: data.difficulty,
       language: data.language,
       question_type: q.type,
-      payload: q as unknown as Record<string, unknown>,
+      payload: q as unknown as any,
       source: "ai" as const,
       generated_by: userId,
       generation_model: MODEL,
