@@ -55,6 +55,99 @@ export type Database = {
           },
         ]
       }
+      ai_question_pool: {
+        Row: {
+          class_id: string | null
+          created_at: string
+          difficulty: string
+          generated_by: string | null
+          generation_model: string | null
+          id: string
+          language: string
+          lesson_id: string | null
+          payload: Json
+          question_type: string
+          source: string
+          stage_id: string | null
+          subject_id: string
+          topic: string | null
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string
+          difficulty?: string
+          generated_by?: string | null
+          generation_model?: string | null
+          id?: string
+          language?: string
+          lesson_id?: string | null
+          payload: Json
+          question_type: string
+          source?: string
+          stage_id?: string | null
+          subject_id: string
+          topic?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string
+          difficulty?: string
+          generated_by?: string | null
+          generation_model?: string | null
+          id?: string
+          language?: string
+          lesson_id?: string | null
+          payload?: Json
+          question_type?: string
+          source?: string
+          stage_id?: string | null
+          subject_id?: string
+          topic?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_question_pool_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_question_pool_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_question_pool_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_stages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_question_pool_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_question_pool_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assignment_submissions: {
         Row: {
           answers: Json
@@ -111,6 +204,9 @@ export type Database = {
       }
       assignments: {
         Row: {
+          ai_difficulty: string | null
+          ai_question_count: number | null
+          ai_topics: Json | null
           allow_retake: boolean
           created_at: string
           due_in_days: number | null
@@ -121,6 +217,7 @@ export type Database = {
           metadata: Json
           pass_threshold: number
           program_code: string | null
+          question_source: string
           questions: Json
           questions_per_attempt: number | null
           retake_mode: string
@@ -128,6 +225,9 @@ export type Database = {
           title: Json
         }
         Insert: {
+          ai_difficulty?: string | null
+          ai_question_count?: number | null
+          ai_topics?: Json | null
           allow_retake?: boolean
           created_at?: string
           due_in_days?: number | null
@@ -138,6 +238,7 @@ export type Database = {
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
+          question_source?: string
           questions?: Json
           questions_per_attempt?: number | null
           retake_mode?: string
@@ -145,6 +246,9 @@ export type Database = {
           title: Json
         }
         Update: {
+          ai_difficulty?: string | null
+          ai_question_count?: number | null
+          ai_topics?: Json | null
           allow_retake?: boolean
           created_at?: string
           due_in_days?: number | null
@@ -155,6 +259,7 @@ export type Database = {
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
+          question_source?: string
           questions?: Json
           questions_per_attempt?: number | null
           retake_mode?: string
@@ -585,6 +690,13 @@ export type Database = {
       }
       lesson_stages: {
         Row: {
+          ai_adaptive: boolean
+          ai_difficulty: string
+          ai_question_count: number
+          ai_randomize: boolean
+          ai_show_explanation: boolean
+          ai_topics: Json | null
+          ai_weak_area_practice: boolean
           allow_retake: boolean | null
           created_at: string
           explanation: Json
@@ -596,6 +708,7 @@ export type Database = {
           narration_hi: string | null
           narration_te: string | null
           pass_threshold: number
+          question_source: string
           questions: Json
           questions_per_attempt: number | null
           retake_mode: string | null
@@ -607,6 +720,13 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_adaptive?: boolean
+          ai_difficulty?: string
+          ai_question_count?: number
+          ai_randomize?: boolean
+          ai_show_explanation?: boolean
+          ai_topics?: Json | null
+          ai_weak_area_practice?: boolean
           allow_retake?: boolean | null
           created_at?: string
           explanation?: Json
@@ -618,6 +738,7 @@ export type Database = {
           narration_hi?: string | null
           narration_te?: string | null
           pass_threshold?: number
+          question_source?: string
           questions?: Json
           questions_per_attempt?: number | null
           retake_mode?: string | null
@@ -629,6 +750,13 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_adaptive?: boolean
+          ai_difficulty?: string
+          ai_question_count?: number
+          ai_randomize?: boolean
+          ai_show_explanation?: boolean
+          ai_topics?: Json | null
+          ai_weak_area_practice?: boolean
           allow_retake?: boolean | null
           created_at?: string
           explanation?: Json
@@ -640,6 +768,7 @@ export type Database = {
           narration_hi?: string | null
           narration_te?: string | null
           pass_threshold?: number
+          question_source?: string
           questions?: Json
           questions_per_attempt?: number | null
           retake_mode?: string | null
@@ -1459,6 +1588,66 @@ export type Database = {
           },
         ]
       }
+      student_question_history: {
+        Row: {
+          correct_count: number
+          created_at: string
+          id: string
+          incorrect_count: number
+          last_answered_at: string | null
+          last_shown_at: string | null
+          lesson_id: string | null
+          question_pool_id: string
+          shown_count: number
+          student_profile_id: string
+          topic: string | null
+          updated_at: string
+        }
+        Insert: {
+          correct_count?: number
+          created_at?: string
+          id?: string
+          incorrect_count?: number
+          last_answered_at?: string | null
+          last_shown_at?: string | null
+          lesson_id?: string | null
+          question_pool_id: string
+          shown_count?: number
+          student_profile_id: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Update: {
+          correct_count?: number
+          created_at?: string
+          id?: string
+          incorrect_count?: number
+          last_answered_at?: string | null
+          last_shown_at?: string | null
+          lesson_id?: string | null
+          question_pool_id?: string
+          shown_count?: number
+          student_profile_id?: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_question_history_question_pool_id_fkey"
+            columns: ["question_pool_id"]
+            isOneToOne: false
+            referencedRelation: "ai_question_pool"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_question_history_student_profile_id_fkey"
+            columns: ["student_profile_id"]
+            isOneToOne: false
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_stage_progress: {
         Row: {
           attempts: number
@@ -1751,6 +1940,9 @@ export type Database = {
       }
       tests: {
         Row: {
+          ai_difficulty: string | null
+          ai_question_count: number | null
+          ai_topics: Json | null
           allow_retake: boolean
           created_at: string
           description: Json
@@ -1760,6 +1952,7 @@ export type Database = {
           metadata: Json
           pass_threshold: number
           program_code: string | null
+          question_source: string
           questions: Json
           questions_per_attempt: number | null
           retake_mode: string
@@ -1769,6 +1962,9 @@ export type Database = {
           unit_id: string | null
         }
         Insert: {
+          ai_difficulty?: string | null
+          ai_question_count?: number | null
+          ai_topics?: Json | null
           allow_retake?: boolean
           created_at?: string
           description?: Json
@@ -1778,6 +1974,7 @@ export type Database = {
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
+          question_source?: string
           questions?: Json
           questions_per_attempt?: number | null
           retake_mode?: string
@@ -1787,6 +1984,9 @@ export type Database = {
           unit_id?: string | null
         }
         Update: {
+          ai_difficulty?: string | null
+          ai_question_count?: number | null
+          ai_topics?: Json | null
           allow_retake?: boolean
           created_at?: string
           description?: Json
@@ -1796,6 +1996,7 @@ export type Database = {
           metadata?: Json
           pass_threshold?: number
           program_code?: string | null
+          question_source?: string
           questions?: Json
           questions_per_attempt?: number | null
           retake_mode?: string
@@ -2011,15 +2212,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ai_question_analytics: {
+        Row: {
+          accuracy: number | null
+          difficulty: string | null
+          lesson_id: string | null
+          questions_in_pool: number | null
+          subject_id: string | null
+          topic: string | null
+          total_correct: number | null
+          total_incorrect: number | null
+          total_shown: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_question_pool_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_question_pool_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      _fetch_ai_pool_for: {
+        Args: {
+          _count: number
+          _difficulty: string
+          _lesson_id: string
+          _subject_id: string
+          _topics: Json
+        }
+        Returns: Json
+      }
       _maybe_random_subset: {
         Args: { _limit: number; _mode: string; _questions: Json }
         Returns: Json
       }
       _score_question: { Args: { _ans: Json; _q: Json }; Returns: boolean }
       _strip_answer_keys: { Args: { _questions: Json }; Returns: Json }
+      _strip_payload_answer: { Args: { _p: Json }; Returns: Json }
       can_access_student: { Args: { _student_id: string }; Returns: boolean }
       get_assignment_admin: { Args: { _assignment_id: string }; Returns: Json }
       get_assignment_for_student:
@@ -2028,6 +2268,18 @@ export type Database = {
             Args: { _assignment_id: string; _student_id?: string }
             Returns: Json
           }
+      get_practice_questions: {
+        Args: { _count?: number; _stage_id: string; _student_id: string }
+        Returns: Json
+      }
+      get_student_weak_topics: {
+        Args: {
+          _accuracy_threshold?: number
+          _student_id: string
+          _subject_id?: string
+        }
+        Returns: Json
+      }
       get_test_admin: { Args: { _test_id: string }; Returns: Json }
       get_test_for_student:
         | { Args: { _test_id: string }; Returns: Json }
@@ -2045,6 +2297,10 @@ export type Database = {
       }
       submit_assignment: {
         Args: { _answers: Json; _assignment_id: string; _student_id: string }
+        Returns: Json
+      }
+      submit_pool_answer: {
+        Args: { _answer: Json; _pool_id: string; _student_id: string }
         Returns: Json
       }
       submit_test_attempt: {
