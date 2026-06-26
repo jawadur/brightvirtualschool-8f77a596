@@ -32,6 +32,7 @@ import { ClipboardList } from "lucide-react";
 import { fetchActiveProgram, PROGRAMS } from "@/lib/program";
 import { fetchHierarchyProgress, pickContinueLesson } from "@/lib/progress-tracking";
 import { fetchStudentTeacherAssignments } from "@/lib/teacher-assignments";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -147,6 +148,8 @@ function TodaysSchool() {
       {activeStudent && <TodaysHomeworkWidget studentId={activeStudent.id} />}
 
       {activeStudent && <TeacherAssignedWidget studentId={activeStudent.id} />}
+
+      {activeStudent && <WeakAreaWidget studentId={activeStudent.id} />}
 
       {pct === 100 && totalSubjects > 0 && <DailySummary enriched={enriched} tr={tr} />}
 
