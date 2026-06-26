@@ -204,9 +204,14 @@ export type Database = {
       }
       assignments: {
         Row: {
+          ai_adaptive: boolean
+          ai_auto_topup: boolean
           ai_difficulty: string | null
           ai_question_count: number | null
+          ai_randomize: boolean
+          ai_show_explanation: boolean
           ai_topics: Json | null
+          ai_weak_area_practice: boolean
           allow_retake: boolean
           created_at: string
           due_in_days: number | null
@@ -225,9 +230,14 @@ export type Database = {
           title: Json
         }
         Insert: {
+          ai_adaptive?: boolean
+          ai_auto_topup?: boolean
           ai_difficulty?: string | null
           ai_question_count?: number | null
+          ai_randomize?: boolean
+          ai_show_explanation?: boolean
           ai_topics?: Json | null
+          ai_weak_area_practice?: boolean
           allow_retake?: boolean
           created_at?: string
           due_in_days?: number | null
@@ -246,9 +256,14 @@ export type Database = {
           title: Json
         }
         Update: {
+          ai_adaptive?: boolean
+          ai_auto_topup?: boolean
           ai_difficulty?: string | null
           ai_question_count?: number | null
+          ai_randomize?: boolean
+          ai_show_explanation?: boolean
           ai_topics?: Json | null
+          ai_weak_area_practice?: boolean
           allow_retake?: boolean
           created_at?: string
           due_in_days?: number | null
@@ -691,6 +706,7 @@ export type Database = {
       lesson_stages: {
         Row: {
           ai_adaptive: boolean
+          ai_auto_topup: boolean
           ai_difficulty: string
           ai_question_count: number
           ai_randomize: boolean
@@ -721,6 +737,7 @@ export type Database = {
         }
         Insert: {
           ai_adaptive?: boolean
+          ai_auto_topup?: boolean
           ai_difficulty?: string
           ai_question_count?: number
           ai_randomize?: boolean
@@ -751,6 +768,7 @@ export type Database = {
         }
         Update: {
           ai_adaptive?: boolean
+          ai_auto_topup?: boolean
           ai_difficulty?: string
           ai_question_count?: number
           ai_randomize?: boolean
@@ -1940,9 +1958,14 @@ export type Database = {
       }
       tests: {
         Row: {
+          ai_adaptive: boolean
+          ai_auto_topup: boolean
           ai_difficulty: string | null
           ai_question_count: number | null
+          ai_randomize: boolean
+          ai_show_explanation: boolean
           ai_topics: Json | null
+          ai_weak_area_practice: boolean
           allow_retake: boolean
           created_at: string
           description: Json
@@ -1962,9 +1985,14 @@ export type Database = {
           unit_id: string | null
         }
         Insert: {
+          ai_adaptive?: boolean
+          ai_auto_topup?: boolean
           ai_difficulty?: string | null
           ai_question_count?: number | null
+          ai_randomize?: boolean
+          ai_show_explanation?: boolean
           ai_topics?: Json | null
+          ai_weak_area_practice?: boolean
           allow_retake?: boolean
           created_at?: string
           description?: Json
@@ -1984,9 +2012,14 @@ export type Database = {
           unit_id?: string | null
         }
         Update: {
+          ai_adaptive?: boolean
+          ai_auto_topup?: boolean
           ai_difficulty?: string | null
           ai_question_count?: number | null
+          ai_randomize?: boolean
+          ai_show_explanation?: boolean
           ai_topics?: Json | null
+          ai_weak_area_practice?: boolean
           allow_retake?: boolean
           created_at?: string
           description?: Json
@@ -2268,6 +2301,10 @@ export type Database = {
             Args: { _assignment_id: string; _student_id?: string }
             Returns: Json
           }
+      get_low_pool_topics: {
+        Args: { _subject_id: string; _threshold?: number }
+        Returns: Json
+      }
       get_practice_questions: {
         Args: { _count?: number; _stage_id: string; _student_id: string }
         Returns: Json
@@ -2284,6 +2321,10 @@ export type Database = {
       get_test_for_student:
         | { Args: { _test_id: string }; Returns: Json }
         | { Args: { _student_id?: string; _test_id: string }; Returns: Json }
+      get_weak_practice_questions: {
+        Args: { _count?: number; _student_id: string; _subject_id?: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
