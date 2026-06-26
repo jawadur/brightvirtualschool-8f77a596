@@ -608,7 +608,3 @@ function WeakAreaWidget({ studentId }: { studentId: string }) {
     </section>
   );
 }
-
-function _trailing() {
-  return null;
-}
