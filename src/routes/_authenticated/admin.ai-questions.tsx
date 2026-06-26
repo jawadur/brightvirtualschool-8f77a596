@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Trash2 } from "lucide-react";
+import { Sparkles, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { generateAiQuestions } from "@/lib/ai-question-bank.functions";
@@ -85,6 +85,19 @@ function AdminAiQuestions() {
     enabled: !!subjectId,
   });
 
+  const lowPool = useQuery({
+    queryKey: ["aiqb-low-pool", subjectId],
+    enabled: !!subjectId,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_low_pool_topics", {
+        _subject_id: subjectId,
+        _threshold: 5,
+      } as any);
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+
   const subj = (subjects.data ?? []).find((s: any) => s.id === subjectId);
 
   const runGenerate = async () => {
@@ -111,6 +124,35 @@ function AdminAiQuestions() {
       qc.invalidateQueries({ queryKey: ["aiqb-analytics"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Generation failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const topUp = async (t: string, diff: string) => {
+    if (!subjectId) return;
+    setBusy(true);
+    try {
+      const res = await generate({
+        data: {
+          subject_id: subjectId,
+          lesson_id: lessonId || undefined,
+          class_id: (subj as any)?.class_id ?? undefined,
+          topic: t,
+          subject_name: typeof subj?.name === "object" ? tr(subj?.name as any) : String(subj?.code ?? "Subject"),
+          class_label: (subj as any)?.classes?.label ? tr((subj as any).classes.label) : (subj as any)?.classes?.code,
+          difficulty: diff as any,
+          language,
+          count: 10,
+          types: ["multiple_choice", "fill_blank"],
+        },
+      });
+      toast.success(`Top-up: +${res.inserted} for ${t} (${diff})`);
+      qc.invalidateQueries({ queryKey: ["aiqb-pool"] });
+      qc.invalidateQueries({ queryKey: ["aiqb-low-pool"] });
+      qc.invalidateQueries({ queryKey: ["aiqb-analytics"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Top-up failed");
     } finally {
       setBusy(false);
     }
@@ -208,6 +250,28 @@ function AdminAiQuestions() {
 
       {subjectId && (
         <>
+          {lowPool.data && lowPool.data.length > 0 && (
+            <Card className="p-4 border-2 border-destructive/40 bg-destructive/5">
+              <div className="flex items-center gap-2 font-extrabold text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+                Low question pool ({lowPool.data.length} topic/difficulty buckets &lt; 5)
+              </div>
+              <div className="mt-3 grid sm:grid-cols-2 gap-2">
+                {lowPool.data.map((r: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between rounded-xl border p-2 text-sm">
+                    <div className="min-w-0">
+                      <div className="font-bold truncate">{r.topic}</div>
+                      <div className="text-xs text-muted-foreground">{r.difficulty} · pool: {r.pool}</div>
+                    </div>
+                    <Button size="sm" variant="outline" disabled={busy} onClick={() => topUp(r.topic, r.difficulty)}>
+                      <Sparkles className="h-3 w-3 mr-1" />Generate +10
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
           <h2 className="text-lg font-extrabold mt-6">Pool ({pool.data?.length ?? 0})</h2>
           <div className="grid gap-2">
             {(pool.data ?? []).map((row: any) => (
