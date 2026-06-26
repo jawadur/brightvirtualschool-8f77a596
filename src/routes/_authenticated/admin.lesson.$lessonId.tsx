@@ -10,6 +10,7 @@ import { I18nField } from "@/components/admin/I18nField";
 import type { LessonStep } from "@/lib/data";
 import { ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown, Save } from "lucide-react";
 import { toast } from "sonner";
+import { AIConfigFields, DEFAULT_AI, aiFromRow, aiToRow, type AIConfig } from "@/components/admin/AIConfigFields";
 
 export const Route = createFileRoute("/_authenticated/admin/lesson/$lessonId")({
   component: LessonEditor,
@@ -248,6 +249,77 @@ function LessonEditor() {
           </Card>
         )}
       </div>
+
+      <LessonStagesAIPanel lessonId={lessonId} />
+    </div>
+  );
+}
+
+function LessonStagesAIPanel({ lessonId }: { lessonId: string }) {
+  const stagesQ = useQuery({
+    queryKey: ["admin-lesson-stages-ai", lessonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("lesson_stages")
+        .select("id, stage_type, sort_order, title, question_source, ai_topics, ai_question_count, ai_difficulty, ai_randomize, ai_adaptive, ai_weak_area_practice, ai_show_explanation, ai_auto_topup")
+        .eq("lesson_id", lessonId)
+        .order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const [edits, setEdits] = useState<Record<string, AIConfig>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!stagesQ.data) return;
+    const next: Record<string, AIConfig> = {};
+    for (const s of stagesQ.data as any[]) next[s.id] = aiFromRow(s);
+    setEdits(next);
+  }, [stagesQ.data]);
+
+  const saveOne = async (stageId: string) => {
+    setSavingId(stageId);
+    try {
+      const cfg = edits[stageId];
+      const { error } = await supabase.from("lesson_stages").update(aiToRow(cfg) as any).eq("id", stageId);
+      if (error) throw error;
+      toast.success("Stage AI settings saved");
+      stagesQ.refetch();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const stages = (stagesQ.data ?? []) as any[];
+  if (stages.length === 0) return null;
+
+  return (
+    <div className="space-y-3 pt-4 border-t">
+      <h2 className="font-extrabold text-lg">Stage AI settings ({stages.length})</h2>
+      <p className="text-xs text-muted-foreground">Configure AI question source per stage (practice, homework, test, etc.).</p>
+      {stages.map((s) => {
+        const cfg = edits[s.id] ?? DEFAULT_AI;
+        return (
+          <Card key={s.id} className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase text-muted-foreground">
+                #{s.sort_order} · {s.stage_type}
+              </span>
+              <span className="text-sm font-bold truncate">
+                {typeof s.title === "object" ? (s.title?.en ?? "") : (s.title ?? "")}
+              </span>
+              <div className="flex-1" />
+              <Button size="sm" onClick={() => saveOne(s.id)} disabled={savingId === s.id}>
+                <Save className="h-4 w-4 mr-1" />{savingId === s.id ? "Saving…" : "Save"}
+              </Button>
+            </div>
+            <AIConfigFields value={cfg} onChange={(next) => setEdits({ ...edits, [s.id]: next })} compact />
+          </Card>
+        );
+      })}
     </div>
   );
 }

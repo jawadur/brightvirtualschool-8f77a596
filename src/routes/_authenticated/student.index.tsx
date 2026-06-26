@@ -32,6 +32,7 @@ import { ClipboardList } from "lucide-react";
 import { fetchActiveProgram, PROGRAMS } from "@/lib/program";
 import { fetchHierarchyProgress, pickContinueLesson } from "@/lib/progress-tracking";
 import { fetchStudentTeacherAssignments } from "@/lib/teacher-assignments";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/student/")({
   component: TodaysSchool,
@@ -147,6 +148,8 @@ function TodaysSchool() {
       {activeStudent && <TodaysHomeworkWidget studentId={activeStudent.id} />}
 
       {activeStudent && <TeacherAssignedWidget studentId={activeStudent.id} />}
+
+      {activeStudent && <WeakAreaWidget studentId={activeStudent.id} />}
 
       {pct === 100 && totalSubjects > 0 && <DailySummary enriched={enriched} tr={tr} />}
 
@@ -565,6 +568,42 @@ function TeacherAssignedWidget({ studentId }: { studentId: string }) {
         {pending.length > 6 && (
           <div className="text-xs text-muted-foreground text-center pt-1">+{pending.length - 6} more</div>
         )}
+      </Card>
+    </section>
+  );
+}
+
+function WeakAreaWidget({ studentId }: { studentId: string }) {
+  const { data: weak = [] } = useQuery({
+    queryKey: ["weak-topics", studentId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_student_weak_topics", {
+        _student_id: studentId,
+      } as any);
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+  if (!weak || weak.length === 0) return null;
+  return (
+    <section>
+      <Card className="p-5 bg-gradient-to-r from-destructive/10 to-accent">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-destructive/15 flex items-center justify-center">
+            <Sparkles className="h-6 w-6 text-destructive" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-bold uppercase text-destructive">Practice Recommended</div>
+            <div className="font-extrabold">Weak Topics — {weak.length} to brush up</div>
+            <div className="text-xs text-muted-foreground truncate">
+              {weak.slice(0, 3).map((w: any) => w.topic).join(" · ")}
+              {weak.length > 3 ? "…" : ""}
+            </div>
+          </div>
+          <Link to="/student/practice/$stageId" params={{ stageId: "weak" }}>
+            <Button size="sm" className="rounded-2xl">Start</Button>
+          </Link>
+        </div>
       </Card>
     </section>
   );

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { QuestionEditor, QUESTION_TYPES, emptyQuestion } from "@/components/admin/QuestionEditor";
 import { QuestionBankPicker } from "@/components/admin/QuestionBankPicker";
 import type { LearningQuestion } from "@/components/learning/QuestionRenderer";
+import { AIConfigFields, DEFAULT_AI, aiFromRow, aiToRow, type AIConfig } from "@/components/admin/AIConfigFields";
 
 export const Route = createFileRoute("/_authenticated/admin/assignment/$assignmentId")({
   component: AssignmentEditor,
@@ -31,6 +32,7 @@ function AssignmentEditor() {
   const [maxAttempts, setMaxAttempts] = useState<number | "">(1);
   const [questionsPerAttempt, setQuestionsPerAttempt] = useState<number | "">("");
   const [questions, setQuestions] = useState<LearningQuestion[]>([]);
+  const [aiCfg, setAiCfg] = useState<AIConfig>(DEFAULT_AI);
   const [saving, setSaving] = useState(false);
 
   const q = useQuery({
@@ -56,6 +58,7 @@ function AssignmentEditor() {
     setRetakeMode((d.retake_mode ?? "none") as any);
     setMaxAttempts(d.max_attempts ?? "");
     setQuestionsPerAttempt(d.questions_per_attempt ?? "");
+    setAiCfg(aiFromRow(d));
   }, [q.data]);
 
   const save = async () => {
@@ -70,6 +73,7 @@ function AssignmentEditor() {
         retake_mode: retakeMode,
         max_attempts: maxAttempts === "" ? null : Number(maxAttempts),
         questions_per_attempt: questionsPerAttempt === "" ? null : Number(questionsPerAttempt),
+        ...aiToRow(aiCfg),
       }).eq("id", assignmentId);
       if (error) throw error;
       toast.success("Assignment saved");
@@ -136,6 +140,10 @@ function AssignmentEditor() {
               onChange={(e)=>setQuestionsPerAttempt(e.target.value===""?"":Number(e.target.value))} />
           </div>
         </div>
+      </Card>
+
+      <Card className="p-4">
+        <AIConfigFields value={aiCfg} onChange={setAiCfg} />
       </Card>
 
       <div className="flex items-center justify-between flex-wrap gap-2">
