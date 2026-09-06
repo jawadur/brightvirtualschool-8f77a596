@@ -125,7 +125,7 @@ function ReadinessPage() {
                   <div className="font-bold truncate">{tr(w.lesson_title)}</div>
                 </div>
                 {w.score != null && <Badge variant="destructive">{w.score}%</Badge>}
-                <Link to="/student/classroom/$lessonId" params={{ lessonId: w.lesson_id }}>
+                <Link to="/student/classroom/$lessonId" params={{ lessonId: w.lesson_id }} search={{}}>
                   <Button size="sm" variant="outline" className="gap-1">Revise <ArrowRight className="h-3 w-3" /></Button>
                 </Link>
               </Card>
@@ -150,7 +150,7 @@ function ReadinessPage() {
                     {tr(p.subject_name)} • {p.minutesPerDay} mins/day for {p.days} days
                   </div>
                 </div>
-                <Link to="/student/classroom/$lessonId" params={{ lessonId: p.lesson_id }}>
+                <Link to="/student/classroom/$lessonId" params={{ lessonId: p.lesson_id }} search={{}}>
                   <Button size="sm">Start</Button>
                 </Link>
               </Card>

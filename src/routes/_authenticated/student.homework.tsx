@@ -96,7 +96,7 @@ function HomeworkPage() {
                     <Badge variant="secondary" className="rounded-full">Lesson Homework</Badge>
                   </div>
                 </div>
-                <Link to="/student/classroom/$lessonId" params={{ lessonId: r.lesson_id }}>
+                <Link to="/student/classroom/$lessonId" params={{ lessonId: r.lesson_id }} search={{}}>
                   <Button size="sm" className="rounded-2xl">Start Homework <ArrowRight className="ml-1 h-4 w-4" /></Button>
                 </Link>
               </Card>

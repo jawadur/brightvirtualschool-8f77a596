@@ -129,7 +129,7 @@ function ClassroomHub() {
                     </div>
                   </div>
                   {row.lesson ? (
-                    <Link to="/student/classroom/$lessonId" params={{ lessonId: row.lesson.id }}>
+                    <Link to="/student/classroom/$lessonId" params={{ lessonId: row.lesson.id }} search={{}}>
                       <Button size="sm" className="rounded-2xl gap-1"><PlayCircle className="h-4 w-4" /> Enter Class</Button>
                     </Link>
                   ) : (
