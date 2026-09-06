@@ -64,7 +64,7 @@ function RevisionCenter() {
                   <div className="font-bold truncate">{tr(m.lesson_title)}</div>
                 </div>
                 <Badge variant="secondary">{m.mastery}%</Badge>
-                <Link to="/student/classroom/$lessonId" params={{ lessonId: m.lesson_id }}>
+                <Link to="/student/classroom/$lessonId" params={{ lessonId: m.lesson_id }} search={{}}>
                   <Button size="sm" variant="outline" className="gap-1">Revise <ArrowRight className="h-3 w-3" /></Button>
                 </Link>
               </Card>
@@ -80,7 +80,7 @@ function RevisionCenter() {
         ) : (
           <div className="flex flex-wrap gap-2">
             {weakConcepts.map((w) => (
-              <Link key={w.lesson_id} to="/student/classroom/$lessonId" params={{ lessonId: w.lesson_id }}>
+              <Link key={w.lesson_id} to="/student/classroom/$lessonId" params={{ lessonId: w.lesson_id }} search={{}}>
                 <Badge variant="destructive" className="cursor-pointer">{tr(w.lesson_title)}</Badge>
               </Link>
             ))}
@@ -100,7 +100,7 @@ function RevisionCenter() {
                   <div className="font-bold truncate">{tr(p.lesson_title)}</div>
                   <div className="text-xs text-muted-foreground">{tr(p.subject_name)} • {p.minutesPerDay} mins × {p.days} days</div>
                 </div>
-                <Link to="/student/classroom/$lessonId" params={{ lessonId: p.lesson_id }}>
+                <Link to="/student/classroom/$lessonId" params={{ lessonId: p.lesson_id }} search={{}}>
                   <Button size="sm">Start</Button>
                 </Link>
               </Card>

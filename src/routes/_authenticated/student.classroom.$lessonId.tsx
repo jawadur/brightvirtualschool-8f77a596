@@ -115,7 +115,7 @@ function ClassroomPage() {
               variant="default"
               onClick={() => {
                 setDone(false);
-                navigate({ to: "/student/classroom/$lessonId", params: { lessonId: nextLessonQ.data!.id } });
+                navigate({ to: "/student/classroom/$lessonId", params: { lessonId: nextLessonQ.data!.id }, search: {} });
               }}
               className="gap-1"
             >
