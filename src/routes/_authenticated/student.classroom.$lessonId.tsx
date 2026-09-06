@@ -12,11 +12,12 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/student/classroom/$lessonId")({
   component: ClassroomPage,
-  validateSearch: (s: Record<string, unknown>) => ({
-    stage: typeof s.stage === "string" && (STAGE_ORDER as readonly string[]).includes(s.stage)
+  validateSearch: (s: Record<string, unknown>) => {
+    const stage = typeof s.stage === "string" && (STAGE_ORDER as readonly string[]).includes(s.stage)
       ? (s.stage as StageType)
-      : undefined,
-  }),
+      : undefined;
+    return stage ? { stage } : {};
+  },
   errorComponent: ({ error }) => (
     <Card className="p-6 max-w-lg mx-auto text-center">
       <h1 className="text-xl font-extrabold">Couldn't open this lesson</h1>
